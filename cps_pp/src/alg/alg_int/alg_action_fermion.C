@@ -180,7 +180,7 @@ void AlgActionFermion::heatbath() {
     LatticeFactory::Destroy();
 
     evolved = 0;
-    traj++;
+//    traj++;
   }
 
 }

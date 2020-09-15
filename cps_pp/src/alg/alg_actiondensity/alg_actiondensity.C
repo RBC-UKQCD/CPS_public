@@ -4,6 +4,7 @@
 #include <util/gjp.h>
 #include <util/site.h>
 #include <util/qcdio.h>
+#include <util/link_buffer.h>
 #include <comms/glb.h>
 #include <comms/scu.h>
 #include <omp.h>
@@ -22,19 +23,22 @@ void AlgActionDensity::ZeroReal(Matrix& m)
 
   //Replacing above with below gives a factor of 2 speedup for the entire smartrun:
   for(int i = 0; i < 3; i++) {
-    m(i, i).real(0);
+    Rcomplex & elem = m(i, i);
+    elem = Rcomplex(0.0,elem.imag());
   }
 
   for(int x = 0; x < 2; x++) {
     for(int y = x+1; y < 3; y++) {
-      Float a = m(x, y).real();
-      Float b = m(x, y).imag();
-      Float c = m(y, x).real();
-      Float d = m(y, x).imag();
-      m(x, y).real(0.5 * (a - c));
-      m(x, y).imag(0.5 * (b + d));
-      m(y, x).real(0.5 * (c - a));
-      m(y, x).imag(0.5 * (b + d));
+      Rcomplex & mxy = m(x, y);
+      Rcomplex & myx = m(y, x);
+
+      Float a = mxy.real();
+      Float b = mxy.imag();
+      Float c = myx.real();
+      Float d = myx.imag();
+   
+      mxy = Rcomplex( 0.5 * (a - c), 0.5 * (b + d) );
+      myx = Rcomplex( 0.5 * (c - a), 0.5 * (b + d) );
     }
   }
 }
@@ -111,7 +115,7 @@ void AlgActionDensity::CloverLeaf(Lattice& lattice, Matrix& pl,  int* pos, int m
 }
 
 
-void AlgActionDensity::run()
+void AlgActionDensity::run(Float *result)
 {
   Lattice& lattice( AlgLattice() );  
 
@@ -158,6 +162,8 @@ void AlgActionDensity::run()
   glb_sum(&action);
   
   Float action_density = action / GJP.VolSites();
+  
+  if(result!=NULL) *result = action_density;
 
   // Print out results
   //----------------------------------------------------------------
@@ -308,12 +314,18 @@ void AlgActionDensity::CloverLeaf(Matrix& pl, int* pos, int mu, int nu,
 // volume and pass on the data to the next neighbor
 // Local size  >= 2 & Slab = 3
 // Twice as large on each dimension will suffice.
-void AlgActionDensity::smartrun()
+void AlgActionDensity::smartrun(Float* result)
 {
   const char fname[] = "smartrun()";
   Lattice& lat( AlgLattice() );  
 
   const int Slab = 1; //Expansion in each direction
+
+  if(GJP.Gparity() && Slab!=1){ //In this case the local field is doubled up and I'm not sure my G-parity changes will work
+    if(!UniqueID()) printf("AlgActionDensity::smartrun(Float* result) : Code not implemented to deal with surface slab sizes > 1\n");
+    exit(-1);
+  }
+
   const int MatrixSize = 2 * lat.Colors() * lat.Colors();
   const int GsiteSize = 4 * MatrixSize;
   int l_node_sites[4] = {
@@ -345,9 +357,12 @@ void AlgActionDensity::smartrun()
       continue;
 
     flag[k] = 1;
+
     Float * afield = (Float*) smalloc(cname, fname, "afield", GsiteSize * vol_node_sites * sizeof(Float));
 
     getPlusData(afield, lfield, GsiteSize * vol_node_sites, k);
+
+    if(GJP.Bc(k) == BND_CND_GPARITY && GJP.NodeCoor(k) == GJP.Nodes(k)-1) for(int f=1;f<GsiteSize * vol_node_sites;f+=2) afield[f]*=-1; //complex conjugate links received from over G-parity boundary
 
     Float * bfield = lfield;
     lfield = (Float*) smalloc(cname, fname, "lfield", 2 * GsiteSize * vol_node_sites * sizeof(Float));
@@ -482,9 +497,14 @@ void AlgActionDensity::smartrun()
 
     // ------------------------------------------------------------------
     // ------------------------------------------------------------------
+    if(GJP.Bc(i) == BND_CND_GPARITY && GJP.NodeCoor(i) == 0) for(int f=1;f<GsiteSize * SurfSize;f+=2) surf0[f]*=-1;
+
     if(flag[i])
     {
       getPlusData(surfx, surf0, GsiteSize * SurfSize, i);
+
+      if(GJP.Bc(i) == BND_CND_GPARITY && GJP.NodeCoor(i) == 0) for(int f=1;f<GsiteSize * SurfSize;f+=2) surfx[f]*=-1;
+
       getPlusData(surf1, surfx, GsiteSize * SurfSize, i);
     }
     else
@@ -535,9 +555,14 @@ void AlgActionDensity::smartrun()
       ysta[i] = Slab;
     }
 
+    if(GJP.Bc(i) == BND_CND_GPARITY && GJP.NodeCoor(i) == GJP.Nodes(i)-1) for(int f=1;f<GsiteSize * SurfSize;f+=2) surf0[f]*=-1;
+
     if(flag[i])
-    {
+    {      
       getMinusData(surfx, surf0, GsiteSize * SurfSize, i);
+
+      if(GJP.Bc(i) == BND_CND_GPARITY && GJP.NodeCoor(i) == GJP.Nodes(i)-1) for(int f=1;f<GsiteSize * SurfSize;f+=2) surfx[f]*=-1;
+
       getMinusData(surf1, surfx, GsiteSize * SurfSize, i);
     }
     else
@@ -629,9 +654,14 @@ void AlgActionDensity::smartrun()
           }
       ysta[i] = Slab;
 
+      if(GJP.Bc(j) == BND_CND_GPARITY && GJP.NodeCoor(j) == 0) for(int f=1;f< 2*GsiteSize * SurfSize;f+=2) surf0[f]*=-1;
+
       if(flag[j])
       {
         getPlusData(surfx, surf0, 2 * GsiteSize * SurfSize, j);
+
+	if(GJP.Bc(j) == BND_CND_GPARITY && GJP.NodeCoor(j) == 0) for(int f=1;f< 2*GsiteSize * SurfSize;f+=2) surfx[f]*=-1;
+
         getPlusData(surf1, surfx, 2 * GsiteSize * SurfSize, j);
       }
       else
@@ -714,9 +744,14 @@ void AlgActionDensity::smartrun()
         ysta[j] = Slab;
       }
 
+      if(GJP.Bc(j) == BND_CND_GPARITY && GJP.NodeCoor(j) == GJP.Nodes(j)-1) for(int f=1;f< 2*GsiteSize * SurfSize;f+=2) surf0[f]*=-1;
+
       if(flag[j])
       {
         getMinusData(surfx, surf0, 2 * GsiteSize * SurfSize, j);
+
+	if(GJP.Bc(j) == BND_CND_GPARITY && GJP.NodeCoor(j) == GJP.Nodes(j)-1) for(int f=1;f< 2*GsiteSize * SurfSize;f+=2) surfx[f]*=-1;
+
         getMinusData(surf1, surfx, 2 * GsiteSize * SurfSize, j);
       }
       else
@@ -776,11 +811,11 @@ void AlgActionDensity::smartrun()
   yend[2] = ysta[2] + GJP.ZnodeSites();
   yend[3] = ysta[3] + GJP.TnodeSites();
 
-  Float tmp_action[64] = {0};
+  int nthread = GJP.SetNthreads();
+  Float tmp_action[nthread];  for(int i=0;i<nthread;i++) tmp_action[i]=0.0;
 
   Float timer = -dclock();
 
-  omp_set_num_threads(64);
 #pragma omp parallel for 
   for(int i = 0; i < GJP.VolNodeSites(); ++i)
   {
@@ -810,7 +845,7 @@ void AlgActionDensity::smartrun()
   }
 
   Float action = 0;
-  for(int i = 0; i < 64; ++i) {
+  for(int i = 0; i < nthread; ++i) {
     action += tmp_action[i];
   }
 
@@ -820,6 +855,8 @@ void AlgActionDensity::smartrun()
   sfree(cname, fname, "lfield", lfield);
 
   Float action_density = action / GJP.VolSites();
+
+  if(result!=NULL) *result = action_density;
 
   // Print out results
   //----------------------------------------------------------------

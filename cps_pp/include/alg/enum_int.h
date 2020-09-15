@@ -38,6 +38,13 @@ enum ChiralProj {
 typedef enum ChiralProj ChiralProj;
 extern struct vml_enum_map ChiralProj_map[];
 
+enum PrecType {
+	PREC_SINGLE = 0,
+	PREC_DOUBLE = 1,
+};
+typedef enum PrecType PrecType;
+extern struct vml_enum_map PrecType_map[];
+
 enum FclassType {
 	F_CLASS_NONE = 0,
 	F_CLASS_STAG = 1,
@@ -50,12 +57,17 @@ enum FclassType {
 	F_CLASS_WILSON_TM = 8,
 	F_CLASS_MDWF = 9,
 	F_CLASS_BFM = 10,
-	F_CLASS_BFM_TYPE2 = 11,
-	F_CLASS_MOBIUS = 12,
-	F_CLASS_DWF4D = 13,
-	F_CLASS_DWF4D_PAIR = 14,
-	F_CLASS_ZMOBIUS = 15,
-	F_CLASS_NAIVE = 16,
+	F_CLASS_MOBIUS = 11,
+	F_CLASS_DWF4D = 12,
+	F_CLASS_DWF4D_PAIR = 13,
+	F_CLASS_ZMOBIUS = 14,
+	F_CLASS_NAIVE = 15,
+	F_CLASS_GRID = 16,
+	F_CLASS_GRID_GPARITY_MOBIUS = 17,
+	F_CLASS_GRID_MOBIUS = 18,
+	F_CLASS_GRID_ZMOBIUS = 19,
+	F_CLASS_GRID_GPARITY_WILSON_TM = 20,
+	F_CLASS_GRID_WILSON_TM = 21,
 };
 typedef enum FclassType FclassType;
 extern struct vml_enum_map FclassType_map[];
@@ -81,6 +93,7 @@ enum StrOrdType {
 	DWF_5D_EOPREC = WILSON,
 	DWF_4D_EOPREC = 5,
 	DWF_4D_EOPREC_EE = 6,
+	S_INNER = 7,
 };
 typedef enum StrOrdType StrOrdType;
 extern struct vml_enum_map StrOrdType_map[];
@@ -146,6 +159,9 @@ extern struct vml_enum_map DagType_map[];
 enum BndCndType {
 	BND_CND_PRD = 0,
 	BND_CND_APRD = 1,
+	BND_CND_TWISTED = 2,
+	BND_CND_GPARITY = 3,
+	BND_CND_GPARITY_TWISTED = 4,
 };
 typedef enum BndCndType BndCndType;
 extern struct vml_enum_map BndCndType_map[];
@@ -612,6 +628,7 @@ enum IntegratorType {
 	INT_RATIONAL = 0 + 15,
 	INT_RATIONAL_SPLIT = 0 + 16,
 	INT_RATIONAL_QUOTIENT = 0 + 17,
+	INT_EOFA = 0 + 18,
 };
 typedef enum IntegratorType IntegratorType;
 extern struct vml_enum_map IntegratorType_map[];
@@ -694,6 +711,7 @@ enum InverterType {
 	LOWMODEAPPROX = 3,
 	CG_LOWMODE_DEFL = 4,
 	HDCG = 5,
+	FAKE = 6,
 };
 typedef enum InverterType InverterType;
 extern struct vml_enum_map InverterType_map[];
@@ -789,6 +807,7 @@ extern  bool_t vml_IFloat (VML *, char *instance, IFloat*);
 extern  bool_t vml_Pointer (VML *, char *instance, Pointer*);
 extern  bool_t vml_DirType (VML *, char *instance, DirType*);
 extern  bool_t vml_ChiralProj (VML *, char *instance, ChiralProj*);
+extern  bool_t vml_PrecType (VML *, char *instance, PrecType*);
 extern  bool_t vml_FclassType (VML *, char *instance, FclassType*);
 extern  bool_t vml_GclassType (VML *, char *instance, GclassType*);
 extern  bool_t vml_StrOrdType (VML *, char *instance, StrOrdType*);
@@ -851,6 +870,7 @@ extern  bool_t vml_IFloat (VML *, char *instance, IFloat*);
 extern  bool_t vml_Pointer (VML *, char *instance, Pointer*);
 extern  bool_t vml_DirType (VML *, char *instance, DirType*);
 extern  bool_t vml_ChiralProj (VML *, char *instance, ChiralProj*);
+extern  bool_t vml_PrecType (VML *, char *instance, PrecType*);
 extern  bool_t vml_FclassType (VML *, char *instance, FclassType*);
 extern  bool_t vml_GclassType (VML *, char *instance, GclassType*);
 extern  bool_t vml_StrOrdType (VML *, char *instance, StrOrdType*);

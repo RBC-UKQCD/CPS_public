@@ -182,9 +182,6 @@ AlgDens::~AlgDens() {
 //------------------------------------------------------------------
 void AlgDens::run()
 {
-#if TARGET==cpsMPI
-    using MPISCU::fprintf;
-#endif
   int iter=0;
   int ls;
   int ls_glb;

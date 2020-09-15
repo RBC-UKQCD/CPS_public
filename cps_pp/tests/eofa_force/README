@@ -1,0 +1,22 @@
+David Murphy (djm2131@columbia.edu)
+03/13/2019
+
+This program checks the implementation of the EOFA force terms.
+If we pick a random, small su(3)-valued perturbation dT, and
+perturb the gauge field U as
+	U' <-- exp(dT)*U
+then the change in the action is given, at first order in dT,
+by the pseudofermion force, i.e.
+	S(U') = S(U) + ReTr(dT*dS/dU) + O(dT^2).
+If the perturbation and lattice volume are both small one should
+see agreement between
+	S(U') - S(U),
+which we can compute directly from the Hamiltonian,
+and 
+	ReTr(dT*dS/dU)
+which is computed using the pseudofermion force routines.
+Numerically this is tricky since S(U) is an extensive quantity
+in which we are trying to compute a small change; this should
+work at least to a few digits of accuracy for appropriate (small)
+choices of the lattice volume (e.g. 16^3*32) and \delta parameter
+(e.g. 1.0e-06).

@@ -38,7 +38,7 @@ class AlgDens : public Alg
     DensArg *alg_dens_arg;
  
     // Node checkerboard size of the fermion field
-    int f_size;
+    size_t f_size;
     int map_table[100];
     int save_table[100];
     int load_table[100];

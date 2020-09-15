@@ -5,4 +5,6 @@ BGQ_DIR = qmp
 QCDOC_DIR = qcdoc
 QCDOC_SERIAL_DIR = qcdoc
 NOARCH_DIR = qmp
+NOARCH_BFM_DIR = qmp
+NOARCH_BFM_QMP_DIR = qmp
 include ../../../Makefile.rules

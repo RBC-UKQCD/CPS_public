@@ -113,8 +113,8 @@ void mobius_m5inv_dag0(Vector *inout,
 		       const Dwf *mobius_lib_arg)
 {
 
-  int x;
-  int s;
+//  int x;
+//  int s;
 
   // Initializations
   //------------------------------------------------------------------
@@ -123,11 +123,12 @@ void mobius_m5inv_dag0(Vector *inout,
   // const int s_node_coor = GJP.SnodeCoor();
   const int vol_4d_cb = mobius_lib_arg->vol_4d / 2;
   const int ls_stride = 24 * vol_4d_cb;
-  const int f_size = 24 * vol_4d_cb * ls;
+  const size_t f_size = 24 * vol_4d_cb * ls;
 
   const IFloat two_kappa = -mobius_lib_arg->mobius_kappa_b/mobius_lib_arg->mobius_kappa_c;
   const IFloat inv_two_kappa = 1.0 / two_kappa;
   const Float  inv_d_last = 1.0 / ( 1.0 + pow(two_kappa, ls)*mass); // 1.0 / d_{ls-1}
+  VRB.Debug("","mobius_m5inv_dag0()", "two_kappa=%g inv_d_last=%g\n",two_kappa,inv_d_last);
 
   Float fact;
 
@@ -142,7 +143,8 @@ void mobius_m5inv_dag0(Vector *inout,
   // s = 0
   //-------
   //#pragma ivdep
-  for(x=0; x<vol_4d_cb; x+=4) {
+#pragma omp parallel for
+  for(int x=0; x<vol_4d_cb; x+=4) {
     // downer part  fout[x,ls-1] *= d_last;
     VEC_TIMESEQU_FLOAT(f_out+ 12+24*(x+vol_4d_cb*(ls-1)), inv_d_last, 12);
     VEC_TIMESEQU_FLOAT(24+f_out+ 12+24*(x+vol_4d_cb*(ls-1)), inv_d_last, 12);
@@ -155,9 +157,10 @@ void mobius_m5inv_dag0(Vector *inout,
 
   // s = 1 ... ls - 2
   //-------------------
-  for(s=0; s<= ls-2 ;++s) {
+  for(int s=0; s<= ls-2 ;++s) {
     //#pragma ivdep
-    for(x=0; x<vol_4d_cb; x+=4) {
+#pragma omp parallel for
+    for(int x=0; x<vol_4d_cb; x+=4) {
       // upper part  fout[x,s+1] +=  two_kappa fout[x,s]
       AXPY(12, two_kappa, f_out + 24*(x+vol_4d_cb*s),f_out + 24*(x+vol_4d_cb*(s+1)));
       // downer part fout[x,ls-1] +=  fact * fout[x,s]
@@ -193,9 +196,10 @@ void mobius_m5inv_dag0(Vector *inout,
 
   // s = ls-2, ... ,  0
   //----------------------
-  for(s=ls-2; s >=0 ; --s){
+  for(int s=ls-2; s >=0 ; --s){
     //#pragma ivdep
-    for(x=0; x<vol_4d_cb; x+=4) {
+#pragma omp parallel for
+    for(int x=0; x<vol_4d_cb; x+=4) {
       // upper fout[x,s] += fact* fout[x,ls-1]
       AXPY(12, fact, f_out +24*(x+vol_4d_cb*(ls-1)), f_out + 24*(x+vol_4d_cb*s));
       // downer fout[x,s] += two_kappa fout[x,s+1]
@@ -225,7 +229,8 @@ void mobius_m5inv_dag0(Vector *inout,
   // s = ls - 1
   //-------------
 
-  for(x=0; x<vol_4d_cb; x+=4) {
+#pragma omp parallel for
+  for(int x=0; x<vol_4d_cb; x+=4) {
     // upper   fou[x,ls-1] *= inv_d_last 
     VEC_TIMESEQU_FLOAT(f_out+ 24*(x+vol_4d_cb*(ls-1)), inv_d_last, 12);
     VEC_TIMESEQU_FLOAT(24+f_out+ 24*(x+vol_4d_cb*(ls-1)), inv_d_last, 12);      
@@ -247,8 +252,8 @@ void mobius_m5inv_dag1(Vector *inout,
 		    const Dwf *mobius_lib_arg)
 {
 
-  int x;
-  int s;
+//  int x;
+//  int s;
 
 // Initializations
 //------------------------------------------------------------------
@@ -257,7 +262,7 @@ void mobius_m5inv_dag1(Vector *inout,
   // const int s_node_coor = GJP.SnodeCoor();
   const int vol_4d_cb = mobius_lib_arg->vol_4d / 2;
   const int ls_stride = 24 * vol_4d_cb;
-  const int f_size = 24 * vol_4d_cb * ls;
+  const size_t f_size = 24 * vol_4d_cb * ls;
 
   const IFloat two_kappa = -mobius_lib_arg->mobius_kappa_b/mobius_lib_arg->mobius_kappa_c;
   const IFloat inv_two_kappa = 1.0 / two_kappa;
@@ -274,7 +279,8 @@ void mobius_m5inv_dag1(Vector *inout,
 
   // s = 0
   //-------
-  for(x=0; x<vol_4d_cb; x+=4) {
+#pragma omp parallel for
+  for(int x=0; x<vol_4d_cb; x+=4) {
     // upper part  fout[x,ls-1] *= d_last;
     VEC_TIMESEQU_FLOAT(f_out+24*(x+vol_4d_cb*(ls-1)), inv_d_last, 12);
     VEC_TIMESEQU_FLOAT(24+f_out+24*(x+vol_4d_cb*(ls-1)), inv_d_last, 12);
@@ -288,8 +294,9 @@ void mobius_m5inv_dag1(Vector *inout,
 
   // s = 1 ... ls - 2
   //-------------------
-  for(s=0; s<= ls-2 ;++s) {
-    for(x=0; x<vol_4d_cb; x+=4) {
+  for(int s=0; s<= ls-2 ;++s) {
+#pragma omp parallel for
+    for(int x=0; x<vol_4d_cb; x+=4) {
       // upper part fout[x,ls-1] +=  fact * fout[x,s]
       AXPY(12, fact, f_out +24*(x+vol_4d_cb*s),f_out +24*(x+vol_4d_cb*(ls-1)));
       // downer part  fout[x,s+1] +=  two_kappa fout[x,s]
@@ -325,8 +332,9 @@ void mobius_m5inv_dag1(Vector *inout,
 
   // s = ls-2, ... ,  0
   //----------------------
-  for(s=ls-2; s >=0 ; --s){
-    for(x=0; x<vol_4d_cb; x+=4) {
+  for(int s=ls-2; s >=0 ; --s){
+#pragma omp parallel for
+    for(int x=0; x<vol_4d_cb; x+=4) {
       // upper fout[x,s] += two_kappa fout[x,s+1]
       AXPY(12, two_kappa, f_out+24*(x+vol_4d_cb*(s+1)),f_out +24*(x+vol_4d_cb*s));
       // downer fout[x,s] += fact* fout[x,ls-1]
@@ -354,7 +362,8 @@ void mobius_m5inv_dag1(Vector *inout,
 
   // s = ls - 1
   //-------------
-  for(x=0; x<vol_4d_cb; x+=4) {
+#pragma omp parallel for
+  for(int x=0; x<vol_4d_cb; x+=4) {
     // downer  fou[x,ls-1] *= inv_d_last 
     VEC_TIMESEQU_FLOAT(f_out+12+ 24*(x+vol_4d_cb*(ls-1)), inv_d_last, 12);
     VEC_TIMESEQU_FLOAT(24+f_out+12+ 24*(x+vol_4d_cb*(ls-1)), inv_d_last, 12);
@@ -394,7 +403,7 @@ void mobius_m5inv(Vector *out, Vector *in,
 		  Dwf *mobius_lib_arg)
 {
   const int vol_4d_cb = mobius_lib_arg->vol_4d / 2;
-  const int f_size = 24 * mobius_lib_arg->ls * vol_4d_cb;
+  const size_t f_size = 24 * mobius_lib_arg->ls * vol_4d_cb;
 
   moveFloat( (Float*)out, (Float*)in, f_size );
 

@@ -47,7 +47,7 @@ void zmobius_mdagm(Vector *out,
 // Calculate the dot product <out, in> = <M in, M in>
 //------------------------------------------------------------------
   if(dot_prd != 0){
-    int f_size = 24 * mobius_lib_arg->vol_4d * mobius_lib_arg->ls / 2;
+    size_t f_size = 24 * mobius_lib_arg->vol_4d * mobius_lib_arg->ls / 2;
     *dot_prd = frm_tmp1->NormSqNode(f_size);
     DiracOp::CGflops+=2*f_size;
   }
@@ -89,7 +89,7 @@ void zmobius_mdagm_shift(Vector *out,
 
   const int vol_4d_cb = mobius_lib_arg->vol_4d / 2;
   const int ls = mobius_lib_arg->ls;
-  const int f_size = vol_4d_cb * ls * 24;
+  const size_t f_size = vol_4d_cb * ls * 24;
   
 
   //  1. tmp1 <- M in
@@ -127,7 +127,7 @@ void zmobius_mdagm_shift(Vector *out,
   // Calculate the dot product <out, in> 
   //------------------------------------------------------------------
   if(dot_prd != 0){
-    int f_size = 24 * mobius_lib_arg->vol_4d * mobius_lib_arg->ls / 2;
+    size_t f_size = 24 * mobius_lib_arg->vol_4d * mobius_lib_arg->ls / 2;
     *dot_prd = frm_tmp1->NormSqNode(f_size);
     DiracOp::CGflops+=2*f_size;
   }

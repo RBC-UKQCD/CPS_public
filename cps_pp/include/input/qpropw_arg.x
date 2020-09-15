@@ -28,7 +28,8 @@ enum RandomType {
   UONE   = 1, 
   ZTWO   = 2, 
   NORAND = 3,
-  TEST = 4 };
+  ZFOUR  = 4,
+  TEST = 5 };
 
 class QPropWArg {
 
@@ -44,6 +45,8 @@ class QPropWArg {
   int z;
   int t;
 
+  //!CK:08/11 G-parity
+  int flavor; 
 
   //! Gauge Fixing flags
   int gauge_fix_src;

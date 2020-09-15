@@ -69,9 +69,6 @@ static void write_to_file(const Float *data_p, FILE *fp,
 			  HadronType type, BndCndType bc)
 {
 
-#if TARGET==cpsMPI
-    using MPISCU::fprintf;
-#endif
 
   // printf("write_to_file: no_of_momenta = %d \n",mom);
   int unit;

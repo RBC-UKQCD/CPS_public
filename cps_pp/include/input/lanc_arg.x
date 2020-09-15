@@ -37,6 +37,9 @@ class LancArg {
 
     //memfun LancArg();
     //memfun ~LancArg();
+
+  rpccommand GENERATE_DEEPCOPY_METHOD;
+  rpccommand GENERATE_PRINT_METHOD;
 };
 
 

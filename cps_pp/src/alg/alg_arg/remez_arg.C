@@ -108,4 +108,43 @@ vml_RationalQuotientRemezArg (VML *vmls, char *name,RationalQuotientRemezArg *ob
 	 vml_class_end(vmls,"RationalQuotientRemezArg",name);
 	return TRUE;
 }
+
+bool EOFARemezArg::Encode(char* filename, char* instance)
+{
+  VML vmls;
+  if(!vmls.Create(filename, VML_ENCODE)){ return false; }
+  if(!Vml(&vmls, instance)){ return false; }
+  vmls.Destroy();
+  return true;
+}
+
+bool EOFARemezArg::Decode(char* filename, char* instance)
+{
+  VML vmls;
+  if(!vmls.Create(filename, VML_DECODE)){ return false; }
+  if(!Vml(&vmls, instance)){ return false; }
+  vmls.Destroy();
+  return true;
+}
+
+bool EOFARemezArg::Vml(VML* vmls, char* instance)
+{
+  if(!vml_EOFARemezArg(vmls, instance, this)){ return false; }
+  return true;
+}
+
+bool_t
+vml_EOFARemezArg(VML* vmls, char* name, EOFARemezArg* objp)
+{
+  vml_class_begin(vmls, "EOFARemezArg", name);
+  if(!vml_array(vmls, "LH", reinterpret_cast<char**>(&objp->LH.LH_val), 
+        static_cast<u_int*>(&objp->LH.LH_len), ~0, sizeof(RemezArg), 
+        reinterpret_cast<vmlproc_t>(vml_RemezArg))){ return FALSE; }
+  if(!vml_array(vmls, "RH", reinterpret_cast<char**>(&objp->RH.RH_val), 
+        static_cast<u_int*>(&objp->RH.RH_len), ~0, sizeof(RemezArg), 
+        reinterpret_cast<vmlproc_t>(vml_RemezArg))){ return FALSE; }
+  vml_class_end(vmls, "EOFARemezArg", name);
+  return TRUE;
+}
+
 CPS_END_NAMESPACE

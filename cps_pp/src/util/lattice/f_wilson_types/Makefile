@@ -5,4 +5,6 @@ BGQ_DIR = noarch
 NORECURSE_DIR = qcdoc_cpp qcdoc qcdsp noarch mpi CVS 
 QCDOC_DIR = qcdoc
 NOARCH_DIR = noarch
+NOARCH_BFM_DIR = noarch
+NOARCH_BFM_QMP_DIR = noarch
 include ../../../../Makefile.rules

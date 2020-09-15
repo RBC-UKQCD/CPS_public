@@ -118,12 +118,15 @@ void AlgLanczos::run(int init_flag, int ncompress, char* comp_file ){
   if (nt>nk)
   ERR.General(cname,fname,"nk(%d) cannot be smaller than nt(%d)\n",nk,nt);
   int m = nk+np;
-  int f_size = GJP.VolNodeSites() * lat.FsiteSize() * Ncb / 2;
+  size_t f_size = GJP.VolNodeSites() * lat.FsiteSize() * Ncb / 2;
 
   lambda = ecache->eval_address();
   // eigenvectors are stored in cache. Pass along addresses.
   eigenv = (Vector**)smalloc(m*sizeof(Vector*));
-  for(int i=0;i<m;++i) eigenv[i] = ecache->vec_ptr(i);
+  for(int i=0;i<m;++i){
+	 eigenv[i] = ecache->vec_ptr(i);
+	VRB.Result (cname, fname, "eigenv[%d]=%p\n", i, eigenv[i]);
+  }
 
 
   if(!(  (lanczos_arg -> RitzMat_lanczos == MATPCDAG_MATPC 
@@ -153,7 +156,7 @@ void AlgLanczos::run(int init_flag, int ncompress, char* comp_file ){
     // set the initial vector 
     int nodes = GJP.Nodes(0)*GJP.Nodes(1)*GJP.Nodes(2)*GJP.Nodes(3)*GJP.Nodes(4);
     for(int n=0;n<f_size;n+=2){
-      *((float*)(eigenv[0])+n) = (float)(sqrt(2.0)/sqrt((float)nodes)/sqrt((float)f_size));
+      *((float*)(eigenv[0])+n) = (float)(std::sqrt(2.0)/std::sqrt((float)nodes)/std::sqrt((float)f_size));
       *((float*)(eigenv[0])+1+n) = 0.0;
     }
 #if 0
@@ -172,7 +175,7 @@ void AlgLanczos::run(int init_flag, int ncompress, char* comp_file ){
       ERR.NotImplemented(cname,fname,"This  init_flag is not supported yet\n");
       Lattice& lattice= lat;
       const int n_fields =  GJP.SnodeSites();  //   *nk ; 
-      const int f_size_per_site = lattice.FsiteSize() / GJP.SnodeSites()  / (lattice.FchkbEvl()+1);
+      const size_t f_size_per_site = lattice.FsiteSize() / GJP.SnodeSites()  / (lattice.FchkbEvl()+1);
       
 #if 1
       int neig= 20;
@@ -188,7 +191,7 @@ void AlgLanczos::run(int init_flag, int ncompress, char* comp_file ){
 
       int step_eig= (neig - 1)/(ncompress-1);
       
-      int f_size = f_size_per_site * n_fields *GJP.VolNodeSites();
+      size_t f_size = f_size_per_site * n_fields *GJP.VolNodeSites();
       Vector* sol = eigenv[0];
 
       Float* eig1 = (Float*) smalloc(cname,fname,"eig1",
@@ -231,6 +234,10 @@ void AlgLanczos::run(int init_flag, int ncompress, char* comp_file ){
     iter = lat.FeigSolv(eigenv, lambda, lanczos_arg, CNV_FRM_YES);
   else if(Ncb==1)
     iter = lat.FeigSolv(eigenv, lambda, lanczos_arg, CNV_FRM_NO);
+  for(int i=0;i<m;++i){
+	 ecache->set_ptr(i,eigenv[i]);
+	VRB.Result (cname, fname, "eigenv[%d]=%p ecache %p\n", i, eigenv[i],ecache->vec_ptr(i));
+  }
  
   // Now Let's save them
 
@@ -241,21 +248,24 @@ void AlgLanczos::run(int init_flag, int ncompress, char* comp_file ){
   char* field_type_label = "n/a";
 
   const int n_fields =  GJP.SnodeSites();  //   *nk ; 
-  const int f_size_per_site = lat.FsiteSize() / GJP.SnodeSites()  * Ncb / 2 / 2; // 2nd two is for float!
+  const size_t f_size_per_site = lat.FsiteSize() / GJP.SnodeSites()  * Ncb / 2 / 2; // 2nd two is for float!
 
   // write to disk if desired, confirm save in cache
   char filename[1024];
-  snprintf(filename,1024, "%s.bc%d%d%d%d", alg_lanczos_arg->file, GJP.Bc(0),GJP.Bc(1),GJP.Bc(2),GJP.Bc(3));
+//  snprintf(filename,1024, "%s.bc%d%d%d%d", alg_lanczos_arg->file, GJP.Bc(0),GJP.Bc(1),GJP.Bc(2),GJP.Bc(3));
+  snprintf(filename,1024, "%s", alg_lanczos_arg->file);
   EigenContainer eigcon( lat, filename, nk, f_size_per_site, n_fields, ecache);
+//  if(lanczos_arg->save) {
+// I'm not sure why the eigenvectors are saved only when 'save' flag is on?
   eigcon. save_eval( lambda );
   ecache->eval_cached=1;
-
-  for(int iev=0; iev < nk; iev++)
+//  }
+  for(int iev=0; iev < nt; iev++)
     ecache->index[iev]=iev;
 
   int save_stride = GJP.SaveStride();
   if(lanczos_arg->save){
-    for(int iev=0; iev < nk; iev+= save_stride){
+    for(int iev=0; iev < nt; iev+= save_stride){
       // save in "nev" format
       eigcon.nev_save( iev, eigenv[iev], 
 		       field_type_label, ensemble_id, ensemble_label, seqNum );

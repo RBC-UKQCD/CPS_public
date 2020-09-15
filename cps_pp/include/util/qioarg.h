@@ -28,7 +28,7 @@ class QioArg {
   int coor[5];
   //  BndCndType  Xbc, Ybc, Zbc, Tbc;
   BndCndType bc[4];
-
+ 
  public:
   inline int Xnodes() const  { return nodes[0]; }
   inline int Ynodes() const  { return nodes[1]; }
@@ -68,7 +68,6 @@ class QioArg {
   Float * StartU1ConfLoadAddr;
 
   char FileName[256];
-//  string FileName;
   int ConcurIONumber;
 
   Float CheckPrecision;  // used in read
@@ -84,19 +83,22 @@ class QioArg {
 
 
  public:
-  inline int VolNodeSites() const 
-    { return node_sites[0] * node_sites[1] * node_sites[2] * node_sites[3]; }
-  inline int VolSites()     const 
-    { return nodes[0] * nodes[1] * nodes[2] * nodes[3] * VolNodeSites(); }
+  inline size_t VolNodeSites() const 
+    { return (size_t)node_sites[0] * node_sites[1] * node_sites[2] * node_sites[3]; }
+  inline size_t VolSites()     const 
+    { return (size_t)nodes[0] * nodes[1] * nodes[2] * nodes[3] * VolNodeSites(); }
 
  public:
-  QioArg(const char * file) {  
+  QioArg(const char * file){  
     init(file, 0, 0.01, FP_AUTOMATIC, INT_AUTOMATIC, 1); 
   }
-  QioArg(const char * file, int concur_io_number) {  
+  QioArg(const char * file, int concur_io_number){  
     init(file, concur_io_number, 0.01, FP_AUTOMATIC, INT_AUTOMATIC, 1); 
   }
-  QioArg(const char * file, const Float chkprec) {  
+  QioArg(const char * file, int concur_io_number, const INT_FORMAT dataintformat){  
+    init(file, concur_io_number, 0.01, FP_AUTOMATIC, dataintformat, 1); 
+  }
+  QioArg(const char * file, const Float chkprec){  
     // used in ReadLatticePar
     init(file, 0, chkprec, FP_AUTOMATIC, INT_AUTOMATIC, 1);
   }
@@ -106,7 +108,7 @@ class QioArg {
     init(file, 0, 0.01, dataformat, INT_AUTOMATIC, recon_row_3);
   }
   
-  QioArg(const char * file, const INT_FORMAT dataintformat) {
+  QioArg(const char * file, const INT_FORMAT dataintformat){
     // used in LatRngIO
     init(file, 0, 0.01, FP_AUTOMATIC, dataintformat, 1);
   }
@@ -125,6 +127,9 @@ class QioControl {
                                                  // caller 1 <finish IO>
   void buildNodesList(int * active_num, int * active_node_list, int this_active) const;
 
+  //Old version of G-parity code saved both U and U* fields, later version saved just U and reconstruct U*. Set this bool to false to load old configs.
+  //Defaults to true.
+  bool GparityReconstructUstarField;
  public:
   QioControl();
   virtual ~QioControl();
@@ -149,6 +154,8 @@ class QioControl {
 
   int syncError(int this_error) const;
 
+  inline void disableGparityReconstructUstarField(){ GparityReconstructUstarField = false; }
+  inline bool doGparityReconstructUstarField(){ return GparityReconstructUstarField; }
  private:
   int do_log;
   int logging;

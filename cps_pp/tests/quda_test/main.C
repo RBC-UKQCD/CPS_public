@@ -89,41 +89,9 @@ int main(int argc,char *argv[]){
     if ( !cg_arg.Decode(argv[4],"cg_arg") ) { printf("Bum cg_arg\n"); exit(-1);}
     
     Start(&argc,&argv);
-    //Layout the lattice on the machine (without regard to even-odd)
-    do_arg.x_nodes = SizeX(); 
-    do_arg.y_nodes = SizeY();
-    do_arg.z_nodes = SizeZ();
-    do_arg.t_nodes = SizeT();
-    do_arg.s_nodes = SizeS();
-    
-    do_arg.x_node_sites = do_arg.x_sites/do_arg.x_nodes; 
-    do_arg.y_node_sites = do_arg.y_sites/do_arg.y_nodes;
-    do_arg.z_node_sites = do_arg.z_sites/do_arg.z_nodes;
-    do_arg.t_node_sites = do_arg.t_sites/do_arg.t_nodes;
-    do_arg.s_node_sites = do_arg.s_sites/do_arg.s_nodes;
-    
-    if (do_arg.x_sites!=do_arg.x_node_sites*do_arg.x_nodes) 
-      {printf("Lattice does not fit\n");exit(-1);}
-    if (do_arg.y_sites!=do_arg.y_node_sites*do_arg.y_nodes) 
-      {printf("Lattice does not fit\n");exit(-1);}
-    if (do_arg.z_sites!=do_arg.z_node_sites*do_arg.z_nodes) 
-      {printf("Lattice does not fit\n");exit(-1);}
-    if (do_arg.t_sites!=do_arg.t_node_sites*do_arg.t_nodes) 
-      {printf("Lattice does not fit\n");exit(-1);}
-    if (do_arg.s_sites!=do_arg.s_node_sites*do_arg.s_nodes) 
-      {printf("Lattice does not fit\n");exit(-1);}
-    
-    
-    
+
     GJP.Initialize(do_arg);
     GJP.InitializeExt(do_ext);
-
-#if 0
-    VRB.Level(0);
-    VRB.ActivateLevel(VERBOSE_RESULT_LEVEL);
-
-    VRB.ActivateLevel(VERBOSE_FLOW_LEVEL);
-#endif
 
     GwilsonFdwf lat;
     int x[4] = {0, 0, 0, 0};
@@ -141,8 +109,8 @@ int main(int argc,char *argv[]){
     }
     int ls_glb = GJP.SnodeSites()*GJP.Snodes();
 
-    int f_size = GJP.VolNodeSites() * lat.FsiteSize()/GJP.SnodeSites();
-    int f_size_5d = GJP.SnodeSites() * f_size;
+    size_t f_size = GJP.VolNodeSites() * lat.FsiteSize()/GJP.SnodeSites();
+    size_t f_size_5d = GJP.SnodeSites() * f_size;
     
     Vector *X_out = (Vector*)smalloc(f_size_5d*sizeof(IFloat),"x_out",fname,cname);
     Vector *X_in = (Vector*)smalloc(f_size_5d*sizeof(IFloat),"X_in",fname,cname);
@@ -237,9 +205,8 @@ int main(int argc,char *argv[]){
 
       printf("MDWF operator is allocated: b_5:%e\t c_5:%e\n",GJP.Mobius_b(),GJP.Mobius_c());
       int iter = dirac.MatInv(X_out,X_in, &cg_arg.stop_rsd , PRESERVE_YES);
-    }
 #if 0
-    dirac.Mat(X_out, X_in);
+//    dirac.Mat(X_out, X_in);
     dirac.Mat(X_tmp, X_out);
 
     lat.Convert(CANONICAL, X_out, X_in);
@@ -249,7 +216,7 @@ int main(int argc,char *argv[]){
 //    {
 //      printf("Out[%d] = %e + j %e\n",k,output[2*k]*kappa_b,output[2*k+1]*kappa_b);
 //    }
-    for(int k = 0 ; k < f_size_5d/2 ; k++)
+    for(size_t k = 0 ; k < f_size_5d/2 ; k++)
     {
       if((fabs(input[2*k] - recal[2*k])>1e-8) || (fabs(input[2*k+1] - recal[2*k+1])>1e-8))
       {
@@ -259,6 +226,7 @@ int main(int argc,char *argv[]){
     }
 //    lat.Convert(CANONICAL, X_out, X_in);
 #endif
+    }
 
     if(X_in != NULL)
     {

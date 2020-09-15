@@ -44,6 +44,11 @@ public:
 	Float reliable_delta;
 	int max_restart;
 	int device;
+	int maxiter_precondition;
+	int Ls_cheap;
+	bool_t perform_mspcg_madwf_ml_training;
+	bool_t use_mspcg_madwf_ml_training;
+	Float mu;
 	   QudaArg (  ) ;
 };
 

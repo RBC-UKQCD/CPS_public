@@ -1,0 +1,7 @@
+class IntABArg ab2_arg = {
+IntegratorType type = INT_OMELYAN
+int A_steps = 10
+int B_steps = 1
+IntegratorLevel level = TOP_LEVEL_INTEGRATOR
+double lambda =   0.1931833275037836
+}

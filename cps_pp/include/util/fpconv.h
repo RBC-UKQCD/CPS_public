@@ -84,6 +84,8 @@ class FPConv : public DataConversion
 
   enum FP_FORMAT  setFileFormat(const char * desc);
   enum FP_FORMAT  setFileFormat(const enum FP_FORMAT dataFormat);
+  enum FP_FORMAT  setHostFormat(const enum FP_FORMAT dataFormat);
+  
   unsigned int checksum(char * data, const int data_len, 
 			const enum FP_FORMAT dataFormat) const;
 

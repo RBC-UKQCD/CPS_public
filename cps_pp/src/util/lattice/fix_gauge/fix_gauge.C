@@ -1,8 +1,5 @@
 #include<config.h>
 CPS_START_NAMESPACE
-/*!\file
-  $Id: fix_gauge.C,v 1.9 2011-03-06 03:13:12 chulwoo Exp $
-*/
 
 /*--------------------------------------------------------------------
  * File fix_gauge.C. Version 14.5. Last modified on 98/11/25 at 19:50:37.
@@ -21,20 +18,12 @@ CPS_END_NAMESPACE
 #include <comms/scu.h>
 #include <comms/glb.h>
 #include <util/omp_wrapper.h>
-CPS_START_NAMESPACE
-
-#ifdef _TARTAN
-CPS_END_NAMESPACE
 #include <math.h>
 CPS_START_NAMESPACE
-#else
-CPS_END_NAMESPACE
-#include <math.h>
-CPS_START_NAMESPACE
-#endif
 
 //! The number of colours, again.
-#define COLORS 3  // implemented only for this number of colors
+#define COLORS 3.  // implemented only for this number of colors
+//static const int COLORS=3;
 #undef NEW_GFIX
 
 //------------------------------------------------------------------------//
@@ -67,22 +56,17 @@ const int XXX::SiteSize = XXX::Dimension;
 
 int XXX::Coor4d(int dir)
 {
-    int coor[] = {GJP.XnodeCoor(), GJP.YnodeCoor(), GJP.ZnodeCoor(),
-                  GJP.TnodeCoor()};
-    return coor[dir];
+  return GJP.NodeCoor(dir);
 }
 
 int XXX::Node_Size_in_Dir(int dir)
 {
-    int node_sites[] = {GJP.XnodeSites(), GJP.YnodeSites(), 
-                        GJP.ZnodeSites(), GJP.TnodeSites()};
-    return node_sites[dir];
+  return GJP.NodeSites(dir);
 }
 
 int XXX::Num_Nodes_in_Dir(int dir)
 {
-    int machine_size[] = {GJP.Xnodes(),GJP.Ynodes(), GJP.Znodes(), GJP.Tnodes()};
-    return machine_size[dir];
+  return GJP.Nodes(dir);
 }
 
 
@@ -276,6 +260,9 @@ HyperPlane::HyperPlane(const Matrix*L0, int Ind2Dir[],
     //creat and initialize buffers for copies of neighbor node gaueg matrices
     //, add by Jianglei
     //------------------------------------------------------------------------------
+  //CK: this code only works for Coulomb gauge and breaks Landau! It also breaks non-checkerboarded gauge fixing
+  //Therefore I add a check to revert to old code when doing Landau
+  if(hplane_dim == XXX::Dimension-1 && GJP.GfixChkb()==1){ //Coulomb
     {
         int mem_size = hplane_dim * sizeof(Matrix*);
         nbr_gauge_minus_rec = (Matrix**) smalloc(mem_size);
@@ -311,6 +298,7 @@ HyperPlane::HyperPlane(const Matrix*L0, int Ind2Dir[],
       }
   }
 #endif
+  
 }
 
 
@@ -337,6 +325,7 @@ HyperPlane::~HyperPlane()
     sfree(neighbor_link);
 
 #ifdef NEW_GFIX
+  if(hplane_dim == XXX::Dimension-1 && GJP.GfixChkb()==1){
     for(int i=hplane_dim; i--; )
 	{
             sfree(nbr_gauge_minus_rec[i]);
@@ -458,6 +447,7 @@ void HyperPlane::copy_nbr_links(int nbr_num, int recurse)
 void HyperPlane::copy_nbr_gauge()
 {
     int ind1, ind2;
+  if(hplane_dim == XXX::Dimension || GJP.GfixChkb()==0) return; //CK: do nothing for Landau or non-checkerboarded gfix
 
     for(int i = 0; i < node_size[1]; i++)	
         for(int j = 0; j < node_size[2]; j++)	
@@ -680,6 +670,7 @@ private:
     int *dist_max;
 
     friend int Lattice::FixGauge(Float SmallFloat, int MaxIterNum);
+  friend IFloat* Lattice::GaugeFixCondSatisfaction(Matrix **gfix_mat, FixGaugeType gfix_type, Float SmallFloat) const;
 };
 
 
@@ -782,11 +773,11 @@ void FixHPlane::iter()
   //                                        Takeshi Yamazaki
   //----------------------------------------------------------------------
   if (GJP.GfixChkb()==0){
-     VRB.Flow(cname,fname,"using sequential order gauge fixing");
-  for(int dist = dist_max[recurse] + 1; dist-- > 0; )
-    iter(recurse, dist);
+//    VRB.Flow(cname,fname,"using sequential order gauge fixing");
+    for(int dist = dist_max[recurse] + 1; dist-- > 0; )
+      iter(recurse, dist);
   } else {
-     VRB.Flow(cname,fname,"using checkerboared order gauge fixing");
+//     VRB.Flow(cname,fname,"using checkerboared order gauge fixing");
   //Even or Odd part
   for(int dist = dist_max[recurse] + 1; (dist=dist-2) >= 0; )
     iter(recurse, dist);
@@ -873,14 +864,19 @@ Matrix& FixHPlane::findA()
 
             // Modified for anisotropic lattices
 
-            if ( ind2dir[i] == GJP.XiDir()) {
-                tmp_m1 = L(i);
-                tmp_m1 *= GJP.XiGfix();
-                tmp_m.DotMPlus(G(i), tmp_m1);
-            } else {
-                tmp_m.DotMPlus(G(i), L(i));
-            }
-            // End modification
+      if ( ind2dir[i] == GJP.XiDir()) {
+	tmp_m1 = L(i);
+	tmp_m1 *= GJP.XiGfix();
+	tmp_m.DotMPlus(G(i), tmp_m1);
+      } else {
+	if(GJP.Bc(i)==BND_CND_GPARITY && GJP.NodeCoor(i)==0 && index[i]==-1){
+	  //CK crosses a G-parity boundary, must complex conjugate the L and G
+	  mStarDotMStarPlus( (IFloat*)&tmp_m, (IFloat*)&G(i), (IFloat*)&L(i) ); 
+	}else{
+	  tmp_m.DotMPlus(G(i), L(i));
+	}
+      }
+      // End modification
 
             index[i] += 2;
             Matrix& G_plus_i = G(i);
@@ -892,9 +888,15 @@ Matrix& FixHPlane::findA()
             if ( ind2dir[i] == GJP.XiDir() ) tmp_m1 *= GJP.XiGfix();
             // End modification
 
-            tmp_m.DotMPlus(G_plus_i, tmp_m1);
+      if(GJP.Bc(i)==BND_CND_GPARITY && GJP.NodeCoor(i)==GJP.Nodes(i)-1 && index[i]==node_size[i]-1){
+	//CK crosses a G-parity boundary, must complex conjugate the G (not the L, which is local).
+	//index[i] is node_size[i]-1 rather than node_size[i] as index was decreased after G was called
+	mStarDotMPlus( (IFloat*)&tmp_m, (IFloat*)&G_plus_i, (IFloat*)&tmp_m1 );
+      }else{
+	tmp_m.DotMPlus(G_plus_i, tmp_m1);
 
-        }
+      }
+    }
 
     tmp_m1.Dagger(G_loc());  // local G
     A_buf.DotMEqual(tmp_m, tmp_m1);
@@ -1049,7 +1051,6 @@ IFloat FixHPlane::delta(int recurse)
                 for(int i=0; i<COLORS*COLORS; i++)
                     dlt += norm(A[i]);
             }
-
     return recurse ? dlt : HyperPlane_Sum(dlt);
 }
 
@@ -1190,7 +1191,7 @@ int Lattice::FixGauge(Float SmallFloat, int MaxIterNum)
     //------------------------------------------------------------------------
 
     Float not_converged = 0;
-    Float tot_iternum = 0;
+    unsigned long tot_iternum = 0;
 
     {
         int loop_num = 
@@ -1216,10 +1217,9 @@ int Lattice::FixGauge(Float SmallFloat, int MaxIterNum)
                         // find gauge fixing matrices for hyperplane
                         //--------------------------------------------------------------
 
-                        int iternum = 0;
+                        unsigned long int iternum = 0;
 
-                        while((hplane.delta() > hplane.small_enough)
-                              && (iternum < MaxIterNum))
+                        while((hplane.delta() > hplane.small_enough) && (iternum < MaxIterNum))
                             {
                                 //----------------------------------------------------------
                                 // Make iterations
@@ -1227,6 +1227,7 @@ int Lattice::FixGauge(Float SmallFloat, int MaxIterNum)
 
                                 for(int j=0; j<XXX::CheckFreq; j++)
                                     {
+										if((iternum%100) ==0 ) VRB.Result(cname,fname,"delta[%d]=%g\n",iternum,hplane.delta());
                                         hplane.iter();
                                         iternum++;
                                     }
@@ -1240,6 +1241,34 @@ int Lattice::FixGauge(Float SmallFloat, int MaxIterNum)
 
                         if(iternum >= MaxIterNum)
                             not_converged += 1;
+	    //--------------------------------------------------------------
+	    // find gauge fixing matrices for hyperplane
+	    //--------------------------------------------------------------
+
+//	    int iternum = 0;
+
+	    while((hplane.delta() > hplane.small_enough)
+		  && (iternum < MaxIterNum))
+	      {
+		//----------------------------------------------------------
+		// Make iterations
+		//----------------------------------------------------------
+
+		for(int j=0; j<XXX::CheckFreq; j++)
+		  {
+		    hplane.iter();
+		    iternum++;
+		  }
+
+		//----------------------------------------------------------
+		// Make sure the matrices are still unitary
+		//----------------------------------------------------------
+
+		hplane.unitarize();
+	      }
+
+	    if(iternum >= MaxIterNum)
+	      not_converged += 1;
 	    
 #ifdef NEW_GFIX
                         tot_iternum += iternum;
@@ -1256,6 +1285,9 @@ int Lattice::FixGauge(Float SmallFloat, int MaxIterNum)
   //------------------------------------------------------------------------
   VRB.Sfree(cname, fname, "Ind2Dir", Ind2Dir);
   sfree(Ind2Dir);
+
+	//Add by Jianglei
+	VRB.Result(cname, fname, "Iteration numbers = %lu", tot_iternum);
 
   //--------------------------------------------------------------
   // Issue a warning through broadcast if MaxIterNum is reached
@@ -1306,6 +1338,50 @@ int Lattice::FixGauge(Float SmallFloat, int MaxIterNum)
 }
 
 
+//Determine how close the gauge fixing matrices 'gfix_mat' come to satisfying the gauge fixing condition
+//returns an array of size 1 for Landau and NodeSites(fixdir) for Coulomb, where fixdir is the gauge fixing direction
+//the elements of the array are the deviation from the gauge fixing condition in units of the stopping condition
+//values < 1 mean all hyperplanes satisfy the gauge fixing condition
+IFloat* Lattice::GaugeFixCondSatisfaction(Matrix **gfix_mat, FixGaugeType gfix_type, Float SmallFloat) const{
+  const static char* fname = "GaugeFixCondSatisfaction(Matrix **gfix_mat, FixGaugeType gfix_type, Float SmallFloat)";
+
+  int NormDir = int(gfix_type);
+  int HplDim = (gfix_type == FIX_GAUGE_LANDAU) ? 
+    XXX::Dimension : XXX::Dimension-1;
+
+  int *Ind2Dir;
+  {
+    int mem_size = XXX::Dimension * sizeof(int);
+    Ind2Dir = new int[mem_size];
+    
+    int i, ii;
+    for(ii=i=0; i<HplDim; i++, ii++){
+      if(ii == NormDir)
+	ii++;
+      Ind2Dir[i] = ii;
+    }
+  }
+    
+  int stride = XXX::SiteSize;  
+  if(gfix_type != FIX_GAUGE_LANDAU){
+    for(int i=0; i<NormDir; i++)
+      stride *= XXX::Node_Size_in_Dir(i);
+  }
+
+  int loop_num = (gfix_type==FIX_GAUGE_LANDAU) ? 1 : XXX::Node_Size_in_Dir(NormDir);
+
+  IFloat* out = new Float[loop_num];
+  
+  for(int i=0; i < loop_num; i++){
+    FixHPlane hplane(GaugeField() + i*stride, Ind2Dir, HplDim, 
+		     gfix_mat[i], SmallFloat);
+    out[i] = hplane.delta()/hplane.small_enough - 1.0;
+  }
+  delete[] Ind2Dir;
+
+  return out;
+}
+
 
 //-------------------------------------------------------------------------//
 /*!
@@ -1324,6 +1400,14 @@ int Lattice::FixGauge(Float SmallFloat, int MaxIterNum)
   the gauge.along the direction orthogonal to them. This list should be in
   increasing order.  This is ignored for Landau gauge fixing and when \a
   NHplanes is zero.
+*/
+/*CKelly G-parity
+  In Coulomb gauge we have an array of hyperplanes along the gauge-fixing direction. For G-parity we double this array
+  and place the gauge-fixing matrices for the U^* field on the second half. That way the hyperplane size is the same
+  as the usual setup.
+
+  For Landau gauge, we have a single matrix for each site. With G-parity we double the array of matrices (Lx*Ly*Lz*Lt) and place the gauge-fixing
+  matrices on the second half.
 */
 //-------------------------------------------------------------------------//
 
@@ -1385,18 +1469,22 @@ void Lattice::FixGaugeAllocate(FixGaugeType GaugeKind,
 
     {
         //--- NormDir is numerically equal to fix_gauge_kind
-        NormDir = int(fix_gauge_kind);
+    NormDir = int(fix_gauge_kind); //is -1 for Landau
 
         //--- number of fields in fix_gauge_ptr
         GaugePtrLen = (fix_gauge_kind == FIX_GAUGE_LANDAU) ?
             1 : XXX::Node_Size_in_Dir(NormDir); 
 
-        //--- Number of matrices in each memory block
-        MemBlockLen = 1;
-        for(int i=0; i<XXX::Dimension; i++)
-            if(i != NormDir)
-                MemBlockLen *= XXX::Node_Size_in_Dir(i);
-    }
+    if(GJP.Gparity() && fix_gauge_kind != FIX_GAUGE_LANDAU) GaugePtrLen*=2; //CK G-parity for Coulomb gauge
+
+    //--- Number of matrices in each memory block
+    MemBlockLen = 1;
+    for(int i=0; i<XXX::Dimension; i++)
+      if(i != NormDir)
+	MemBlockLen *= XXX::Node_Size_in_Dir(i);
+
+    if(GJP.Gparity() && fix_gauge_kind == FIX_GAUGE_LANDAU) MemBlockLen*=2; //CK G-parity for Landau gauge
+  }
 
     //------------------------------------------------------------------------
     // allocate fix_gauge_ptr and initialize fields to NULL
@@ -1444,16 +1532,27 @@ void Lattice::FixGaugeAllocate(FixGaugeType GaugeKind,
                             {
                                 int crd_loc = Hplanes[i] - crd_min;
 
-                                //--- allocate space for a local hyperplane
-                                fix_gauge_ptr[crd_loc] = (Matrix*) smalloc(mem_size);
-                                if(fix_gauge_ptr[crd_loc] == NULL)
-                                    ERR.Pointer(cname, fname, "fix_gauge_ptr[i]");
-                                VRB.Smalloc(cname, fname, "fix_gauge_ptr[i]", 
-                                            fix_gauge_ptr[crd_loc], mem_size);
-                            }
-                    }
-            }
-    }
+		//--- allocate space for a local hyperplane
+		fix_gauge_ptr[crd_loc] = (Matrix*) smalloc(mem_size);
+		if(fix_gauge_ptr[crd_loc] == NULL)
+		  ERR.Pointer(cname, fname, "fix_gauge_ptr[i]");
+		VRB.Smalloc(cname, fname, "fix_gauge_ptr[i]", 
+			    fix_gauge_ptr[crd_loc], mem_size);
+
+		if(GJP.Gparity()){
+		  //allocate a second hyperplane for the U* fields
+		  crd_loc += GaugePtrLen/2;
+		  
+		  fix_gauge_ptr[crd_loc] = (Matrix*) smalloc(mem_size);
+		  if(fix_gauge_ptr[crd_loc] == NULL)
+		    ERR.Pointer(cname, fname, "G-parity fix_gauge_ptr[i]");
+		  VRB.Smalloc(cname, fname, "G-parity fix_gauge_ptr[i]", 
+			    fix_gauge_ptr[crd_loc], mem_size);
+	      }
+	  }
+      }
+  }
+  }
 
     //------------------------------------------------------------------------
     // initialize matrices to unity
@@ -1478,56 +1577,110 @@ void Lattice::FixGaugeAllocate(FixGaugeType GaugeKind,
   
 void Lattice::FixGaugeFree()
 {
-    char *fname = "FixGaugeFree()";
+  char *fname = "FixGaugeFree()";
 
-    VRB.Func(cname, fname);
-
-
-    //------------------------------------------------------------------------
-    // Initial checking
-    //------------------------------------------------------------------------
-    {
-        if( (fix_gauge_kind == FIX_GAUGE_NONE) || (fix_gauge_ptr == NULL) )
-            ERR.General(cname, fname, "Not initialized");
-    }
+  VRB.Func(cname, fname);
 
 
-    //------------------------------------------------------------------------
-    // Deallocate hyperplane buffers
-    //------------------------------------------------------------------------
-    {
-        //--- Normal direction is numerically equal to fix_gauge_kind
-        int NormDir = int(fix_gauge_kind);
+  //------------------------------------------------------------------------
+  // Initial checking
+  //------------------------------------------------------------------------
+  {
+    if( (fix_gauge_kind == FIX_GAUGE_NONE) || (fix_gauge_ptr == NULL) )
+      ERR.General(cname, fname, "Not initialized");
+  }
 
-        int GaugePtrLen = (fix_gauge_kind == FIX_GAUGE_LANDAU) ?
-            1 : XXX::Node_Size_in_Dir(NormDir);
 
-        //--- Notice: to avoid memory fragmentation here, 
-        //--- entries in Hplanes[] should be in increasing order
-        for(int i=GaugePtrLen; i--; )
-            if(fix_gauge_ptr[i] != NULL)
-                {
-                    VRB.Sfree(cname, fname, "fix_gauge_ptr[i]", fix_gauge_ptr[i]);
-                    sfree(fix_gauge_ptr[i]);
-                }
-    }
+  //------------------------------------------------------------------------
+  // Deallocate hyperplane buffers
+  //------------------------------------------------------------------------
+  {
+    //--- Normal direction is numerically equal to fix_gauge_kind
+    int NormDir = int(fix_gauge_kind);
 
-    //------------------------------------------------------------------------
-    // deallocate the fix_gauge_ptr buffer itself
-    //------------------------------------------------------------------------
-    {
-        VRB.Sfree(cname, fname, "fix_gauge_ptr", fix_gauge_ptr);
-        sfree(fix_gauge_ptr);
-    }
+    int GaugePtrLen = (fix_gauge_kind == FIX_GAUGE_LANDAU) ?
+      1 : XXX::Node_Size_in_Dir(NormDir);
+    if(GJP.Gparity() && fix_gauge_kind != FIX_GAUGE_LANDAU) GaugePtrLen*=2; //CK G-parity
 
-    //------------------------------------------------------------------------
-    // reset system variables
-    //------------------------------------------------------------------------
-    {
-        fix_gauge_ptr = NULL;
-        fix_gauge_kind = FIX_GAUGE_NONE;
-        fix_gauge_stpCond = 0;
-    }
+    //--- Notice: to avoid memory fragmentation here, 
+    //--- entries in Hplanes[] should be in increasing order
+    for(int i=GaugePtrLen; i--; )
+      if(fix_gauge_ptr[i] != NULL)
+	{
+	  VRB.Sfree(cname, fname, "fix_gauge_ptr[i]", fix_gauge_ptr[i]);
+	  sfree(fix_gauge_ptr[i]);
+	}
+  }
+
+  //------------------------------------------------------------------------
+  // deallocate the fix_gauge_ptr buffer itself
+  //------------------------------------------------------------------------
+  {
+    VRB.Sfree(cname, fname, "fix_gauge_ptr", fix_gauge_ptr);
+    sfree(fix_gauge_ptr);
+  }
+
+  //------------------------------------------------------------------------
+  // reset system variables
+  //------------------------------------------------------------------------
+  {
+    fix_gauge_ptr = NULL;
+    fix_gauge_kind = FIX_GAUGE_NONE;
+    fix_gauge_stpCond = 0;
+  }
 }
+
+
+const Matrix* Lattice::FixGaugeMatrix(int const* pos,const int &flavor){
+  static const char* fname = "FixGaugeMatrix(int const* pos, const int &flavor)";
+  if(fix_gauge_kind==FIX_GAUGE_LANDAU){ //stored in CANONICAL ordering
+    int off = pos[0]+GJP.XnodeSites()*(pos[1] + GJP.YnodeSites()*(pos[2] * GJP.ZnodeSites()*pos[3]));
+    if(GJP.Gparity()) off += flavor * GJP.VolNodeSites();
+    return &fix_gauge_ptr[0][off];
+  }else if(fix_gauge_kind == FIX_GAUGE_COULOMB_X ||
+	   fix_gauge_kind == FIX_GAUGE_COULOMB_Y ||
+	   fix_gauge_kind == FIX_GAUGE_COULOMB_Z ||
+	   fix_gauge_kind == FIX_GAUGE_COULOMB_T){
+    int normdir = (int)fix_gauge_kind - (int)FIX_GAUGE_COULOMB_X;
+    int hplane = pos[normdir];
+    if(GJP.Gparity()) hplane += flavor * GJP.NodeSites(normdir);
+    if(fix_gauge_ptr[hplane] == NULL) return NULL;
+
+    int tposvec[3];
+    int tlenvec[3];
+    int j=0;
+    for(int i=0;i<4;i++){
+      if(i==normdir) continue;
+      tlenvec[j] = GJP.NodeSites(i);
+      tposvec[j++] = pos[i];
+    }      
+    int threepos = tposvec[0] + tlenvec[0]*(tposvec[1] + tlenvec[1]*tposvec[2]);
+
+    return &fix_gauge_ptr[hplane][threepos];
+  }else ERR.General(cname,fname,"Unknown gauge fixing");
+}
+
+
+const Matrix* Lattice::FixGaugeMatrix(const int &site,const int &flavor){
+  static const char* fname = "FixGaugeMatrix(const int &site, const int &flavor)";
+
+  if( (fix_gauge_kind == FIX_GAUGE_NONE) || (fix_gauge_ptr == NULL) )
+    ERR.General(cname, fname, "No gauge fixing performed");
+
+  int pos[4];
+  if(StrOrd() == CANONICAL){
+    if(fix_gauge_kind==FIX_GAUGE_LANDAU){ //stored in CANONICAL ordering
+      int off = site; if(GJP.Gparity()) off += flavor * GJP.VolNodeSites();
+      return &fix_gauge_ptr[0][off];
+    }
+    int rem = site;
+    for(int i=0;i<4;i++){ pos[i] = rem % GJP.NodeSites(i); rem/=GJP.NodeSites(i); }
+  }else{
+    ERR.General(cname,fname,"Only implemented for CANONICAL ordering");
+  }
+  return FixGaugeMatrix(pos,flavor);
+}
+
+
 
 CPS_END_NAMESPACE

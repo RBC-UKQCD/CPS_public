@@ -23,6 +23,8 @@
 
 #ifdef USE_QUDA
 #include <alg/quda_arg.h>
+#include <invert_quda.h>
+#include <util/dirac_op/cps_quda.h>
 #endif
 
 CPS_START_NAMESPACE
@@ -169,7 +171,7 @@ class DiracOp
   
   //! Implicitly restarted Lanczos (TB Dec. 2010)
   //  with Polynomial accerelation+shift+ many (TIZB Aug. 2011)
-  int ImpResLanczos( Vector **V, //Lanczos vectors, eigenvectors of RitzMat on return
+  virtual int ImpResLanczos( Vector **V, //Lanczos vectors, eigenvectors of RitzMat on return
 		     Float *alpha, // eigenvalues
 		     LanczosArg* lanczos_arg
 		     ); // arguments for eigen solver algorithm
@@ -196,7 +198,7 @@ class DiracOp
   //
 
   //! the fundamental lanczos steps (TB Dec. 2010, TIZB Aug. 2011)
-  void lanczos(int k, int m, int f_size,
+  void lanczos(int k, int m, size_t f_size,
 	       Vector *Apsi, Vector *r, Vector **V, Float *alpha, Float* beta,
 	       MatrixPolynomialArg* cheby_arg,
 	       RitzMatType RitMat_lanczos );
@@ -204,8 +206,8 @@ class DiracOp
 
   
   //! Vector orthogonalisation
-  void GramSchm(Vector **psi, int Npsi, Vector **vec, int Nvec, int f_size);
-  void GramSchm(Vector *psi, Vector **vec, int Nvec, int f_size);
+  void GramSchm(Vector **psi, int Npsi, Vector **vec, int Nvec, size_t f_size);
+  void GramSchm(Vector *psi, Vector **vec, int Nvec, size_t f_size);
 
   //! Jacobi diagonalisation of a matrix.
   int Jacobi(Vector **psi, int N_eig, Float *lambda, 
@@ -220,7 +222,7 @@ class DiracOp
 	     MultiShiftSolveType type, Float *alpha);
 
   //! Chronological initial guess for the solver. 
-  void MinResExt(Vector *psi, Vector *phi, Vector **psi_old, 
+  virtual void MinResExt(Vector *psi, Vector *phi, Vector **psi_old, 
 		 Vector **vm, int degree);
 
 // Pure virtual functions
@@ -235,7 +237,7 @@ class DiracOp
   virtual void DiracArg(CgArg *arg) = 0;
      // It sets the dirac_arg pointer to arg and initializes
      // the relevant parameters (kappa, m^2, ...).
-  virtual CgArg * const DiracArg() {return dirac_arg;}
+  virtual CgArg * DiracArg() {return dirac_arg;}
 
   //! Multiplication by the square of the odd-even preconditioned fermion matrix.
   /*!
@@ -497,7 +499,7 @@ class DiracOpStag : public DiracOpStagTypes
   Float mass_rs;       // rescaled mass
   Float mass_sq;       // = mass^2
 
-  int f_size_cb;       //The node checkerbrd. size of the ferm. field
+  size_t f_size_cb;       //The node checkerbrd. size of the ferm. field
 
   Vector *frm_tmp;     // Temporary fermion field
 
@@ -615,7 +617,7 @@ class DiracOpAsqtad : public DiracOpStagTypes
   Float mass_rs;       // rescaled mass
   Float mass_sq;       // = mass^2
 
-  int f_size_cb;       //The node checkerbrd. size of the ferm. field
+  size_t f_size_cb;       //The node checkerbrd. size of the ferm. field
 
   Vector *frm_tmp;     // Temporary fermion field
 
@@ -740,7 +742,7 @@ class DiracOpP4 : public DiracOpStagTypes
   Float mass_rs;       // rescaled mass
   Float mass_sq;       // = mass^2
 
-  int f_size_cb;       //The node checkerbrd. size of the ferm. field
+  size_t f_size_cb;       //The node checkerbrd. size of the ferm. field
 
   Vector *frm_tmp;     // Temporary fermion field
 
@@ -846,7 +848,7 @@ class DiracOpHisq : public DiracOpStagTypes
   Float mass_rs;       // rescaled mass
   Float mass_sq;       // = mass^2
   
-  int f_size_cb;       //The node checkerbrd. size of the ferm. field
+  size_t f_size_cb;       //The node checkerbrd. size of the ferm. field
   
   Vector *frm_tmp;     // Temporary fermion field
   
@@ -1351,7 +1353,11 @@ class DiracOpWilsonTm : public DiracOpWilson
   Float epsilon;	 // fractional imaginary mass 
   Float ctheta, stheta;	 // gamma_5(theta) parameters
  
- public:
+public:
+  const Float& get_epsilon() const{ return epsilon; }
+  const Float& get_ctheta() const{ return ctheta; }
+  const Float& get_stheta() const{ return stheta; }
+  const Float& get_kappa() const{ return kappa; }
 
 //
 // Functions DiracOpWilson to CalcHmdForceVecs are as in DiracOpWilson 
@@ -1398,10 +1404,15 @@ class DiracOpWilsonTm : public DiracOpWilson
 #ifdef USE_BFM_TM
   int InvCg(Vector *out, Vector *in,
 	    Float src_norm_sq, Float *true_res);
-//  int InvCg(Vector *out, Vector *in, Float *true_res);
+
   int InvCg(Float *true_res){
- InvCg(f_out,f_in,0,true_res);
- }
+    InvCg(f_out,f_in,0,true_res);
+  }
+
+  //BFM multi-shift inverter for twisted Wilson, added by CK
+  int MInvCG(Vector **out, Vector *in, Float in_norm, Float *shift, 
+	     int Nshift, int isz, Float *RsdCG, 
+	     MultiShiftSolveType type, Float *alpha);
 #endif
 //
 
@@ -1903,6 +1914,13 @@ class DiracOpMobius : public DiracOpWilsonTypes
      // The in, out fields are defined on the checkerboard lattice
      // cb = 0/1 <--> even/odd checkerboard of in field.
      // dag = 0/1 <--> Dslash/Dslash^dagger is calculated.
+  
+  void Dslash(Vector *out, 
+	      Vector *in,
+	      DagType dag);
+     // Unpreconditioned dslash
+     // The in, out fields are defined on the checkerboard lattice
+     // dag = 0/1 <--> Dslash/Dslash^dagger is calculated.
 
   //! Multiplication by the odd-even preconditioned fermion matrix.
   void MatPc(Vector *out, Vector *in);
@@ -1964,6 +1982,8 @@ class DiracOpMobius : public DiracOpWilsonTypes
   // CANONICAL fermion vectors with conversion enabled to the
   // constructor.  Using chi, the function fills these vectors;
   // the result may be used to compute the HMD fermion force.
+  void CalcHmdForceVecs(Vector *v1, Vector *v2,
+                                Vector *phi1, Vector *phi2);
   
   void Reflex(Vector *out, Vector *in);
   //!< Not implemented
@@ -1987,8 +2007,78 @@ class DiracOpMobius : public DiracOpWilsonTypes
   void Dminus(Vector *out, Vector *in);
 
 #ifdef USE_QUDA
+
   int QudaInvert(Vector *out, Vector *in, Float *true_res, int mat_type);
+  int QudaMInvCG(Vector **out, Vector *in, Float in_norm, Float *shift, 
+	     int Nshift, int isz, Float *RsdCG, 
+	     MultiShiftSolveType type, Float *alpha);
+#ifdef USE_QUDA_LANCZOS
+  int QudaLanczos (Vector ** V,        //Lanczos vectors, eigenvectors of RitzMat on return
+                            Float * alpha,      // eigenvalues
+                            LanczosArg * eig_arg);
+  int ImpResLanczos( Vector **V, //Lanczos vectors, eigenvectors of RitzMat on return
+                     Float *alpha, // eigenvalues
+                     LanczosArg* lanczos_arg){
+      return QudaLanczos (V,alpha,lanczos_arg);
+  }
 #endif
+
+#endif
+};
+
+//------------------------------------------------------------------
+//! A class describing the Dirac operator for Mobius Wilson fermions.
+/*!
+  See the description of the DiracOpWilsonTypes class for the definition
+  of the Wilson fermion matrix.
+
+  The constructor changes the storage order of the gauge field to ::WILSON
+  order This change persists throughout the lifetime of the object.
+
+  Only one instance of this class is allowed to be in existence at any time.
+*/
+//------------------------------------------------------------------
+class DiracOpMobiusEOFA : public DiracOpWilsonTypes
+{
+  private:
+    char *cname;          // Class name.
+    void *mobius_lib_arg; // pointer to mobius params structure.
+    Float m1;
+    Float m2;
+    Float m3;
+    Float a;
+    int pm;
+
+  public:
+    DiracOpMobiusEOFA(Lattice& lat, Vector* f_out, Vector* f_in,
+        Float _m1, Float _m2, Float _m3, Float _a, int _pm,
+        CgArg* cg_arg, CnvFrmType convert);
+  
+    void DiracArg(CgArg* arg);
+
+#if 1
+    void MatDag(Vector* out, Vector* in){ ERR.NotImplemented(cname, "MatDag(V*,V*)"); } 
+    void MatPc(Vector* out, Vector* in){ ERR.NotImplemented(cname, "MatPc(V*,V*)"); } 
+    void MatPcDagMatPc(Vector* out, Vector* in, Float* dot_prd=0){ ERR.NotImplemented(cname, "MatPcDagMatPc(V*,V*,F*)"); } 
+    void Dslash(Vector* out, Vector* in, ChkbType cb, DagType dag){ ERR.NotImplemented(cname, "Dslash(V*,V*,ChkbType,DagType"); }
+    int MatInv(Vector* out, Vector* in, Float* true_res, PreserveType prs_in=PRESERVE_YES) {
+      ERR.NotImplemented(cname, "MatInv(V*,V*,F*,PreserveType)");
+      return 0;
+    }
+    int MatInv(Vector* out, Vector* in, PreserveType prs_in=PRESERVE_YES){ ERR.NotImplemented(cname, "MatInv(V*,V*,PreserveType)"); return 0; }
+    int MatInv(Float* true_res, PreserveType prs_in=PRESERVE_YES) { ERR.NotImplemented(cname, "MatInv(F*,PreserveType)"); return 0; }
+    int MatInv(PreserveType prs_in=PRESERVE_YES) { ERR.NotImplemented(cname, "MatInv(PreserveType)"); return 0; }
+#ifdef USE_QUDA
+    CPSQuda::QudaParams GetQudaParams(int mat_type);
+#endif
+    void Mat(Vector* out, Vector* in);
+    void MatHerm(Vector* out, Vector* in);
+    void MinResExt(Vector* psi, Vector* phi, Vector** psi_old, Vector** vm, int degree) override;
+    void CalcHmdForceVecs(Vector* v1, Vector* v2, Vector* phi1, Vector* phi2);
+    int QudaInvert(Vector* out, Vector* in, Float* true_res, int mat_type);
+#endif
+
+    virtual ~DiracOpMobiusEOFA();
 };
 
 //------------------------------------------------------------------

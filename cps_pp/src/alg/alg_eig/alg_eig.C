@@ -92,10 +92,12 @@ AlgEig::AlgEig(Lattice& latt,
   // NOTE: at this point we must know on what lattice size the operator 
   // will act.
   //----------------------------------------------------------------
-  int f_size = GJP.VolNodeSites() * latt.FsiteSize() * Ncb / 2;
+  size_t f_size = GJP.VolNodeSites() * latt.FsiteSize() * Ncb / 2;
+  if(GJP.Gparity()) f_size*=2;
+
   VRB.Flow(cname,fname,"f_size=%d\n",0);
 
-  //  int f_size = GJP.VolNodeSites() * Ncb / 2;
+  //  size_t f_size = GJP.VolNodeSites() * Ncb / 2;
   //  exit(1);
 
   
@@ -130,6 +132,9 @@ AlgEig::AlgEig(Lattice& latt,
   VRB.Input(cname,fname,
 	    "Mass_step = %g\n",IFloat(alg_eig_arg->Mass_step));
   
+  //CK: add check for twisted mass fermions
+  if(latt.Fclass() == F_CLASS_WILSON_TM && alg_eig_arg->pattern_kind != ARRAY) ERR.General(cname,fname,"Not implemented for pattern_kind other than ARRAY");
+
   // Calculate n_masses if necessary
   VRB.Flow(cname,fname,"alg_eig_arg->pattern_kind=%d\n",alg_eig_arg->pattern_kind);
   switch( alg_eig_arg->pattern_kind ) {
@@ -194,9 +199,6 @@ void AlgEig::run()
 //------------------------------------------------------------------
 void AlgEig::run(Float **evalues, Vector **in_eigv)
 {
-#if TARGET==cpsMPI
-    using MPISCU::fprintf;
-#endif
 
   Float time = -dclock();
   int iter=0;
@@ -208,9 +210,11 @@ void AlgEig::run(Float **evalues, Vector **in_eigv)
   //----------------------------------------------------------------
   Lattice& lat = AlgLattice();
   eig_arg = alg_eig_arg;
-  Float **hsum;
+
   const int N_eig = eig_arg->N_eig;
-  const int f_size = GJP.VolNodeSites() * lat.FsiteSize() * Ncb / 2;
+  size_t f_size = GJP.VolNodeSites() * lat.FsiteSize() * Ncb / 2;
+  if(GJP.Gparity()) f_size*=2;
+  Float **hsum;
   int hsum_len = 0;
   int n;
 
@@ -239,7 +243,8 @@ void AlgEig::run(Float **evalues, Vector **in_eigv)
      default:
       ERR.General(cname,fname,"Invalid direction\n");
     }
-
+    
+    if(GJP.Bc(eig_arg->hsum_dir) == BND_CND_GPARITY) hsum_len*=2; //stack hsum for second flavour after first
     hsum = (Float **) smalloc(cname,fname,"hsum",N_eig * sizeof(Float*)); // surely Float* ?
   
     for(n = 0; n < N_eig; ++n)
@@ -277,6 +282,7 @@ void AlgEig::run(Float **evalues, Vector **in_eigv)
   switch( eig_arg->pattern_kind ) {
   case ARRAY: 
     eig_arg->mass = eig_arg->Mass.Mass_val[0]; 
+    eig_arg->epsilon = eig_arg->Epsilon.Epsilon_val[0]; //Added by CK for twisted mass fermions
     break;
   case LIN:   
     // Loop over mass values
@@ -326,6 +332,35 @@ void AlgEig::run(Float **evalues, Vector **in_eigv)
       for(n = 0; n<N_eig; ++n)
 	{
 	  lat.RandGaussVector(eigenv[n], 0.5, Ncb);
+
+      if(GJP.Gparity1fX() && GJP.Gparity1fY()){
+	if(Ncb!=1) ERR.General(cname,fname,"G-parity 1f XY Only set up for odd-even preconditioned fermion vectors\n");
+	if(!UniqueID()){ printf("Putting minus sign on fermion source in UR quadrant\n"); fflush(stdout); }
+	//make source on upper-right quadrant negative (RNGs should be correct)
+	for(int s=0;s<GJP.SnodeSites();s++){
+	  for(int t=0;t<GJP.TnodeSites();t++){
+	    for(int z=0;z<GJP.ZnodeSites();z++){
+	      for(int y=0;y<GJP.YnodeSites();y++){
+		for(int x=0;x<GJP.XnodeSites();x++){
+		  if( (x+y+z+t+s)%2 == 0) continue; //ferm vect is odd parity only
+
+		  int gx = x+GJP.XnodeCoor()*GJP.XnodeSites();
+		  int gy = y+GJP.YnodeCoor()*GJP.YnodeSites();
+
+		  if(gx>=GJP.Xnodes()*GJP.XnodeSites()/2 && gy>=GJP.Ynodes()*GJP.YnodeSites()/2){
+		    int pos[5] = {x,y,z,t,s};
+		    int f_off = lat.FsiteOffsetChkb(pos) * lat.SpinComponents();
+
+		    for(int spn=0;spn<lat.SpinComponents();spn++) *(eigenv[n]+f_off+spn) *=-1;
+		  }
+		}
+	      }
+	    }
+	  }
+	}
+      }
+
+
 	}
   //  }
 
@@ -334,7 +369,7 @@ void AlgEig::run(Float **evalues, Vector **in_eigv)
 /*
     // DEBUG, dumping start vector from QCDOC to be read in QCDSP
     cout << "Dump DEBUGGING info...startvector.dat" << endl;
-    int f_size = GJP.VolNodeSites() * lat.FsiteSize() * Ncb / 2;
+    size_t f_size = GJP.VolNodeSites() * lat.FsiteSize() * Ncb / 2;
     ofstream fout ( "startvector.dat");
     fout << "f_size=" << f_size << endl;
     for(n=0;n<N_eig;++n) {
@@ -416,6 +451,12 @@ void AlgEig::run(Float **evalues, Vector **in_eigv)
 	  
 	  FILE* filep;
 	  filep=Fopen(eig_arg->fname,"a");
+
+	  //CK: Might be nice to actually write out the eigenvalues too!
+	  for (int eig=0; eig<eig_arg->N_eig; eig++) {
+	    Fprintf(filep,"eigenvalue: %d %g\n",
+		    eig, lambda[eig]);
+	  }
               
 	  int i_eig,j_eig;
               
@@ -475,7 +516,8 @@ void AlgEig::run(Float **evalues, Vector **in_eigv)
     if( m < n_masses - 1 ) {
       switch( eig_arg->pattern_kind ) {
       case ARRAY: 
-	eig_arg->mass = eig_arg->Mass.Mass_val[m+1]; 
+	eig_arg->mass = eig_arg->Mass.Mass_val[m+1];
+	eig_arg->epsilon = eig_arg->Epsilon.Epsilon_val[m+1]; //CK: Added for twisted mass fermions
 	break;
       case LIN:   
 	eig_arg->mass += eig_arg->Mass_step; 
@@ -497,8 +539,10 @@ void AlgEig::run(Float **evalues, Vector **in_eigv)
       for(n = 0; n < N_eig; ++n)
         {
           sfree(cname,fname,"eig_store[n]",eig_store[n]);
+	  if (eig_arg->print_hsum) sfree(cname,fname,"hsum[n]",hsum[n]);
         }
       sfree(cname,fname,"eig_store",eig_store);
+      if (eig_arg->print_hsum) sfree(cname,fname,"hsum",hsum);
     }
   time +=dclock();
   print_flops(cname,fname,0,time);
@@ -511,6 +555,9 @@ void AlgEig::run(Float **evalues, Vector **in_eigv)
 
 }
 
+Vector ** AlgEig::getEigenVectors(){
+  return eigenv;
+}
 
 
 CPS_END_NAMESPACE

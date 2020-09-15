@@ -306,6 +306,9 @@ void Dwf4d_CalcHmdForceVecsBilinear(bfm_evo<double> &bfm_d, bfm_evo<float> &bfm_
     bfm_d.residual = pauli_villars_resid; 
     if (use_mixed_solver) bfm_f.residual = 1e-5; 
     int iters1, iters2;
+#ifdef BFM_GPARITY
+   ERR.General("",fname,"mixed_cg::threaded_cg_mixed_Mdag_guess not implemented for BFM with Gparity\n");
+#else
 #pragma omp parallel
     {
 	// D1inv_Dm_Pphi2 = D_DW(1)^-1 D_DW(m) P phi2
@@ -328,6 +331,7 @@ void Dwf4d_CalcHmdForceVecsBilinear(bfm_evo<double> &bfm_d, bfm_evo<float> &bfm_
 	    mixed_cg::threaded_cg_mixed_Mdag(v1_bfm, phi1_5d, bfm_d, bfm_f, 5) :
 	    bfm_d.CGNE_Mdag(v1_bfm, phi1_5d);
     }
+#endif
 
     bfm_d.cps_impexFermion_s(v1, v1_bfm, Export);
     bfm_d.cps_impexFermion_s(v2, v2_bfm, Export);

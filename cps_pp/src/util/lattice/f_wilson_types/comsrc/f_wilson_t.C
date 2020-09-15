@@ -5,21 +5,6 @@ CPS_START_NAMESPACE
 
   $Id: f_wilson_t.C,v 1.7 2005/10/04 05:35:47 chulwoo Exp $
 */
-//--------------------------------------------------------------------
-//  CVS keywords
-//
-//  $Author: chulwoo $
-//  $Date: 2005/10/04 05:35:47 $
-//  $Header: /space/cvs/cps/cps++/src/util/lattice/f_wilson_types/comsrc/f_wilson_t.C,v 1.7 2005/10/04 05:35:47 chulwoo Exp $
-//  $Id: f_wilson_t.C,v 1.7 2005/10/04 05:35:47 chulwoo Exp $
-//  $Name: v5_0_16_hantao_io_test_v7 $
-//  $Locker:  $
-//  $RCSfile: f_wilson_t.C,v $
-//  $Revision: 1.7 $
-//  $Source: /space/cvs/cps/cps++/src/util/lattice/f_wilson_types/comsrc/f_wilson_t.C,v $
-//  $State: Exp $
-//
-//--------------------------------------------------------------------
 //------------------------------------------------------------------
 //
 // f_wilson_types.C
@@ -50,6 +35,12 @@ FwilsonTypes::FwilsonTypes()
   cname = "FwilsonTypes";
   char *fname = "FwilsonTypes()";
   VRB.Func(cname,fname);
+
+  full_size =  GJP.VolNodeSites() * (size_t) this->FsiteSize();
+  if(GJP.Gparity()) full_size*=2;
+  half_size = full_size/2;
+  VRB.Flow(cname,fname,"full_size=%d half_sie=%d\n",full_size,half_size);
+
 
   //----------------------------------------------------------------
   // Fill in the array of sproj_tr functions
@@ -154,7 +145,10 @@ Float FwilsonTypes::FhamiltonNode( Vector *phi,  Vector *chi) {
   if (chi == 0)
     ERR.Pointer(cname,fname,"chi") ;
 
-  return phi->ReDotProductNode(chi,((GJP.VolNodeSites()*FsiteSize())>>1)*(2-FchkbEvl())) ;
+  size_t f_size = ((GJP.VolNodeSites()*FsiteSize())>>1)*(2-FchkbEvl());
+  if(GJP.Gparity()) f_size*=2;
+
+  return phi->ReDotProductNode(chi,f_size);
 }
 
 //------------------------------------------------------------------

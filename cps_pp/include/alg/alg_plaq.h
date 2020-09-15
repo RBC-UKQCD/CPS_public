@@ -4,7 +4,6 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of the AlgPlaq class.
 
-  $Id: alg_plaq.h,v 1.3 2004/08/18 11:57:35 zs Exp $
 */
 //------------------------------------------------------------------
 
@@ -49,7 +48,7 @@ class AlgPlaq : public Alg
 
     virtual ~AlgPlaq();
 
-    void run(void);
+    void run(Float *results =0);
 };
 
 

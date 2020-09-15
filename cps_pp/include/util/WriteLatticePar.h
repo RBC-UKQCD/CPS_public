@@ -37,6 +37,7 @@ class WriteLatticeParallel : public QioControl
     int csum_pos;
     bool recon_row_3;
     const char *cname;
+    bool UseParIO;
 
  public:
     LatticeHeader hd;
@@ -44,20 +45,35 @@ class WriteLatticeParallel : public QioControl
  public:
     // ctor for 2-step unloading
     WriteLatticeParallel()  
-      : QioControl(), cname("WriteLatticeParallel"), UseParIO(1) {
+      : QioControl(), cname("WriteLatticeParallel"){
+#if TARGET != QCDOC
+      setSerial();
+#else
+      setParallel();
+#endif
     }
 
     // ctor containing unloading behavior
     WriteLatticeParallel(Lattice & lat, const char * filename,
 			 const FP_FORMAT dataFormat = FP_AUTOMATIC, const int recon_row_3 = 1)
-      : QioControl(), cname("WriteLatticeParallel"), UseParIO(1)  {
+      : QioControl(), cname("WriteLatticeParallel"){
+#if TARGET != QCDOC
+      setSerial();
+#else
+      setParallel();
+#endif
       QioArg  wt_arg(filename, dataFormat, recon_row_3);
       write(lat, wt_arg);
     }
 
     // ctor containing unloading behavior
     WriteLatticeParallel(Lattice & lat, const QioArg & wt_arg)
-      : QioControl(), cname("WriteLatticeParallel"), UseParIO(1)   {
+      : QioControl(), cname("WriteLatticeParallel"){
+#if TARGET != QCDOC
+      setSerial();
+#else
+      setParallel();
+#endif
       write(lat, wt_arg);
     }
 
@@ -75,8 +91,6 @@ class WriteLatticeParallel : public QioControl
     }
     void write(Lattice & lat, const QioArg & wt_arg);
 
- private:
-    bool UseParIO;
  public:
     inline void setParallel() { UseParIO = 1; }
     inline void setSerial() { 

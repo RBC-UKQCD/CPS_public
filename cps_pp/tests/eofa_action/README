@@ -1,0 +1,12 @@
+David Murphy (djm2131@columbia.edu)
+03/08/2019
+
+The test program here is intended to check that the EOFA Hamiltonian is implemented correctly 
+by verifying that we can compute the same reweighting factor using both the RHMC and EOFA actions
+for a given gauge field configuration.
+For Shamir DWF the two actions compute exactly the same determinant; for Mobius DWF they differ
+by a factor of
+	Z = ( (c+d)^Ls + m1*(c-d)^Ls )^(12*V) / ( (c+d)^Ls + m2*(c-d)^Ls )^(12*V)
+where c = 0.5*mobius_scale, d = 0.5, V = L^3*T (4D lattice volume), and m1 and m2 are the numerator
+and denominator masses, respectively (see my write-ups for a derivation of this). 
+For G-parity Mobius DWF the factor is Z^2 rather than Z due to the fermion doubling.

@@ -114,8 +114,6 @@ getUDagX(Vector& v, const Vector *cvp, int *x, int mu) const
     Vector v_tmp1;
     Matrix *uoff = GaugeField()+GsiteOffset(x)+mu;
 
-    setCbufCntrlReg(3, CBUF_MODE3);
-    setCbufCntrlReg(4, CBUF_MODE4);
 
 
     //----------------------------------------
@@ -464,7 +462,6 @@ void Fstag::FforceSite(Matrix& force, Vector *frm, int *x, int mu)
 
     int x_off = FsiteOffsetChkb(x);
 
-    setCbufCntrlReg(3, CBUF_MODE3);
 
     //----------------------------------------
     // mp1 and mp2 free
@@ -529,7 +526,6 @@ ForceArg Fstag::EvolveMomFforce(Matrix *mom, Vector *frm,
   char *fname = "EvolveMomFforce(M*,V*,F,F)";
   VRB.Func(cname,fname);
  
-  setCbufCntrlReg(4, CBUF_MODE4);
   int x[4];
   
   Float L1 = 0.0;

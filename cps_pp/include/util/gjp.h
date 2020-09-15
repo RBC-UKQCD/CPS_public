@@ -1,6 +1,8 @@
 #ifndef INCLUDED_GLOBAL_JOB_PARAMETER_H
 #define INCLUDED_GLOBAL_JOB_PARAMETER_H
 
+#include<vector>
+#include<assert.h>
 #include<config.h>
 /*!\file
   \brief  Definitions of global job parameters.
@@ -30,6 +32,8 @@
 
 #include <util/lattice.h>
 #include <util/vector.h>
+#include <util/error.h>
+#include <util/verbose.h>
 #include <util/smalloc.h>
 #include <util/zmobius.h>
 #include <comms/sysfunc_cps.h>
@@ -73,29 +77,6 @@ extern int gjp_scu_wire_map[];
      // so that the local direction wire number is not
      // used. 
 
-#if TARGET == BGL
-extern int bgl_machine_dir[8];
-     // This array is set by GJP.Initialize to:
-     // bgl_machine_dir[0] = 2*bgl_machine_dir_x;
-     // bgl_machine_dir[1] = 2*bgl_machine_dir_x+1;
-     // bgl_machine_dir[2] = 2*bgl_machine_dir_y;
-     // bgl_machine_dir[3] = 2*bgl_machine_dir_y+1;
-     // bgl_machine_dir[4] = 2*bgl_machine_dir_z;
-     // bgl_machine_dir[5] = 2*bgl_machine_dir_z+1;
-     // bgl_machine_dir[6] = 2*bgl_machine_dir_t;
-     // bgl_machine_dir[7] = 2*bgl_machine_dir_t+1;
-     // This array is for convenience when translating
-     // from the physics system directions to the processor
-     // grid directions.
-
-extern int bgl_cps_dir[8];
-     // This array is set by GJP.Initialize to be the
-     // "reverse" array of bgl_machine_dir. 
-     // This array is for convenience when translating
-     // from the the processor grid directions to the
-     // physics system directions
-
-#endif //TARGET == BGL
 
 #endif //PARALLEL
 
@@ -128,59 +109,49 @@ class GlobalJobParameter
   BndCndType node_bc[5];  // sites of a single node along {X,Y,Z,T,S} direction
   int node_coor[5];  // sites of a single node along {X,Y,Z,T,S} direction
 
-  int vol_node_sites;  // The number of sites (4-D) of a single node.
-  int vol_sites;       // The number of sites (4-D) of the whole lattice
+  size_t vol_node_sites;  // The number of sites (4-D) of a single node.
+  size_t vol_sites;       // The number of sites (4-D) of the whole lattice
+
+  Float twist_angle[3]; // Twist angle for (partially-)twisted BCs in units of pi
+                        // Note: for regular case  p = n*2*pi/L + theta/L  where theta is the twist_angle
+                        // For twisted G-parity  p = n*2*pi/(2*L) + theta/(2*L)  as BC is applied on u->d boundary but not d->u
+                        // Reproduce untwisted G-parity with theta = pi  (APBC on doubled lattice length)
+  //2f G-parity
+  int gparity; // are G-parity boundary conditions in use?
 
   void Initialize();
 
+  //1f G-parity: for testing purposes we can compare the 2f model with the 1f model 
+  //in up to 2-directions (double/quadrupled lattice size) fixed to X (double latt) or X&Y (quad latt)
+  //these can be switched on using the options in do_arg
+  int gparity_1f_X;
+  int gparity_1f_Y;      
+
+  //option to execute extra code required to ensure 1f and 2f G-parity internal quantities like mom field checksum
+  //are equal (sometimes this requires extra copy-conjugation to be done, hence making this optional)
+  int gparity_doing_1f2f_comparison; 
 
   MdwfArg *mdwf_arg;
   MdwfTuning *mdwf_tuning;
   char *mdwf_tuning_fn;
   char *mdwf_tuning_record_fn;
 
+  int threads;
 
-  Complex* zmobius_b;
-  Complex* zmobius_c;
+
   ZMobiusPCType zmobius_pc_type;
+
+  bool eofa; // are we using EOFA?
   
 public:
   GlobalJobParameter();
 
+
+  inline const int & Nthreads() const{ return threads; }
+  int SetNthreads(const int &n=0);
+
   ~GlobalJobParameter();
 
-#if TARGET == BGL
-
-  int BglMachineDirX(void)
-    {return bgl_machine_dir[0]/2;}
-     // bgl_machine_dir[0] = 2*bgl_machine_dir_x;
-  //!< Gets the direction of the processor grid that X is "mapped" on. 
-  /*!<
-    \return The direction of the processor grid that X is "mapped" on. 
-  */
-
-  int BglMachineDirY(void)
-    {return bgl_machine_dir[2]/2;}
-  //!< Gets the direction of the processor grid that X is "mapped" on. 
-  /*!<
-    \return The direction of the processor grid that X is "mapped" on. 
-  */
-
-  int BglMachineDirZ(void)
-    {return bgl_machine_dir[4]/2;}
-  //!< Gets the direction of the processor grid that X is "mapped" on. 
-  /*!<
-    \return The direction of the processor grid that X is "mapped" on. 
-  */
-
-  int BglMachineDirT(void)
-    {return bgl_machine_dir[6]/2;}
-  //!< Gets the direction of the processor grid that X is "mapped" on. 
-  /*!<
-    \return The direction of the processor grid that X is "mapped" on. 
-  */
-
-#endif
 
 
 
@@ -300,9 +271,11 @@ public:
     This is only relevant for Domain Wall Fermions.
     \return The size of the grid in the 5th direction.
   */
+  int TotalNodes() const
+      {return nodes[0]*nodes[1]*nodes[2]*nodes[3]*nodes[4];}
 
 
-  int VolNodeSites() const
+  size_t VolNodeSites() const
       {return vol_node_sites;}
   //!< Gets the local lattice volume.
   /*!<
@@ -312,7 +285,7 @@ public:
     \return The number of lattice sites on the node.
    */
 
-  int VolSites() const
+  size_t VolSites() const
       {return vol_sites;}
   //!< Gets the global lattice volume.
   /*!<
@@ -421,6 +394,42 @@ public:
   /*!<
     \return The type of global boundary condition along the T axis.
   */
+  const Float& TwistAngle(const int &dir) const{ return twist_angle[dir]; }
+  //!< Get the twist angle in the 'dir'-direction
+  /*!< 
+    \param dir The direction in which to obtain the boundary 
+    condition; 0, 1, or 2 corresponding to X, Y, Z.
+    \return Twist angle in units of pi
+  */
+  Complex TwistPhase(const int &dir) const;
+  //!< Get the twist phase in the 'dir'-direction
+  /*!< 
+    \param dir The direction in which to obtain the boundary 
+    condition; 0, 1, or 2 corresponding to X, Y, Z.
+    \return Complex twist phase
+  */
+
+  bool Gparity() const
+  { return gparity; }
+  //!< Determine whether G-parity boundary conditions are in use in any of the 3 spatial directions.
+  /*!<
+    \return true if G-parity boundary conditions are in use.
+  */
+  
+  bool Gparity1fX() const { return gparity_1f_X == 1; }
+  bool Gparity1fY() const { return gparity_1f_Y == 1; }
+
+  void EnableGparity1f2fComparisonCode(){  gparity_doing_1f2f_comparison = 1; }
+  bool Gparity1f2fComparisonCode() const { return gparity_doing_1f2f_comparison == 1; }
+
+  void EnableEOFA()  { eofa = true;  }
+  void DisableEOFA() { eofa = false; }
+
+  bool EOFA() const { return eofa; }
+  //!< Determine whether we are using EOFA
+  /*!<
+   \return true if EOFA is in use.
+  */
 
   BndCndType NodeBc(int dir) const
       { return node_bc[dir];}
@@ -500,16 +509,16 @@ public:
   const char * StartSeedFilename() const
       {return doarg_int.start_seed_filename;}
 
-  const int StartConfAllocFlag() 
+  int StartConfAllocFlag() 
       {return doarg_int.start_conf_alloc_flag;}
-  const int StartU1ConfAllocFlag()
+  int StartU1ConfAllocFlag()
       {return doext_p->start_u1_conf_alloc_flag;}
-  const int mult_u1()
+  int mult_u1()
       {return doext_p->mult_u1_conf_flag;}
 
-  const int WfmSendAllocFlag() 
+  int WfmSendAllocFlag() 
       {return doarg_int.wfm_send_alloc_flag;}
-  const int WfmAllocFlag() 
+  int WfmAllocFlag() 
       {return doarg_int.wfm_alloc_flag;}
 
   StartSeedType StartSeedKind() const
@@ -583,16 +592,41 @@ public:
     \return The inverse of the 5th direction lattice spacing.
   */
   Float Mobius_b() const
-      {return doext_p->mobius_b_coeff;}
+      { 
+//VRB.Result(cname,"Mobius_b()","doext_p=%p\n",doext_p);fflush(stdout);
+	return doext_p->mobius_b_coeff;}
   Float Mobius_c() const
-      {return doext_p->mobius_c_coeff;}
+      { 
+//VRB.Result(cname,"Mobius_b()","doext_p=%p\n",doext_p);fflush(stdout);
+      return doext_p->mobius_c_coeff;}
+
+  Float SetMobius (Float mob) { 
+   doext_p->mobius_b_coeff = 0.5*(mob+1.);
+   doext_p->mobius_c_coeff = 0.5*(mob-1.);
+   VRB.Result(cname,"SetMobius()","mobius_b_coeff=%g mobius_c_coeff=%g \n",
+		 doext_p->mobius_b_coeff, doext_p->mobius_c_coeff);fflush(stdout);
+    return mob;}
+
+  Float GetMobius () {
+   Float mob_b = doext_p->mobius_b_coeff ;
+   Float mob_c = doext_p->mobius_c_coeff ;
+   if(fabs(mob_b-mob_c-1.)>1e-4)
+   ERR.General(cname,"GetMobius()","b-c(%g) not equal to 1\n",mob_b-mob_c);
+   // VRB.Result(cname,"GetMobius()","mobius_factor=%g\n",mob_b+mob_c);
+    return (mob_b+mob_c);}
+
+
+  std::vector< Complex >  zmobius_b;
+  std::vector< Complex >  zmobius_c;
   
-  Complex* ZMobius_b() const
-  {return zmobius_b;}
-  //{return (Complex*)( doext_p->zmobius_b_coeff.zmobius_b_coeff_val);}
-  Complex* ZMobius_c() const
-  {return zmobius_c;}
-  //{return (Complex*)( doext_p->zmobius_c_coeff.zmobius_c_coeff_val);}
+  Complex* ZMobius_b() 
+  {return zmobius_b.data();}
+  Complex* ZMobius_c() 
+  {return zmobius_c.data();}
+  int ZMobius_ls(){
+	assert(zmobius_b.size()==zmobius_c.size());
+	return zmobius_b.size();
+  }
   
   ZMobiusPCType ZMobius_PC_Type() const
   {return zmobius_pc_type; }
@@ -808,23 +842,29 @@ public:
   void Mobius_c(Float c)
       {doext_int.mobius_c_coeff = c;}
 
-  // FIXME: this is dangerous, assuming the contents of pointer b and c are foever
   void ZMobius_b(Float* b, int ls)
   {
-    if(zmobius_b) sfree(zmobius_b, "zmobius_b", "Zmobius_b", "GJP");
-    zmobius_b=(Complex*)smalloc("GJP","Zmobius_b", "zmobius_b", sizeof(Complex)*ls );
-    for(int s=0;s<ls;++s) zmobius_b[s]=Complex(b[2*s],b[2*s+1]);
+//    if(zmobius_b) sfree(zmobius_b, "zmobius_b", "Zmobius_b", "GJP");
+//    zmobius_b=(Complex*)smalloc("GJP","Zmobius_b", "zmobius_b", sizeof(Complex)*ls );
+//    for(int s=0;s<ls;++s) zmobius_b[s]=Complex(b[2*s],b[2*s+1]);
+      zmobius_b.clear();
+    for(int s=0;s<ls;++s){
+	printf("%d: %g %g\n",s,b[2*s],b[2*s+1]);
+	 zmobius_b.push_back(Complex(b[2*s],b[2*s+1]));
+    }
+
+      
   }
   
       
     
-  //{doext_int. zmobius_c_coeff.zmobius_c_coeff_val = b;}
   void ZMobius_c(Float* c, int ls)
   {
-    if(zmobius_c) sfree(zmobius_c, "zmobius_c", "Zmobius_c", "GJP");
-    zmobius_c=(Complex*)smalloc("GJP","Zmobius_c", "zmobius_c", sizeof(Complex)*ls );
-    for(int s=0;s<ls;++s) 
-      zmobius_c[s]=Complex(c[2*s],c[2*s+1]);
+//    if(zmobius_c) sfree(zmobius_c, "zmobius_c", "Zmobius_c", "GJP");
+//    zmobius_c=(Complex*)smalloc("GJP","Zmobius_c", "zmobius_c", sizeof(Complex)*ls );
+//    for(int s=0;s<ls;++s) zmobius_c[s]=Complex(c[2*s],c[2*s+1]);
+      zmobius_c.clear();
+    for(int s=0;s<ls;++s) zmobius_c.push_back(Complex(c[2*s],c[2*s+1]));
   }
 
   void ZMobius_PC_Type(ZMobiusPCType zpc )
@@ -850,6 +890,12 @@ public:
   //! Sets the global lattice boundary condition in the T direction.
   void Tbc(BndCndType bc) { Bc(3,bc);}
 
+  //! Sets the twist angle in direction 'dir', specified in units of pi
+  // Note: for regular case  p = n*2*pi/L + theta/L  where theta is the twist_angle
+  // For twisted G-parity  p = n*2*pi/(2*L) + theta/(2*L)  as BC is applied on u->d boundary but not d->u
+  // Reproduce untwisted G-parity with theta = pi  (APBC on doubled lattice length)
+  void TwistAngle(const int &dir, const Float &theta){ twist_angle[dir] = theta; }
+    
   void StartConfKind(StartConfType sc)
       {doarg_int.start_conf_kind = sc;}
   //!< Sets the type of initial  gauge configuration.
@@ -939,19 +985,12 @@ inline void Start(){}
 void End();
 void Start(int * argc, char ***argv);
 
-#if TARGET == QCDOC 
-extern "C" {
-  void _mcleanup(void);
-}
-inline void Start(int * argc, char ***argv){Start(); GJP.setArg(argc, argv);}
-#elif USE_QMP
+#ifdef USE_QMP
 namespace QMPSCU {
   void init_qmp();
   void init_qmp(int * argc, char *** argv);
   void destroy_qmp();
 }
-#elif TARGET == BGL
-void Start(const BGLAxisMap *);
 #endif
 
 #ifdef USE_BFM

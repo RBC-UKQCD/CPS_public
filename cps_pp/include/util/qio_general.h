@@ -134,8 +134,10 @@
 #define USE_QIO_SPARSE_PARTFILE
 
 #ifdef USE_QIO_SPARSE_PARTFILE
+#undef QIO_VOLFMT 
 #define QIO_VOLFMT QIO_PARTFILE
 #define QIO_SPARSE_PARTFILE
+#undef QIO_SERPAR 
 #define QIO_SERPAR QIO_PARALLEL
 // Number of nodes, per which one io-node is designated.
 // Set it to zero if you want all nodes to be io-node.

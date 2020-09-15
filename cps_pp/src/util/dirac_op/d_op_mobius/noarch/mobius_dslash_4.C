@@ -1,20 +1,5 @@
 #include<config.h>
 CPS_START_NAMESPACE
-//--------------------------------------------------------------------
-//  CVS keywords
-//
-//  $Author: chulwoo $
-//  $Date: 2013-04-05 17:46:30 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_mobius/noarch/mobius_dslash_4.C,v 1.2 2013-04-05 17:46:30 chulwoo Exp $
-//  $Id: mobius_dslash_4.C,v 1.2 2013-04-05 17:46:30 chulwoo Exp $
-//  $Name: not supported by cvs2svn $
-//  $Locker:  $
-//  $RCSfile: mobius_dslash_4.C,v $
-//  $Revision: 1.2 $
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_mobius/noarch/mobius_dslash_4.C,v $
-//  $State: Exp $
-//
-//--------------------------------------------------------------------
 //------------------------------------------------------------------
 //
 // mobius_dslash_4.C
@@ -37,18 +22,23 @@ CPS_END_NAMESPACE
 #include<util/verbose.h>
 #include<util/error.h>
 #include<comms/scu.h>
-CPS_START_NAMESPACE
-#ifdef PARALLEL
-CPS_END_NAMESPACE
 #include <comms/sysfunc_cps.h>
 CPS_START_NAMESPACE
-#endif
-
 
 void mobius_dslash_4(Vector *out, 
 		     Matrix *gauge_field, 
 		     Vector *in, 
 		     int cb, 
+		     int dag, 
+		     Dwf *mobius_lib_arg,
+		     Float mass)
+{
+
+    zmobius_dslash_4(out,gauge_field,in,cb,dag,mobius_lib_arg,mass);
+}
+
+void mobius_Booee(Vector *out, 
+		     Vector *in, 
 		     int dag, 
 		     Dwf *mobius_lib_arg,
 		     Float mass)
@@ -66,20 +56,22 @@ void mobius_dslash_4(Vector *out,
   // Initializations
   //----------------------------------------------------------------
   ls = mobius_lib_arg->ls;
-  const int f_size = 24 * mobius_lib_arg->vol_4d / 2;
+  const size_t f_size = 24 * mobius_lib_arg->vol_4d / 2;
   Float b_coeff = GJP.Mobius_b();
   Float c_coeff = GJP.Mobius_c();
+  VRB.Debug("","mobius_Booee","b_coeff=%g c_coeff=%g\n",b_coeff,c_coeff);
+  if(dag)
+  ERR.General("","mobius_Booee", "Only implemented for dag=0\n");
 
   frm_in = (IFloat *) in;
   frm_out = (IFloat *) out;
-  g_field = (IFloat *) gauge_field;
   wilson_p = mobius_lib_arg->wilson_p;
   size_cb[0] = 24*wilson_p->vol[0];
   size_cb[1] = 24*wilson_p->vol[1];
   
   IFloat* frm_;
-  Vector  *frm_tmp3 = (Vector *) mobius_lib_arg->frm_tmp3;
-  frm_ = (IFloat*)frm_tmp3;
+//  Vector  *frm_tmp3 = (Vector *) mobius_lib_arg->frm_tmp3;
+  frm_ = (IFloat*)frm_out;
 
   //----------------------------------------------------------------
   // Apply 4-dimensional Dslash
@@ -90,23 +82,6 @@ void mobius_dslash_4(Vector *out,
   // frm_ += c * P_L * Psi(s+1) + c * P_R * Psi(s-1)
   mobius_kappa_dslash_5_plus((Vector*)frm_, in, mass, dag, mobius_lib_arg, c_coeff);
 
-  // out = D_W * frm_
-  for(i=0; i<ls; i++){
-
-    // parity of 4-D checkerboard
-    //------------------------------------------------------------
-    parity = cb;//4d odd-even preconditioning
-
-    // Apply on 4-dim "parity" checkerboard part
-    //------------------------------------------------------------
-    wilson_dslash(frm_out, g_field, frm_, parity, dag, wilson_p);
-    
-    frm_ = frm_ + size_cb[parity];
-    frm_out = frm_out + size_cb[parity];
-  }
-  
 }
-
-
 
 CPS_END_NAMESPACE

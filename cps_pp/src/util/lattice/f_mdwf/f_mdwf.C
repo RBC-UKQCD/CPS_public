@@ -214,7 +214,7 @@ int Fmdwf::FmatInv(Vector *f_out, Vector *f_in,
   MdwfArg *_mdwf_arg_p = GJP.GetMdwfArg();
 
   const int ls = _mdwf_arg_p->b5.b5_len;
-  const int f_size = SPINOR_SIZE * GJP.VolNodeSites() * ls;
+  const size_t f_size = SPINOR_SIZE * GJP.VolNodeSites() * ls;
   Vector *tmp = (Vector *)smalloc(cname, fname, "tmp", sizeof(Float) * f_size);
 
 #if 1
@@ -433,7 +433,7 @@ void Fmdwf::Ffour2five(Vector *five, Vector *four, int s_u, int s_l, int Ncb)
 //------------------------------------------------------------------
 // Initializations
 //------------------------------------------------------------------
-  int f_size = GJP.VolNodeSites() * FsiteSize()*Ncb/2;
+  size_t f_size = GJP.VolNodeSites() * FsiteSize()*Ncb/2;
   int ls = GJP.SnodeSites();
   int vol_4d = GJP.VolNodeSites()*Ncb/2;
   int ls_stride = 24 * vol_4d;
@@ -511,7 +511,7 @@ void Fmdwf::Ffive2four(Vector *four, Vector *five, int s_u, int s_l, int Ncb)
 // Initializations
 //------------------------------------------------------------------
   int ls = GJP.SnodeSites();
-  int f_size = GJP.VolNodeSites() * FsiteSize()*Ncb / (ls*2);
+  size_t f_size = GJP.VolNodeSites() * FsiteSize()*Ncb / (ls*2);
   int vol_4d = GJP.VolNodeSites()*Ncb/2;
   int ls_stride = 24 * vol_4d;
   int s_u_local = s_u % GJP.SnodeSites();
@@ -619,7 +619,7 @@ int Fmdwf::FeigSolv(Vector **f_eigenv, Float *lambda,
 
   // calculate chirality
   int Ncb = NumChkb(cg_arg.RitzMatOper);
-  int f_size = GJP.VolNodeSites()*2*Colors()*SpinComponents()*Ncb/2;
+  size_t f_size = GJP.VolNodeSites()*2*Colors()*SpinComponents()*Ncb/2;
   Vector *four = (Vector *) smalloc (cname,fname, "four", f_size * sizeof(Float));
   Vector *fourg5 = (Vector *) smalloc (cname,fname, "fourg5", f_size * sizeof(Float));
   Float help;
@@ -717,7 +717,7 @@ Float Fmdwf::FhamiltonNode( Vector *phi,  Vector *chi)
   if (phi == 0) ERR.Pointer(cname,fname,"phi") ;
   if (chi == 0) ERR.Pointer(cname,fname,"chi") ;
 
-  int f_size = GJP.VolNodeSites() * FsiteSize() / 2 ;
+  size_t f_size = GJP.VolNodeSites() * FsiteSize() / 2 ;
 
   Float ret_val;
 
@@ -799,7 +799,7 @@ void Fmdwf::SpinProject(Vector * out, Vector *in, int s_size, int type)
   int lcl_pos[4], color;
   int s;
 
-  int f_size_4d= GJP.VolNodeSites()*2*Colors()*SpinComponents();
+  size_t f_size_4d= GJP.VolNodeSites()*2*Colors()*SpinComponents();
 
   for(s = 0; s < lcl_size[4]; ++s){
     for_each_site_4d(lcl_pos){
@@ -888,7 +888,7 @@ void Fmdwf::Dminus(Vector *out, Vector *in)
   MdwfArg &mdwf_arg = *GJP.GetMdwfArg();
 
   const int ls = mdwf_arg.b5.b5_len;
-  const int f_size = SPINOR_SIZE * GJP.VolNodeSites() * ls;
+  const size_t f_size = SPINOR_SIZE * GJP.VolNodeSites() * ls;
 
   Vector *tmp = (Vector *)smalloc(cname, fname, "tmp", sizeof(Float) * f_size);
   Float *b5_tmp = (Float *)smalloc(cname, fname, "b5_tmp", sizeof(Float) * ls);

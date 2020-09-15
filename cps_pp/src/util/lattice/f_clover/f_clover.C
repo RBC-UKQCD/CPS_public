@@ -287,7 +287,7 @@ int Fclover::FeigSolv(Vector **f_eigenv, Float *lambda,
       Fconvert(f_eigenv[i], CANONICAL, StrOrd());
 
   // Compute chirality
-  int f_size = (GJP.VolNodeSites() * FsiteSize());
+  size_t f_size = (GJP.VolNodeSites() * FsiteSize());
   Float factor = 4.0 + eig_arg->mass;
   v1 = (Vector *)smalloc(f_size*sizeof(Float));
   if (v1 == 0)
@@ -385,7 +385,7 @@ ForceArg Fclover::EvolveMomFforce(Matrix *mom, Vector *frm,
 //------------------------------------------------------------------
 // allocate space for four CANONICAL fermion fields.
 //------------------------------------------------------------------
-  int f_size = FsiteSize() * GJP.VolNodeSites() ;
+  size_t f_size = FsiteSize() * GJP.VolNodeSites() ;
   
   char *str_v1 = "v1" ;
   Vector *v1 = (Vector *)smalloc(f_size*sizeof(Float)) ;
@@ -673,7 +673,7 @@ Float Fclover::BhamiltonNode(Vector *boson, Float mass){
 
   const int half_sites = GJP.VolNodeSites()/2;  
   int vec_size = FsiteSize() * half_sites;    
-  int f_size = vec_size *2;
+  size_t f_size = vec_size *2;
    
   Vector *bsn_tmp = (Vector *)
     smalloc(f_size*sizeof(Float));

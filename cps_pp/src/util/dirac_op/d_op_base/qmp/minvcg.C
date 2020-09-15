@@ -56,6 +56,8 @@ int DiracOp::MInvCG(Vector **psi_slow, Vector *chi, Float chi_norm, Float *mass,
   if( (lat.Fclass() != F_CLASS_DWF) && (GJP.Snodes()>1) )
     ERR.General(cname,fname,"Fermion class type inconsistent with spread-out S dimension\n");
 
+  if(GJP.Gparity()) ERR.General(cname,fname,"(QMP subdir version) Code needs testing for Gparity");
+
   // Print out input parameters
   //------------------------------------------------------------------
   VRB.Input(cname,fname,
@@ -74,12 +76,14 @@ int DiracOp::MInvCG(Vector **psi_slow, Vector *chi, Float chi_norm, Float *mass,
   //------------------------------------------------------------------
 
   int iz, k, s;
-  int f_size;
+  size_t f_size;
   if(lat.Fclass() == F_CLASS_CLOVER)
     f_size = lat.FsiteSize()*GJP.VolNodeSites() / 2;
   else
     f_size = lat.FsiteSize()*GJP.VolNodeSites() / (lat.FchkbEvl()+1);
 
+  if(GJP.Gparity()) f_size *= 2;
+  
   unsigned long loc_csum = local_checksum((Float *)chi,f_size);
   CSM.SaveCsum(CSUM_EVL_SRC,loc_csum);
   CSM.Clear(CSUM_GLB_LOC);

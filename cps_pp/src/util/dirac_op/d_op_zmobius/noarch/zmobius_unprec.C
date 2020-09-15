@@ -1,12 +1,5 @@
 #include<config.h>
 CPS_START_NAMESPACE
-//--------------------------------------------------------------------
-//  CVS keywords
-//
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_mobius/noarch/mobius_dslash.C,v $
-//  $State: Exp $
-//
-//--------------------------------------------------------------------
 //------------------------------------------------------------------
 //
 // mobius_dslash.C
@@ -49,11 +42,12 @@ void zmobius_unprec(Vector *out,
 // Apply 4-dimensional Dslash
 //-b----------------------------------------------------------------- 
 
-  Vector  *frm_tmp2 = (Vector *) mobius_lib_arg->frm_tmp2;
+//  Vector  *frm_tmp2 = (Vector *) mobius_lib_arg->frm_tmp2;
 
   
-  const unsigned long  f_size = (24/(2*6)) * mobius_lib_arg->vol_4d * mobius_lib_arg->ls;
+  size_t  f_size = (24/(2*6)) * mobius_lib_arg->vol_4d * mobius_lib_arg->ls;
   memset(out,0,f_size*(2*6)*sizeof(Float));
+  Vector  *frm_tmp2 = (Vector *) smalloc("","zmobius_unprec","frm_tmp2",f_size*(2*6)*sizeof(Float));
   zmobius_dslash_4(out+f_size, gauge_field, in, 0, dag, mobius_lib_arg, mass);
   zmobius_dslash_4(out, gauge_field, in+f_size, 1, dag, mobius_lib_arg, mass);
 
@@ -61,8 +55,8 @@ void zmobius_unprec(Vector *out,
 //------------------------------------------------------------------
 // Apply 5th-direction Dslash
 //------------------------------------------------------------------
-  Complex* kappa_c = mobius_lib_arg->zmobius_kappa_c;
-  Complex* kappa_b = mobius_lib_arg->zmobius_kappa_b;
+  Complex* kappa_c = mobius_lib_arg->zmobius_kappa_c.data();
+  Complex* kappa_b = mobius_lib_arg->zmobius_kappa_b.data();
   Complex *one = new Complex[mobius_lib_arg->ls];
   for(int i=0;i<mobius_lib_arg->ls;i++) one[i] = -1./kappa_c[i];
 
@@ -95,6 +89,7 @@ void zmobius_unprec(Vector *out,
   }
 }
 #endif
+  sfree(frm_tmp2);
 
 
 

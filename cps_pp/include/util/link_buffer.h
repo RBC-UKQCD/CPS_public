@@ -111,6 +111,9 @@ class LinkBuffer{
 
 };
 
+//Given a coordinate relative to the origin of this node, determine how many G-parity boundaries are crossed to reach it
+int nGparityBoundariesCrossed(const int * x);
+
 #endif
 
 

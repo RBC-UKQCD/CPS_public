@@ -106,8 +106,6 @@ void GtadpoleRect::GforceSite(Matrix& force, int *x, int mu)
 
   Float tmp ;
 
-  setCbufCntrlReg(4, CBUF_MODE4);
-
   Matrix *u_off = GaugeField()+GsiteOffset(x)+mu;
 
   //----------------------------------------------------------------------------
@@ -179,8 +177,6 @@ ForceArg GtadpoleRect::EvolveMomGforce(Matrix *mom, Float dt){
   ForceFlops = 0;
 #endif
   
-  setCbufCntrlReg(4, CBUF_MODE4);
-
   int x[4];
   
   for(x[0] = 0; x[0] < GJP.XnodeSites(); ++x[0])

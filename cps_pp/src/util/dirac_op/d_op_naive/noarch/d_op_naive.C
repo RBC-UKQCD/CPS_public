@@ -427,7 +427,7 @@ void DiracOpNaive::CalcHmdForceVecs(Vector *chi)
 
   Vector *chi_new, *rho, *psi, *sigma ;
 
-  int f_size_cb = 12 * GJP.VolNodeSites() ;
+  size_t f_size_cb = 12 * GJP.VolNodeSites() ;
 
   chi_new = f_out ;
 

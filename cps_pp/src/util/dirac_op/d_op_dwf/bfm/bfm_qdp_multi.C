@@ -63,7 +63,7 @@ template<class Float>
 void bfm_spawn_cg_CJ (bfm_qdp<Float> &dwf)
 {
     int THREADS= dwf.threads;
-     bfmarg::Threads(16);
+     bfmarg::Threads(THREADS);
      bfmarg::Reproduce(0);
     bfmarg::ReproduceChecksum(0);
      bfmarg::ReproduceMasterCheck(0);
@@ -123,13 +123,8 @@ int dwf_CG_precMdagM_oo_multi(multi2d<LatticeFermion> &sol_qdp,
     else             dwfa.local_comm[mu] = 1;
   }
 
-//        bfmarg::Threads(16);
- //       bfmarg::Reproduce(0);
-  //      bfmarg::ReproduceChecksum(0);
-   //     bfmarg::ReproduceMasterCheck(0);
-    //    bfmarg::Verbose(1);
   dwfa.verbose=1;
-  dwfa.threads=64;
+  dwfa.threads=GJP.Nthreads();
 
 
   QDPIO::cout << "bfm_qdp:: Initialising BAGEL-2 solver "<<endl;

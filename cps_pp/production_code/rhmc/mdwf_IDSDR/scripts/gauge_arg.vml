@@ -1,0 +1,7 @@
+class ActionGaugeArg gauge_arg = {
+GclassType gluon = G_CLASS_IMPR_RECT
+class ActionArg action_arg = {
+ForceMeasure force_measure = FORCE_MEASURE_NO
+string force_label = "Gauge"
+}
+}

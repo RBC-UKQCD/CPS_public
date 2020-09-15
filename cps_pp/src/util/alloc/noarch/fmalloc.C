@@ -14,23 +14,26 @@
 CPS_START_NAMESPACE
 
 #define ALLOC_MEMALIGN_NUM 4096
-void* fmalloc(size_t request,
-	      const char vname[], const char fname[], const char cname[]){
+void* fmalloc( const char cname[], const char fname[], const char vname[], size_t request){
 
-    return smalloc(request, vname, fname, cname);
+    return smalloc(cname,fname,vname,request);
     
 }
 
+#if 0
 void* fmalloc(size_t request){
     return smalloc(request);
 }
+#endif
 
-void ffree(void* p, const char vname[], const char fname[], const char cname[]){
-    sfree(p, cname, fname, vname);
+void ffree( const char cname[], const char fname[], const char vname[], void *p){
+    sfree(cname, fname, vname,p);
 }
+#if 0
 void ffree(void* p){
     sfree(p);
 }
+#endif
 
 
 CPS_END_NAMESPACE

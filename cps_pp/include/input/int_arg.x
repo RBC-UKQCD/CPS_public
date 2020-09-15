@@ -67,6 +67,16 @@ class RationalDescr {
   Float stag_bsn_mass;
 } ;
 
+class EOFARationalDescr 
+{
+  FieldType field_type;
+  int power_num;
+  int power_den;
+  //! The precision used in the Remez algorithm of the RHMC approximation.
+  long precision;
+  ApproxDescr rat_approx;
+} ;
+
 class EigenDescr {
   //! Whether the approximation bounds are checked
   EigenMeasure eigen_measure;
@@ -88,7 +98,7 @@ class ActionRationalArg {
 
   ActionBilinearArg bi_arg;
    
-  int remez_generate;
+  int remez_generate; //! Force it to regenerate remez poles
   string rat_poles_file<>;
 
   RationalDescr rationals<>;
@@ -190,8 +200,39 @@ class ActionRationalQuotientArg {
   Float bsn_mass<>;
   Float frm_mass<>;
 
+  //!Twist parameters for twisted mass Wilson fermions
+  Float bsn_mass_epsilon<>;
+  Float frm_mass_epsilon<>;
+
   RationalDescr bosons<>;
   RationalDescr fermions<>;
+
+  EigenDescr eigen;
+};
+
+class ActionEOFAArg 
+{
+  memfun void resize(u_int nmass);
+  memfun void resize(u_int mass, int LH_deg, int RH_deg); 
+
+  ActionBilinearArg bi_arg;
+   
+  Float LH_stop_rsd_fg<>;
+  Float LH_stop_rsd_md<>;
+  Float LH_stop_rsd_mc<>;
+  Float RH_stop_rsd_fg<>;
+  Float RH_stop_rsd_md<>;
+  Float RH_stop_rsd_mc<>;
+
+  Float spread;
+  int remez_generate;
+  string rat_poles_file<>;
+
+  Float num_mass<>;
+  Float den_mass<>;
+
+  EOFARationalDescr LH_rat_approx<>;
+  EOFARationalDescr RH_rat_approx<>;
 
   EigenDescr eigen;
 };

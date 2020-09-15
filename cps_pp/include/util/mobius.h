@@ -220,6 +220,13 @@ void mobius_dminus(Vector *out,
 		   int dag, 
 		   Dwf *mobius_lib_arg);
 
+void mobius_Booee(Vector *out, 
+		   Vector *in, 
+		   int dag, 
+		   Dwf *mobius_lib_arg,
+		   Float mass);
+
+
 #endif
 
 CPS_END_NAMESPACE

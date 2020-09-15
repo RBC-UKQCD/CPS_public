@@ -1,2 +1,2 @@
 #!/bin/tcsh
-indent -l80 -npsl -ce -br $*
+indent -l80 -npsl -ce -br -nut $*

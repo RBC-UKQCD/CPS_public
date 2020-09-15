@@ -14,6 +14,8 @@
 #include <cstdlib>
 #include <unistd.h>
 
+//disabling. Seems to have been manually copied from C. Kelly
+#if 0
 namespace mixed_cg {
 
 
@@ -1353,6 +1355,7 @@ namespace mixed_cg {
 	return iter;
     }
 };
+#endif
 
 
 #endif

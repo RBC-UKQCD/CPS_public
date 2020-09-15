@@ -1,0 +1,385 @@
+class JobPropagatorArgs prop_arg = {
+Array props[8] = {
+class PropagatorArg props[0] = {
+struct GenericPropAttrArg generics = {
+PropagatorType type = QPROPW_TYPE
+string tag = "prop_f0_m0.01_110"
+double mass = 1.000000e-02
+Vector bc[4] = {
+BndCndType bc[0] = BND_CND_GPARITY
+BndCndType bc[1] = BND_CND_GPARITY
+BndCndType bc[2] = BND_CND_PRD
+BndCndType bc[3] = BND_CND_APRD
+}
+}
+Array attributes[6] = {
+AttrType type = WALL_SOURCE_ATTR
+struct WallSourceAttrArg wall_source_attr = {
+int t = 0
+}
+AttrType type = MOMENTUM_ATTR
+struct MomentumAttrArg momentum_attr = {
+Vector p[3] = {
+int p[0] = 1
+int p[1] = 1
+int p[2] = 0
+}
+}
+AttrType type = GPARITY_FLAVOR_ATTR
+struct GparityFlavorAttrArg gparity_flavor_attr = {
+int flavor = 0
+}
+AttrType type = GAUGE_FIX_ATTR
+struct GaugeFixAttrArg gauge_fix_attr = {
+int gauge_fix_src = 1
+int gauge_fix_snk = 0
+}
+AttrType type = GPARITY_OTHER_FLAV_PROP_ATTR
+struct GparityOtherFlavPropAttrArg gparity_other_flav_prop_attr = {
+string tag = "prop_f1_m0.01_110"
+}
+AttrType type = DEFLATED_CG_ATTR
+struct DeflatedCGAttrArg deflated_cg_attr = {
+string lanczos_tag = "lanczos"
+}
+}
+}
+class PropagatorArg props[1] = {
+struct GenericPropAttrArg generics = {
+PropagatorType type = QPROPW_TYPE
+string tag = "prop_f0_m0.01_m1m10"
+double mass = 1.000000e-02
+Vector bc[4] = {
+BndCndType bc[0] = BND_CND_GPARITY
+BndCndType bc[1] = BND_CND_GPARITY
+BndCndType bc[2] = BND_CND_PRD
+BndCndType bc[3] = BND_CND_APRD
+}
+}
+Array attributes[6] = {
+AttrType type = WALL_SOURCE_ATTR
+struct WallSourceAttrArg wall_source_attr = {
+int t = 0
+}
+AttrType type = MOMENTUM_ATTR
+struct MomentumAttrArg momentum_attr = {
+Vector p[3] = {
+int p[0] = -1
+int p[1] = -1
+int p[2] = 0
+}
+}
+AttrType type = GPARITY_FLAVOR_ATTR
+struct GparityFlavorAttrArg gparity_flavor_attr = {
+int flavor = 0
+}
+AttrType type = GAUGE_FIX_ATTR
+struct GaugeFixAttrArg gauge_fix_attr = {
+int gauge_fix_src = 1
+int gauge_fix_snk = 0
+}
+AttrType type = GPARITY_OTHER_FLAV_PROP_ATTR
+struct GparityOtherFlavPropAttrArg gparity_other_flav_prop_attr = {
+string tag = "prop_f1_m0.01_m1m10"
+}
+AttrType type = DEFLATED_CG_ATTR
+struct DeflatedCGAttrArg deflated_cg_attr = {
+string lanczos_tag = "lanczos"
+}
+}
+}
+class PropagatorArg props[2] = {
+struct GenericPropAttrArg generics = {
+PropagatorType type = QPROPW_TYPE
+string tag = "prop_f0_m0.01_1m30"
+double mass = 1.000000e-02
+Vector bc[4] = {
+BndCndType bc[0] = BND_CND_GPARITY
+BndCndType bc[1] = BND_CND_GPARITY
+BndCndType bc[2] = BND_CND_PRD
+BndCndType bc[3] = BND_CND_APRD
+}
+}
+Array attributes[6] = {
+AttrType type = WALL_SOURCE_ATTR
+struct WallSourceAttrArg wall_source_attr = {
+int t = 0
+}
+AttrType type = MOMENTUM_ATTR
+struct MomentumAttrArg momentum_attr = {
+Vector p[3] = {
+int p[0] = 1
+int p[1] = -3
+int p[2] = 0
+}
+}
+AttrType type = GPARITY_FLAVOR_ATTR
+struct GparityFlavorAttrArg gparity_flavor_attr = {
+int flavor = 0
+}
+AttrType type = GAUGE_FIX_ATTR
+struct GaugeFixAttrArg gauge_fix_attr = {
+int gauge_fix_src = 1
+int gauge_fix_snk = 0
+}
+AttrType type = GPARITY_OTHER_FLAV_PROP_ATTR
+struct GparityOtherFlavPropAttrArg gparity_other_flav_prop_attr = {
+string tag = "prop_f1_m0.01_1m30"
+}
+AttrType type = DEFLATED_CG_ATTR
+struct DeflatedCGAttrArg deflated_cg_attr = {
+string lanczos_tag = "lanczos"
+}
+}
+}
+class PropagatorArg props[3] = {
+struct GenericPropAttrArg generics = {
+PropagatorType type = QPROPW_TYPE
+string tag = "prop_f0_m0.01_m130"
+double mass = 1.000000e-02
+Vector bc[4] = {
+BndCndType bc[0] = BND_CND_GPARITY
+BndCndType bc[1] = BND_CND_GPARITY
+BndCndType bc[2] = BND_CND_PRD
+BndCndType bc[3] = BND_CND_APRD
+}
+}
+Array attributes[6] = {
+AttrType type = WALL_SOURCE_ATTR
+struct WallSourceAttrArg wall_source_attr = {
+int t = 0
+}
+AttrType type = MOMENTUM_ATTR
+struct MomentumAttrArg momentum_attr = {
+Vector p[3] = {
+int p[0] = -1
+int p[1] = 3
+int p[2] = 0
+}
+}
+AttrType type = GPARITY_FLAVOR_ATTR
+struct GparityFlavorAttrArg gparity_flavor_attr = {
+int flavor = 0
+}
+AttrType type = GAUGE_FIX_ATTR
+struct GaugeFixAttrArg gauge_fix_attr = {
+int gauge_fix_src = 1
+int gauge_fix_snk = 0
+}
+AttrType type = GPARITY_OTHER_FLAV_PROP_ATTR
+struct GparityOtherFlavPropAttrArg gparity_other_flav_prop_attr = {
+string tag = "prop_f1_m0.01_m130"
+}
+AttrType type = DEFLATED_CG_ATTR
+struct DeflatedCGAttrArg deflated_cg_attr = {
+string lanczos_tag = "lanczos"
+}
+}
+}
+class PropagatorArg props[4] = {
+struct GenericPropAttrArg generics = {
+PropagatorType type = QPROPW_TYPE
+string tag = "prop_f1_m0.01_110"
+double mass = 1.000000e-02
+Vector bc[4] = {
+BndCndType bc[0] = BND_CND_GPARITY
+BndCndType bc[1] = BND_CND_GPARITY
+BndCndType bc[2] = BND_CND_PRD
+BndCndType bc[3] = BND_CND_APRD
+}
+}
+Array attributes[6] = {
+AttrType type = WALL_SOURCE_ATTR
+struct WallSourceAttrArg wall_source_attr = {
+int t = 0
+}
+AttrType type = MOMENTUM_ATTR
+struct MomentumAttrArg momentum_attr = {
+Vector p[3] = {
+int p[0] = 1
+int p[1] = 1
+int p[2] = 0
+}
+}
+AttrType type = GPARITY_FLAVOR_ATTR
+struct GparityFlavorAttrArg gparity_flavor_attr = {
+int flavor = 1
+}
+AttrType type = GAUGE_FIX_ATTR
+struct GaugeFixAttrArg gauge_fix_attr = {
+int gauge_fix_src = 1
+int gauge_fix_snk = 0
+}
+AttrType type = GPARITY_OTHER_FLAV_PROP_ATTR
+struct GparityOtherFlavPropAttrArg gparity_other_flav_prop_attr = {
+string tag = "prop_f0_m0.01_110"
+}
+AttrType type = DEFLATED_CG_ATTR
+struct DeflatedCGAttrArg deflated_cg_attr = {
+string lanczos_tag = "lanczos"
+}
+}
+}
+class PropagatorArg props[5] = {
+struct GenericPropAttrArg generics = {
+PropagatorType type = QPROPW_TYPE
+string tag = "prop_f1_m0.01_m1m10"
+double mass = 1.000000e-02
+Vector bc[4] = {
+BndCndType bc[0] = BND_CND_GPARITY
+BndCndType bc[1] = BND_CND_GPARITY
+BndCndType bc[2] = BND_CND_PRD
+BndCndType bc[3] = BND_CND_APRD
+}
+}
+Array attributes[6] = {
+AttrType type = WALL_SOURCE_ATTR
+struct WallSourceAttrArg wall_source_attr = {
+int t = 0
+}
+AttrType type = MOMENTUM_ATTR
+struct MomentumAttrArg momentum_attr = {
+Vector p[3] = {
+int p[0] = -1
+int p[1] = -1
+int p[2] = 0
+}
+}
+AttrType type = GPARITY_FLAVOR_ATTR
+struct GparityFlavorAttrArg gparity_flavor_attr = {
+int flavor = 1
+}
+AttrType type = GAUGE_FIX_ATTR
+struct GaugeFixAttrArg gauge_fix_attr = {
+int gauge_fix_src = 1
+int gauge_fix_snk = 0
+}
+AttrType type = GPARITY_OTHER_FLAV_PROP_ATTR
+struct GparityOtherFlavPropAttrArg gparity_other_flav_prop_attr = {
+string tag = "prop_f0_m0.01_m1m10"
+}
+AttrType type = DEFLATED_CG_ATTR
+struct DeflatedCGAttrArg deflated_cg_attr = {
+string lanczos_tag = "lanczos"
+}
+}
+}
+class PropagatorArg props[6] = {
+struct GenericPropAttrArg generics = {
+PropagatorType type = QPROPW_TYPE
+string tag = "prop_f1_m0.01_1m30"
+double mass = 1.000000e-02
+Vector bc[4] = {
+BndCndType bc[0] = BND_CND_GPARITY
+BndCndType bc[1] = BND_CND_GPARITY
+BndCndType bc[2] = BND_CND_PRD
+BndCndType bc[3] = BND_CND_APRD
+}
+}
+Array attributes[6] = {
+AttrType type = WALL_SOURCE_ATTR
+struct WallSourceAttrArg wall_source_attr = {
+int t = 0
+}
+AttrType type = MOMENTUM_ATTR
+struct MomentumAttrArg momentum_attr = {
+Vector p[3] = {
+int p[0] = 1
+int p[1] = -3
+int p[2] = 0
+}
+}
+AttrType type = GPARITY_FLAVOR_ATTR
+struct GparityFlavorAttrArg gparity_flavor_attr = {
+int flavor = 1
+}
+AttrType type = GAUGE_FIX_ATTR
+struct GaugeFixAttrArg gauge_fix_attr = {
+int gauge_fix_src = 1
+int gauge_fix_snk = 0
+}
+AttrType type = GPARITY_OTHER_FLAV_PROP_ATTR
+struct GparityOtherFlavPropAttrArg gparity_other_flav_prop_attr = {
+string tag = "prop_f0_m0.01_1m30"
+}
+AttrType type = DEFLATED_CG_ATTR
+struct DeflatedCGAttrArg deflated_cg_attr = {
+string lanczos_tag = "lanczos"
+}
+}
+}
+class PropagatorArg props[7] = {
+struct GenericPropAttrArg generics = {
+PropagatorType type = QPROPW_TYPE
+string tag = "prop_f1_m0.01_m130"
+double mass = 1.000000e-02
+Vector bc[4] = {
+BndCndType bc[0] = BND_CND_GPARITY
+BndCndType bc[1] = BND_CND_GPARITY
+BndCndType bc[2] = BND_CND_PRD
+BndCndType bc[3] = BND_CND_APRD
+}
+}
+Array attributes[6] = {
+AttrType type = WALL_SOURCE_ATTR
+struct WallSourceAttrArg wall_source_attr = {
+int t = 0
+}
+AttrType type = MOMENTUM_ATTR
+struct MomentumAttrArg momentum_attr = {
+Vector p[3] = {
+int p[0] = -1
+int p[1] = 3
+int p[2] = 0
+}
+}
+AttrType type = GPARITY_FLAVOR_ATTR
+struct GparityFlavorAttrArg gparity_flavor_attr = {
+int flavor = 1
+}
+AttrType type = GAUGE_FIX_ATTR
+struct GaugeFixAttrArg gauge_fix_attr = {
+int gauge_fix_src = 1
+int gauge_fix_snk = 0
+}
+AttrType type = GPARITY_OTHER_FLAV_PROP_ATTR
+struct GparityOtherFlavPropAttrArg gparity_other_flav_prop_attr = {
+string tag = "prop_f0_m0.01_m130"
+}
+AttrType type = DEFLATED_CG_ATTR
+struct DeflatedCGAttrArg deflated_cg_attr = {
+string lanczos_tag = "lanczos"
+}
+}
+}
+}
+Array lanczos[1] = {
+class LanczosContainerArg lanczos[0] = {
+string tag = "lanczos"
+struct LancArg lanc_arg = {
+double mass = 0.01
+double stop_rsd = 1e-10
+double qr_rsd = 1e-14
+EigenType EigenOper = DDAGD
+bool precon = 1
+int N_get = 200
+int N_use = 230
+int N_true_get = 200
+int ch_ord = 100
+double ch_alpha = 6
+double ch_beta = 0.4
+bool ch_sh = 0
+double ch_mu = 0
+bool lock = 1
+int maxits = 10000
+string fname = "Lanczos"
+}
+int cg_max_iter = 10000
+double cg_residual = 1e-08
+int cg_precon_5d = 1
+BfmSolverType solver = BFM_DWF
+double mobius_scale = 2
+BndCndType tbc = BND_CND_APRD
+}
+}
+}

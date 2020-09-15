@@ -1,5 +1,5 @@
-#ifndef RANDOMMATRIX_H
-#define RANDOMMATRIX_H
+#ifndef BFM_RANDOMMATRIX_H
+#define BFM_RANDOMMATRIX_H
 
 #include <cstdlib>
 #include <string>
@@ -11,23 +11,25 @@
 #include <complex>
 #include "Matrix.h"
 
+namespace BFM_Krylov{
+
 /**Random real vector**/
 
-template <class T> void RandomReal(vector<T> &A, int seed){
+template <class T> void RandomReal(std::vector<T> &A, int seed){
 
 srand48(seed);for(int i=0;i<A.size();i++){A[i] = drand48();}
 
 }
 
 /**Random complex vector**/
-template <class T> void RandomComplex(vector<T> &A, int seed){
+template <class T> void RandomComplex(std::vector<T> &A, int seed){
 
 srand48(seed);for(int i=0;i<A.size();i++){A[i] = T( drand48(),drand48() );}
 
 }
 
 /**Random unit vector**/
-template <class T> void RandomComplexUnit(vector<T> &A, int seed){
+template <class T> void RandomComplexUnit(std::vector<T> &A, int seed){
 
 srand48(seed);for(int i=0;i<A.size();i++){A[i] = T( drand48(),drand48() );}
 T norm = norm(A); for(int i=0;i<A.size();i++){A[i] /= norm;}
@@ -35,7 +37,7 @@ T norm = norm(A); for(int i=0;i<A.size();i++){A[i] /= norm;}
 }
 
 /**Random unit vector**/
-template <class T> void RandomRealUnit(vector<T> &A, int seed){
+template <class T> void RandomRealUnit(std::vector<T> &A, int seed){
 
 srand48(seed);for(int i=0;i<A.size();i++){A[i] = drand48();}
 T norm = norm(A); for(int i=0;i<A.size();i++){A[i] /= norm;}
@@ -43,7 +45,7 @@ T norm = norm(A); for(int i=0;i<A.size();i++){A[i] /= norm;}
 }
 
 /**Random dense vector(vector(**/
-template <class T> void RandomReal(vector<vector<T> > &A, int seed){
+template <class T> void RandomReal(std::vector<std::vector<T> > &A, int seed){
 
 int M = A.size();
 srand48(seed);
@@ -53,7 +55,7 @@ for(int j=0;j<M;j++){ A[i][j] = drand48(); }}
 }
 
 /**Random dense vector(vector(**/
-template <class T> void RandomComplex(vector<vector<T> > &A, int seed){
+template <class T> void RandomComplex(std::vector<std::vector<T> > &A, int seed){
 
 int M = A.size();
 srand48(seed);
@@ -93,7 +95,7 @@ Adag A = A Adag = I
 template <class T> void RandomUnitary(Matrix<T> &A, int seed){
 
 int M = A.dim;
-vector< vector<T> > q(M);
+std::vector< std::vector<T> > q(M);
 
 srand48(seed);
 for(int i=0;i<M;i++){q[i].resize(M);
@@ -393,6 +395,11 @@ for(int i=1;i<M;i++){ if(drand48() > 0.5){A( T( drand48(),drand48() ) ,  i, i-1)
 
 
 }
+
+
+
+}
+
 #endif
 /*
 int main(void){

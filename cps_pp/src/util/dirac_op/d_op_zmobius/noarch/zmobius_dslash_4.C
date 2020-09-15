@@ -1,23 +1,8 @@
 #include<config.h>
 CPS_START_NAMESPACE
-//--------------------------------------------------------------------
-//  CVS keywords
-//
-//  $Author: chulwoo $
-//  $Date: 2013-04-05 17:46:30 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_mobius/noarch/mobius_dslash_4.C,v 1.2 2013-04-05 17:46:30 chulwoo Exp $
-//  $Id: mobius_dslash_4.C,v 1.2 2013-04-05 17:46:30 chulwoo Exp $
-//  $Name: not supported by cvs2svn $
-//  $Locker:  $
-//  $RCSfile: mobius_dslash_4.C,v $
-//  $Revision: 1.2 $
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_mobius/noarch/mobius_dslash_4.C,v $
-//  $State: Exp $
-//
-//--------------------------------------------------------------------
 //------------------------------------------------------------------
 //
-// mobius_dslash_4.C
+// zmobius_dslash_4.C
 //
 // mobius_dslash_4 is the derivative part of the space-time part of
 // the fermion matrix. 
@@ -61,6 +46,7 @@ void zmobius_dslash_4_dag0(Vector *out,
   Wilson *wilson_p;
   int size_cb[2];
   int parity;
+  const char *fname="zmobius_dslash_4_dag0";
 
 
   //----------------------------------------------------------------
@@ -68,10 +54,12 @@ void zmobius_dslash_4_dag0(Vector *out,
   //----------------------------------------------------------------
   const int dag=0;
   ls = mobius_lib_arg->ls;
-  const int f_size = 24 * mobius_lib_arg->vol_4d / 2;
-#if 0
-  Float b_coeff = GJP.Mobius_b();
-  Float c_coeff = GJP.Mobius_c();
+  const size_t f_size = 24 * mobius_lib_arg->vol_4d / 2;
+#if 1
+//  Float b_coeff = GJP.Mobius_b();
+//  Float c_coeff = GJP.Mobius_c();
+  Complex* b_coeff = mobius_lib_arg->zmobius_b.data();
+  Complex* c_coeff = mobius_lib_arg->zmobius_c.data();
 #else
   Complex* b_coeff = GJP.ZMobius_b();
   Complex* c_coeff = GJP.ZMobius_c();
@@ -86,6 +74,8 @@ void zmobius_dslash_4_dag0(Vector *out,
   
   IFloat* frm_;
   Vector  *frm_tmp3 = (Vector *) mobius_lib_arg->frm_tmp3;
+//  VRB.Debug("",fname,"frm_tmp3=%p\n", mobius_lib_arg->frm_tmp3);
+
   frm_ = (IFloat*)frm_tmp3;
 
   //----------------------------------------------------------------
@@ -123,6 +113,7 @@ void zmobius_dslash_4_dag0(Vector *out,
 
     // Apply on 4-dim "parity" checkerboard part
     //------------------------------------------------------------
+//    VRB.Result("",fname,"wilson_dslash(%p %p %p %d %d %p)\n",frm_out, g_field, frm_, parity, dag, wilson_p);
     wilson_dslash(frm_out, g_field, frm_, parity, dag, wilson_p);
     
     frm_ = frm_ + size_cb[parity];
@@ -153,10 +144,12 @@ void zmobius_dslash_4_dag1(Vector *out,
   //----------------------------------------------------------------
   const int dag=1;
   ls = mobius_lib_arg->ls;
-  const int f_size = 24 * mobius_lib_arg->vol_4d / 2;
-#if 0
-  Float b_coeff = GJP.Mobius_b();
-  Float c_coeff = GJP.Mobius_c();
+  const size_t f_size = 24 * mobius_lib_arg->vol_4d / 2;
+#if 1
+//  Float b_coeff = GJP.Mobius_b();
+//  Float c_coeff = GJP.Mobius_c();
+  Complex* b_coeff = mobius_lib_arg->zmobius_b.data();
+  Complex* c_coeff = mobius_lib_arg->zmobius_c.data();
 #else
   Complex* b_coeff = GJP.ZMobius_b();
   Complex* c_coeff = GJP.ZMobius_c();

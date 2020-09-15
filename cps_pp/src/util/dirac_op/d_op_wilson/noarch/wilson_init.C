@@ -1,5 +1,6 @@
 #include <config.h>
-#ifdef USE_SSE
+//#ifdef USE_SSE //CK: no longer appears to work
+#if (defined USE_SSE)||(defined SSE_TO_C)
 #include "../sse/wilson_init.C"
 #else
 CPS_START_NAMESPACE
@@ -8,20 +9,6 @@ CPS_START_NAMESPACE
   
   $Id: wilson_init.C,v 1.6 2012/03/26 13:50:12 chulwoo Exp $
 */
-//--------------------------------------------------------------------
-//  CVS keywords
-//
-//  $Author: chulwoo $
-//  $Date: 2012/03/26 13:50:12 $
-//  $Header: /space/cvs/cps/cps++/src/util/dirac_op/d_op_wilson/noarch/wilson_init.C,v 1.6 2012/03/26 13:50:12 chulwoo Exp $
-//  $Id: wilson_init.C,v 1.6 2012/03/26 13:50:12 chulwoo Exp $
-//  $Name: v5_0_16_hantao_io_test_v7 $
-//  $Locker:  $
-//  $Revision: 1.6 $
-//  $Source: /space/cvs/cps/cps++/src/util/dirac_op/d_op_wilson/noarch/wilson_init.C,v $
-//  $State: Exp $
-//
-//--------------------------------------------------------------------
 /****************************************************************************/
 /* 10/16/97                                                                 */
 /*                                                                          */
@@ -100,6 +87,7 @@ void wilson_init(Wilson *wilson_p)  /* pointer to Wilson type structure    */
 /* spinors.)                                                                */
 /*--------------------------------------------------------------------------*/
   spinor_words = SPINOR_SIZE * wilson_p->vol[0];
+  if(GJP.Gparity()) spinor_words *=2; //2 flavours
 
   wilson_p->af[0] = (IFloat *) smalloc(spinor_words*sizeof(Float));
   if(wilson_p->af[0] == 0)

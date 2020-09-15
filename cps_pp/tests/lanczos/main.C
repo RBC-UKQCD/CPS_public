@@ -16,7 +16,8 @@
 #include <alg/meson.h>
 #include <alg/nuc2pt.h>
 #include <util/lattice.h>
-#include <util/gjp.h>
+#include <util/lattice/fgrid.h>
+#if 1
 #include <util/verbose.h>
 #include <util/error.h>
 #include <util/command_line.h>
@@ -25,6 +26,7 @@
 #include <util/qio_readLattice.h>
 #include <util/qcdio.h>
 #include <util/eigen_container.h>
+#endif
 
 
 
@@ -35,15 +37,14 @@ using namespace std;
 DoArg do_arg;
 DoArgExt doext_arg;
 
-HmcArg hmc_arg;
-ActionGaugeArg gauge_arg;
+//HmcArg hmc_arg;
+//ActionGaugeArg gauge_arg;
 
 // It is very imporatnt that mobius_arg is global and exits for ever
 // as in GJP, we use zmobius_c_coeff and zmobius_b_coeff is pointing the contetnts of mobius_arg
-// We may want to fix this later,  I am not fixing this due to lack of time
 MobiusArg mobius_arg;
-MobiusArg mobius_arg2;
-MdwfArg mdwf_arg;
+//MobiusArg mobius_arg2;
+//MdwfArg mdwf_arg;
 //RemezArg remez_arg;
 
 NoArg no_arg;
@@ -52,26 +53,7 @@ LanczosArg lanczos_arg;
 QPropWArg qp_arg;
 
 
-void movefloattoFloat (Float * out, float *in, int f_size);
-
-
-#if 0
-// needed to declare globally
-std::vector < EigenCache * >cps::EigenCacheList (0);
-
-//Search contents that match to arguments, return 0 if not found
-EigenCache *cps::EigenCacheListSearch (char *fname_root_bc, int neig)
-{
-  EigenCache *ecache = 0;
-
-  for (int i = 0; i < EigenCacheList.size (); ++i) {
-    if (EigenCacheList[i]->is_cached (fname_root_bc, neig))
-      ecache = EigenCacheList[i];
-  }
-
-  return ecache;
-}
-#endif
+void movefloattoFloat (Float * out, float *in, size_t f_size);
 
 
 static void SetZmobiusPC(int flag)
@@ -172,31 +154,37 @@ void comp_read_eigenvectors (Lattice & lattice, int eig_start=0,int num_eig=0)
   int Ncb = eig.NumChkb (lanczos_arg.RitzMat_lanczos);
   int fsize = GJP.VolNodeSites () * lattice.FsiteSize () * Ncb / 2 / 2;	//last 2 for single prec.;
   EigenCacheList.push_back (ecache);
+  EigenCacheListSearch("test",0);
+  printf("EigenCacheList.size()=%d\n",EigenCacheList.size());
+//  exit(-5432);
   int neig;
 
 
 #if 1
-  if (lanczos_arg.nk_lanczos_vectors > 0) {
+  if (lanczos_arg.nt_lanczos_vectors > 0) {
 
     int init_flag = 0;		// 0 : wall start, 1 :  compression, 2 : compress & decompress, 3: refinement using Ritz
-    int ncompress = 10;		// number of evecs in the compressed linear combination
+    int ncompress = 1;		// number of evecs in the compressed linear combination
 
     char *comp_file;
 
     neig = lanczos_arg.nk_lanczos_vectors + lanczos_arg.np_lanczos_vectors;
     ecache->alloc (evecname_bc, neig, fsize);
     eig.run (init_flag, ncompress, comp_file);
-    neig = lanczos_arg.nk_lanczos_vectors;
+    neig = lanczos_arg.nt_lanczos_vectors;
     ecache->set_neig (neig);
+  EigenCacheListSearch("test",0);
+  printf("EigenCacheList.size()=%d\n",EigenCacheList.size());
+//  exit(-5432);
   } else {
     if (num_eig>0) neig=num_eig;
     else
-    neig = mobius_arg2.cg.neig;
+    neig = mobius_arg.cg.neig;
     if (neig > 0) {
       ecache->alloc (evecname_bc, neig, fsize);
       {				//read in only
 	const int n_fields = GJP.SnodeSites ();
-	const int f_size_per_site = lattice.FsiteSize () / n_fields / 2;
+	const size_t f_size_per_site = lattice.FsiteSize () / n_fields / 2;
 	EigenContainer eigcon (lattice, evecname_bc, neig, f_size_per_site / 2,
 			       n_fields, ecache);
 	// factor of 2 for single-prec.
@@ -216,7 +204,7 @@ void comp_read_eigenvectors (Lattice & lattice, int eig_start=0,int num_eig=0)
 
 
 
-  // Read eigenvectors for small Ls mobius in mobius_arg2
+  // Read eigenvectors for small Ls mobius in mobius_arg
   //-------------------------------------------------------
   VRB.FuncEnd("",fname);
 
@@ -238,6 +226,12 @@ int main (int argc, char *argv[])
   char *fname = "main()";
 
   Start (&argc, &argv);
+{
+  const int LEN=10;
+  Vector a[LEN*6],b[LEN*6],c[LEN*6];
+  double coef=1.;
+  vaxpy3(a,&coef,b,c,LEN);
+}
 
   if (argc < 3) {
     if (!UniqueID ())
@@ -272,14 +266,12 @@ int main (int argc, char *argv[])
     ERR.General (fname, fname, "Decoding of mobius_arg failed\n");
   }
   mobius_arg.Encode ("mboius_arg.dat", "mobius_arg");
-  if (!mobius_arg2.Decode ("mobius_arg2.vml", "mobius_arg2")) {
-    ERR.General (fname, fname, "Decoding of mobius_arg2 failed\n");
-  }
-  mobius_arg2.Encode ("mobius_arg2.dat", "mobius_arg2");
+
   if (!qp_arg.Decode ("qpropw_arg.vml", "qpropw_arg")) {
     ERR.General (fname, fname, "Decoding of qpropw_arg failed\n");
   }
   qp_arg.Encode ("qpropw_arg.dat", "qpropw_arg");
+
   if (!lanczos_arg.Decode ("lanczos_arg.vml", "lanczos_arg")) {
     lanczos_arg.Encode ("lanczos_arg.dat", "lanczos_arg");
     if (!UniqueID ())
@@ -287,96 +279,63 @@ int main (int argc, char *argv[])
     exit (-1);
   }
   lanczos_arg.Encode ("lanczos_arg.dat", "lanczos_arg");
-  if (!gauge_arg.Decode ("gauge_arg.vml", "gauge_arg")) {
-    lanczos_arg.Encode ("gauge_arg.dat", "gauge_arg");
-    if (!UniqueID ())
-      printf ("Decoding of gauge_arg failed\n");
-    exit (-1);
-  }
-  if (!hmc_arg.Decode ("hmc_arg.vml", "hmc_arg")) {
-    lanczos_arg.Encode ("hmc_arg.dat", "hmc_arg");
-    if (!UniqueID ())
-      printf ("Decoding of hmc_arg failed\n");
-    exit (-1);
-  }
-  if (!mdwf_arg.Decode ("mdwf_arg.vml", "mdwf_arg")) {
-    if (!UniqueID ())
-      printf ("Decoding of mdwf_arg failed\n");
-    exit (-1);
-  }
-  mdwf_arg.Encode ("mdwf_arg.dat", "mdwf_arg");
-#if 0
-    if ( !remez_arg.Decode("remez_arg.vml","remez_arg") ) {
-     remez_arg.Encode("bum_arg","bum_arg");
-    printf("Bum remez_arg\n");
-    exit(-1);
-  }
-#endif
 
-//  remez_arg.Encode ("remez_arg.dat", "remez_arg");
 
   GJP.Initialize (do_arg);
   GJP.InitializeExt (doext_arg);
-    IntABArg ab1_arg;
-    ab1_arg.type = INT_LEAP;
-    ab1_arg.A_steps = 1;
-    ab1_arg.B_steps = 1;
-    ab1_arg.level = TOP_LEVEL_INTEGRATOR;
   VRB.Result("","main()","GJP.SaveStride()=%d\n",GJP.SaveStride());
   VRB.Level (do_arg.verbose_level);
-{
-   AlgMomentum mom;
-    AlgActionGauge gauge(mom, gauge_arg);
-    //!< Construct numerical integrators
-
-    AlgIntAB &ab1 = AlgIntAB::Create(mom, gauge, ab1_arg);
-for(int traj=0;traj<ntraj;traj++){
-        CommonArg common_arg_hmc;
-        truncate_it(&common_arg_hmc, "hmc", traj);
-     AlgHmc hmc(ab1,common_arg_hmc, hmc_arg);
-	hmc.run();
-}
-
-}
-
 
   // Solve  Small Ls with Zmobius
   //--------------------------------------------
  // if (do_zmob_sm) 
   {
-    GJP.SnodeSites (mobius_arg2.ls);
-//    GnoneFzmobius lattice;
-    GJP.ZMobius_b (mobius_arg2.zmobius_b_coeff.zmobius_b_coeff_val,
-		   mobius_arg2.ls);
-    GJP.ZMobius_c (mobius_arg2.zmobius_c_coeff.zmobius_c_coeff_val,
-		   mobius_arg2.ls);
+    GJP.SnodeSites (mobius_arg.ls);
+#if 0
+    GnoneFzmobius lattice;
+    GJP.ZMobius_b (mobius_arg.zmobius_b_coeff.zmobius_b_coeff_val,
+		   mobius_arg.ls);
+    GJP.ZMobius_c (mobius_arg.zmobius_c_coeff.zmobius_c_coeff_val,
+		   mobius_arg.ls);
+#else
+#if 1
+#ifndef USE_GRID
     GnoneFmobius lattice;
-    GJP.Mobius_b (mobius_arg2.mobius_b_coeff);
-    GJP.Mobius_c (mobius_arg2.mobius_c_coeff);
-//    GnoneFdwf lattice;
+    GJP.Mobius_b (mobius_arg.mobius_b_coeff);
+    GJP.Mobius_c (mobius_arg.mobius_c_coeff);
+#else
+    FgridParams params;
+    params.mobius_scale = GJP.GetMobius();
+    GnoneFgridMobius lattice(params);
+#endif
+#else
+    GnoneFdwf lattice;
+#endif
+#endif
 
 
     SetZmobiusPC(atoi(argv[2]));
 
     VRB.Result(cname,"main()", "GJP.ZMobius_PC_Type() = %d\n",GJP.ZMobius_PC_Type());
 
-if (do_meas){
+{
     Float high = 0.,low=0.;
-    meas_bound (lattice,&high,&low,mobius_arg2.cg.mass);
+    if (do_meas)
+    meas_bound (lattice,&high,&low,mobius_arg.cg.mass);
 //  cps::sync();exit(-1);
 }
     comp_read_eigenvectors (lattice);
 
     CgArg cg_save = qp_arg.cg;
-    qp_arg.cg = mobius_arg2.cg;
+    qp_arg.cg = mobius_arg.cg;
 
     CommonArg carg;
 
     QPropWPointSrc qp (lattice, &qp_arg, &carg);
     // 
-    system ("mkdir -p zmob_sm");
-    CalMesons (qp, "zmob_sm", 0, "point");
-    CalNucleons (qp, "zmob_sm", 0, "point");
+    system ("mkdir -p results");
+    CalMesons (qp, "results", 0, "point");
+    CalNucleons (qp, "results", 0, "point");
 
     qp_arg.cg = cg_save;
   }
@@ -391,7 +350,7 @@ if (do_meas){
 }
 
 
-void movefloattoFloat (Float * out, float *in, int f_size)
+void movefloattoFloat (Float * out, float *in, size_t f_size)
 {
 
   float flt;

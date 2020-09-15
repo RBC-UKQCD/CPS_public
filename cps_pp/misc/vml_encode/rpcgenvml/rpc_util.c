@@ -32,7 +32,7 @@
  * From: @(#)rpc_util.c 1.11 89/02/22 (C) 1987 SMI
  */
 char util_rcsid[] =
-  "$Id: rpc_util.c,v 1.3 2005/05/09 07:16:06 chulwoo Exp $";
+  "$Id: rpc_util.c,v 1.3.358.1 2012-11-15 18:17:08 ckelly Exp $";
 
 /*
  * rpc_util.c, Utility routines for the RPC protocol compiler
@@ -395,6 +395,12 @@ static const token tokstrings[] =
   {TOK_VOID, "void"},
   {TOK_PROGRAM, "program"},
   {TOK_VERSION, "version"},
+  /*Added by CK*/
+  {TOK_AMPERSAND, "&"},
+  {TOK_LANGLE, "<"},
+  {TOK_RANGLE, ">"},
+  {TOK_STRCONST, "\""},
+  /*End CK*/
   {TOK_EOF, "??????"}
 };
 

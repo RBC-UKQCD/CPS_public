@@ -119,7 +119,7 @@ void mobius_m5inv_dag0(Vector *inout,
   const int ls = GJP.SnodeSites()*GJP.Snodes();
   const int vol_4d_cb = mobius_lib_arg->vol_4d / 2;
   const int ls_stride = 24 * vol_4d_cb;
-  const int f_size = 24 * vol_4d_cb * ls;
+  const size_t f_size = 24 * vol_4d_cb * ls;
 
   const IFloat kappa_ratio = mobius_lib_arg->mobius_kappa_b/mobius_lib_arg->mobius_kappa_c;
   const Float  inv_d_last = 1.0 / ( 1.0 + pow(kappa_ratio, ls)*mass); // 1.0 / d_{ls-1}
@@ -246,7 +246,7 @@ void mobius_m5inv_dag1(Vector *inout,
   // const int s_node_coor = GJP.SnodeCoor();
   const int vol_4d_cb = mobius_lib_arg->vol_4d / 2;
   const int ls_stride = 24 * vol_4d_cb;
-  const int f_size = 24 * vol_4d_cb * ls;
+  const size_t f_size = 24 * vol_4d_cb * ls;
 
   const IFloat kappa_ratio = mobius_lib_arg->mobius_kappa_b/mobius_lib_arg->mobius_kappa_c;
   const Float  inv_d_last = 1.0 / ( 1.0 + pow(kappa_ratio, ls)*mass); // 1.0 / d_{ls-1}
@@ -372,7 +372,7 @@ void mobius_m5inv(Vector *out, Vector *in,
 		  Dwf *mobius_lib_arg)
 {
   const int vol_4d_cb = mobius_lib_arg->vol_4d / 2;
-  const int f_size = 24 * mobius_lib_arg->ls * vol_4d_cb;
+  const size_t f_size = 24 * mobius_lib_arg->ls * vol_4d_cb;
 
   printf("IN OUT ADDRESS %x %x fsize vol ls  %d %d %d\n", in, out,f_size,vol_4d_cb, mobius_lib_arg->ls );
   

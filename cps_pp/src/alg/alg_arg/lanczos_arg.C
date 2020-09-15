@@ -85,6 +85,10 @@ vml_LanczosArg (VML *vmls, char *name,LanczosArg *objp)
 		 return FALSE;
 	 if (!vml_int (vmls, "conv_check", &objp->conv_check))
 		 return FALSE;
+	 if (!vml_PrecType (vmls, "precision", &objp->precision))
+		 return FALSE;
+	 if (!vml_int (vmls, "mem_save", &objp->mem_save))
+		 return FALSE;
 	 if (!vml_string (vmls, "results", &objp->results, ~0))
 		 return FALSE;
 	 if (!vml_string (vmls, "file", &objp->file, ~0))

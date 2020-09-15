@@ -16,6 +16,10 @@ void ThreeMom::CalcLatMom(void){
   pp[0] = TWO_PI/(GJP.XnodeSites()*GJP.Xnodes()) ;
   pp[1] = TWO_PI/(GJP.YnodeSites()*GJP.Ynodes()) ;
   pp[2] = TWO_PI/(GJP.ZnodeSites()*GJP.Znodes()) ;
+
+  for(int i=0;i<3;i++)
+    if(GJP.Bc(i)==BND_CND_GPARITY) pp[i]/=4.0; //CK: units of momentum are pi/2L not 2pi/L in G-parity directions
+    else if(GJP.Bc(i) == BND_CND_APRD) pp[i]/=2.0; //units of momentum are pi/L in anti-periodic directions
 }
 #undef TWO_PI
 
@@ -43,7 +47,11 @@ Complex  ThreeMom::Fact(Site& s){
     if(p[i]!=0)
       {
 	int xx ;
-	xx = p[i]*(s.physCoor(i)) ;
+	int physcoor = s.physCoor(i);
+	if(i==0 && GJP.Gparity1fX() && physcoor >= GJP.Nodes(0)*GJP.NodeSites(0)/2) physcoor -= GJP.Nodes(0)*GJP.NodeSites(0)/2;
+	else if(i==1 && GJP.Gparity1fY() && physcoor >= GJP.Nodes(1)*GJP.NodeSites(1)/2) physcoor -= GJP.Nodes(1)*GJP.NodeSites(1)/2;
+
+	xx = p[i]*(physcoor) ;
 	xp += pp[i]*xx ;
       }
   
@@ -66,7 +74,11 @@ Complex  ThreeMom::FactCos(Site& s){
     if(p[i]!=0)
       {
 	int xx ;
-	xx = p[i]*(s.physCoor(i)) ;
+	int physcoor = s.physCoor(i);
+	if(i==0 && GJP.Gparity1fX() && physcoor >= GJP.Nodes(0)*GJP.NodeSites(0)/2) physcoor -= GJP.Nodes(0)*GJP.NodeSites(0)/2;
+	else if(i==1 && GJP.Gparity1fY() && physcoor >= GJP.Nodes(1)*GJP.NodeSites(1)/2) physcoor -= GJP.Nodes(1)*GJP.NodeSites(1)/2;
+
+	xx = p[i]*(physcoor) ;
 	ccc *= cos(pp[i]*xx) ;
       }
   

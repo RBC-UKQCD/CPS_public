@@ -287,6 +287,17 @@ enum FP_FORMAT  FPConv::setFileFormat(const enum FP_FORMAT dataFormat) {
   return fileFormat;
 }
 
+enum FP_FORMAT  FPConv::setHostFormat(const enum FP_FORMAT dataFormat) {
+  const char * fname = "setHostFormat";
+  hostFormat = dataFormat;
+  if(hostFormat == FP_AUTOMATIC)
+    ERR.General(cname,fname,"Manually-specified host format cannot be FP_AUTOMATIC\n");
+  if(hostFormat == FP_UNKNOWN)
+    ERR.General(cname,fname,"Manually-specified host format cannot be FP_UNKNOWN\n");
+  return hostFormat;
+}
+
+
 enum FP_FORMAT  FPConv::setFileFormat(const char * desc) {
   const char * fname = "setFileFormat()";
   fileFormat = FP_UNKNOWN;

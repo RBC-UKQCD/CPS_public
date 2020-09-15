@@ -30,6 +30,10 @@ CPS_END_NAMESPACE
 #include <util/qblas_extend.h>
 #endif
 
+#include <util/fpconv.h>
+#include <util/checksum.h>
+#include <util/qioarg.h>
+
 #ifdef USE_CG_DWF_WRAPPER
 #include "cps_cg_dwf.h"
 int CgDwfWrapper::lat_allocated=0;
@@ -336,7 +340,8 @@ int DiracOpDwf::MatInv(Vector *out,
   // Implement routine
   //----------------------------------------------------------------
   Vector *temp2;
-  unsigned long long temp_size = GJP.VolNodeSites() * lat.FsiteSize() / 2;
+  unsigned long long temp_size = GJP.VolNodeSites() * lat.FsiteSize() / 2; //odd-even preconditioned
+  if(GJP.Gparity()) temp_size*=2; //each parity comprises 2 stacked fields on each ls site
 
 
   Vector *temp = (Vector *) smalloc(temp_size * sizeof(Float));
@@ -359,6 +364,32 @@ int DiracOpDwf::MatInv(Vector *out,
 
 	
   Dslash(temp, even_in, CHKB_EVEN, DAG_NO);
+
+  //DEBUG - checksum the temp vector
+  {
+    int nwilson = GJP.VolNodeSites()*GJP.SnodeSites()/2; //how many blocks of 24 floats
+    if(GJP.Gparity()) nwilson*=2;
+    
+    FPConv fp;
+    enum FP_FORMAT format = FP_IEEE64LITTLE;
+    uint32_t csum(0);
+    
+    Float *field_5D = (Float *)temp;
+    
+    for(int x=0; x<nwilson; x++){
+      uint32_t csum_contrib = fp.checksum((char *)(field_5D),24,format);
+      csum += csum_contrib;
+      field_5D+=24;
+    }
+    
+    QioControl qc;
+    csum = qc.globalSumUint(csum);
+    
+    if(UniqueID()==0) printf("Even sites after Dslash(src) checksum %u\n",csum);
+  }
+  //DEBUG
+
+
 //  printf("MatInv : even : Dslash : temp:%e even:%e\n",temp->NormSqNode(temp_size),even_in->NormSqNode(temp_size));
 
   fTimesV1PlusV2((IFloat *)temp, (IFloat) dwf_arg->dwf_kappa, (IFloat *)temp,
@@ -394,6 +425,32 @@ int DiracOpDwf::MatInv(Vector *out,
 #ifdef USE_QUDA
     iter = QudaInvert(out, in, true_res, 1);
 #else
+    //DEBUG - checksum the converted 5d source
+    {
+      int nwilson = GJP.VolNodeSites()*GJP.SnodeSites(); //how many blocks of 24 floats
+      if(GJP.Gparity()) nwilson*=2;
+    
+      FPConv fp;
+      enum FP_FORMAT format = FP_IEEE64LITTLE;
+      uint32_t csum(0);
+    
+      Float *field_5D = (Float *)in;
+    
+      for(int x=0; x<nwilson; x++){
+	uint32_t csum_contrib = fp.checksum((char *)(field_5D),24,format);
+	csum += csum_contrib;
+	field_5D+=24;
+      }
+    
+      QioControl qc;
+      csum = qc.globalSumUint(csum);
+    
+      if(UniqueID()==0) printf("After initial D^dag D(src) checksum %u\n",csum);
+    }
+    //DEBUG
+
+
+    //printf("Starting invCG\n"); fflush(stdout);//DEBUG
     iter = InvCg(out,in,true_res);
 #endif
 #ifdef PROFILE
@@ -613,7 +670,7 @@ void DiracOpDwf::MatHerm(Vector *out, Vector *in) {
 
   \post The vector \a f_field_out is \f$ (1+D)\chi \f$
 
-  and the vector \a f_field_in is \f$ (D^\dagger-\kappa^2 M)\chi \f$
+  and the vector \a f_field_in is \f$ (D^\dagger-\kappa^2 M)\chi \f$  //CK: this does not match with what is actually done below!
 
   where \e M is the odd-even preconditioned fermion matrix connecting odd to
   odd parity sites and \e D is the hopping term connecting odd to
@@ -648,39 +705,34 @@ void DiracOpDwf::CalcHmdForceVecs(Vector *chi)
   // Implement routine
   //----------------------------------------------------------------
 
-//------------------------------------------------------------------
-// f_out stores (chi,rho), f_in stores (psi,sigma)
-//------------------------------------------------------------------
-
   Vector *chi_new, *rho, *psi, *sigma ;
 
-  int f_size_cb = 12 * GJP.VolNodeSites() * GJP.SnodeSites() ;
+  size_t f_size_cb = 12 * GJP.VolNodeSites() * GJP.SnodeSites() ;
+  if(GJP.Gparity()) f_size_cb*=2; //odd-parity sites for CubarT field stored immediately after odd-parity sites for d field
 
   chi_new = f_out ;
 
-  chi_new->CopyVec(chi, f_size_cb) ;
+  chi_new->CopyVec(chi, f_size_cb) ; //f_out[ODD] = chi[ODD]
 
-  psi = f_in ;
+  psi = f_in ; //f_in[ODD]
 
-//  fprintf(stderr,"psi=%p chi=%p rho=%p sigma=%p\n",psi,chi,rho,sigma);
-  MatPc(psi,chi) ;
-//  fprintf(stderr,"MatPc\n");
-
+  MatPc(psi,chi) ;  //f_in[ODD] = Mprec chi[ODD] = (1 - 1/[2(5-M5)]^2 Doe Deo) chi [ODD]
   {
     Float kappa = ((Dwf *)dwf_lib_arg)->dwf_kappa ;
-    psi->VecTimesEquFloat(-kappa*kappa,f_size_cb) ;
+    psi->VecTimesEquFloat(-kappa*kappa,f_size_cb) ;  //f_in[ODD] = -kappa^2 Mprec chi[ODD];
   }
 
-  rho = (Vector *)((Float *)f_out + f_size_cb) ;
+  rho = (Vector *)((Float *)f_out + f_size_cb) ; //f_out[EVEN]
 
-  Dslash(rho, chi, CHKB_ODD, DAG_NO) ;
-//  fprintf(stderr,"Dslash\n");
+  Dslash(rho, chi, CHKB_ODD, DAG_NO) ;  //f_out[EVEN] = D_eo f_out[ODD] = D_eo chi [ODD]
 
-  sigma = (Vector *)((Float *)f_in + f_size_cb) ;
+  sigma = (Vector *)((Float *)f_in + f_size_cb) ; //f_in[EVEN]
 
-  Dslash(sigma, psi, CHKB_ODD, DAG_YES) ;
-//  fprintf(stderr,"Dslash\n");
+  Dslash(sigma, psi, CHKB_ODD, DAG_YES) ; //f_in[EVEN] = -kappa^2 D_eo^dag Mprec chi[ODD];
 
+  //Net result is:
+  // f_in = ( -kappa^2 Mprec chi, -kappa^2 D_eo^dag Mprec chi )    f_out = ( chi, D_eo chi )
+  // These are converted into CANONICAL format when DiracOpDWF is destroyed
   return ;
 }
 

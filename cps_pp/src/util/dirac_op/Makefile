@@ -7,4 +7,6 @@ NORECURSE_DIR = CVS noarch qcdsp_nos qcdsp_nos_hdw_diag d_op_impr_dwf
 QCDOC_DIR = qcdoc
 QCDOC_SERIAL_DIR = noarch
 NOARCH_DIR =  noarch
+NOARCH_BFM_DIR =  noarch
+NOARCH_BFM_QMP_DIR =  noarch
 include ../../../Makefile.rules

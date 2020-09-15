@@ -25,6 +25,11 @@ AlgHamiltonian::AlgHamiltonian() : AlgInt()
 {
   Lattice &lat = LatticeFactory::Create(F_CLASS_NONE, G_CLASS_NONE);  
   g_size = GJP.VolNodeSites() * lat.GsiteSize();
+  if(GJP.Gparity()){
+    g_size *=2;
+    if(!UniqueID()) printf("g_size = 2 (G-parity) * GJP.VolNodeSites() * lat.GsiteSize() = %d\n",g_size);
+  }else if(!UniqueID()) printf("g_size = GJP.VolNodeSites() * lat.GsiteSize() = %d\n",g_size);
+
   LatticeFactory::Destroy();
 }
 

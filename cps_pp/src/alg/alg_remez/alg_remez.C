@@ -3,7 +3,7 @@
 #include<math.h>
 #include<cmath>
 
-#ifndef GMP
+#ifndef USE_GMP
 #include<alg/alg_remez.h>
 #else
 

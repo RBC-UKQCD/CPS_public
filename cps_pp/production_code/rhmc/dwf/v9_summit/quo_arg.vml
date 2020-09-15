@@ -1,0 +1,118 @@
+class ActionQuotientArg quo_arg = {
+class ActionBilinearArg bi_arg = {
+FclassType fermion = F_CLASS_MOBIUS
+Array bilinears[7] = { 
+class BilinearDescr bilinears[0] = {
+double mass =   0.0000000000000000e+00
+int max_num_iter = 50000
+}
+class BilinearDescr bilinears[1] = {
+double mass =   0.0000000000000000e+00
+int max_num_iter = 50000
+}
+class BilinearDescr bilinears[2] = {
+double mass =   0.0000000000000000e+00
+int max_num_iter = 50000
+}
+class BilinearDescr bilinears[3] = {
+double mass =   0.0000000000000000e+00
+int max_num_iter = 50000
+}
+class BilinearDescr bilinears[4] = {
+double mass =   0.0000000000000000e+00
+int max_num_iter = 50000
+}
+class BilinearDescr bilinears[5] = {
+double mass =   0.0000000000000000e+00
+int max_num_iter = 50000
+}
+class BilinearDescr bilinears[6] = {
+double mass =   0.0000000000000000e+00
+int max_num_iter = 50000
+}
+}
+class ActionArg action_arg = {
+ForceMeasure force_measure = FORCE_MEASURE_YES
+string force_label = "Quotient"
+}
+}
+Array quotients[7] = { 
+class QuotientDescr quotients[0] = {
+double bsn_mass =   3.8000000000000006e-03
+double bsn_mass_epsilon =   0.0000000000000000e+00
+double frm_mass =   5.4000000000000001e-04
+double frm_mass_epsilon =   0.0000000000000000e+00
+int chrono = 0
+double stop_rsd_hb =   1.0000000000000000e-14
+double stop_rsd_fg_mult =   1.0000000000000000e+00
+double stop_rsd_md =   1.0000000000000000e-07
+double stop_rsd_mc =   1.0000000000000000e-14
+}
+class QuotientDescr quotients[1] = {
+double bsn_mass =   1.4500000000000000e-02
+double bsn_mass_epsilon =   0.0000000000000000e+00
+double frm_mass =   3.8000000000000006e-03
+double frm_mass_epsilon =   0.0000000000000000e+00
+int chrono = 0
+double stop_rsd_hb =   1.0000000000000000e-14
+double stop_rsd_fg_mult =   1.0000000000000000e+00
+double stop_rsd_md =   1.0000000000000000e-09
+double stop_rsd_mc =   1.0000000000000000e-14
+}
+class QuotientDescr quotients[2] = {
+double bsn_mass =   4.5000000000000003e-02
+double bsn_mass_epsilon =   0.0000000000000000e+00
+double frm_mass =   1.4500000000000000e-02
+double frm_mass_epsilon =   0.0000000000000000e+00
+int chrono = 0
+double stop_rsd_hb =   1.0000000000000000e-14
+double stop_rsd_fg_mult =   1.0000000000000000e+00
+double stop_rsd_md =   1.0000000000000000e-09
+double stop_rsd_mc =   1.0000000000000000e-14
+}
+class QuotientDescr quotients[3] = {
+double bsn_mass =   1.0800000000000000e-01
+double bsn_mass_epsilon =   0.0000000000000000e+00
+double frm_mass =   4.5000000000000003e-02
+double frm_mass_epsilon =   0.0000000000000000e+00
+int chrono = 0
+double stop_rsd_hb =   1.0000000000000000e-14
+double stop_rsd_fg_mult =   1.0000000000000000e+00
+double stop_rsd_md =   1.0000000000000000e-09
+double stop_rsd_mc =   1.0000000000000000e-14
+}
+class QuotientDescr quotients[4] = {
+double bsn_mass =   2.5000000000000003e-01
+double bsn_mass_epsilon =   0.0000000000000000e+00
+double frm_mass =   1.0800000000000000e-01
+double frm_mass_epsilon =   0.0000000000000000e+00
+int chrono = 0
+double stop_rsd_hb =   1.0000000000000000e-14
+double stop_rsd_fg_mult =   1.0000000000000000e+00
+double stop_rsd_md =   1.0000000000000000e-09
+double stop_rsd_mc =   1.0000000000000000e-14
+}
+class QuotientDescr quotients[5] = {
+double bsn_mass =   5.1000000000000005e-01
+double bsn_mass_epsilon =   0.0000000000000000e+00
+double frm_mass =   2.5000000000000003e-01
+double frm_mass_epsilon =   0.0000000000000000e+00
+int chrono = 0
+double stop_rsd_hb =   1.0000000000000000e-14
+double stop_rsd_fg_mult =   1.0000000000000000e+00
+double stop_rsd_md =   1.0000000000000000e-09
+double stop_rsd_mc =   1.0000000000000000e-14
+}
+class QuotientDescr quotients[6] = {
+double bsn_mass =   1.0000000000000000e+00
+double bsn_mass_epsilon =   0.0000000000000000e+00
+double frm_mass =   5.1000000000000005e-01
+double frm_mass_epsilon =   0.0000000000000000e+00
+int chrono = 0
+double stop_rsd_hb =   1.0000000000000000e-14
+double stop_rsd_fg_mult =   1.0000000000000000e+00
+double stop_rsd_md =   1.0000000000000000e-09
+double stop_rsd_mc =   1.0000000000000000e-14
+}
+}
+}

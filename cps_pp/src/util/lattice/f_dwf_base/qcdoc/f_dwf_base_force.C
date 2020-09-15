@@ -78,9 +78,9 @@ ForceArg FdwfBase::EvolveMomFforce(Matrix *mom, Vector *chi,
   // allocate space for two CANONICAL fermion fields
   //----------------------------------------------------------------
 
-  int f_size = FsiteSize() * GJP.VolNodeSites() ;
+  size_t f_size = FsiteSize() * GJP.VolNodeSites() ;
   int f_site_size_4d = 2 * Colors() * SpinComponents();
-  int f_size_4d = f_site_size_4d * GJP.VolNodeSites() ;
+  size_t f_size_4d = f_site_size_4d * GJP.VolNodeSites() ;
  
   char *str_v1 = "v1" ;
   Vector *v1 = (Vector *)fmalloc(cname,fname,str_v1,f_size*sizeof(Float));

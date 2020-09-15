@@ -3,7 +3,7 @@ CPS_START_NAMESPACE
 /*!\file
   \brief  Definitions of the AlgPbp class.
 
-  $Id: alg_pbp.h,v 1.3 2004/08/18 11:57:35 zs Exp $
+
 */
 //---------------------------------------------------------------------------
 
@@ -55,7 +55,7 @@ class AlgPbp : public Alg
     PbpArg *alg_pbp_arg;
         // The argument structure for the pbp algorithm
  
-    int f_size;       
+    size_t f_size;       
         // Node checkerboard size of the fermion field
 
     Vector *src;
@@ -69,7 +69,12 @@ class AlgPbp : public Alg
 
     virtual ~AlgPbp();
 
-    void run(void);
+    //results is only filled for DWF
+    //if results != 0 and pbp_arg->snk_loop = 0 then results[2*midx+0] = pbp, results[2*midx+1] = pbg5p
+    //where midx is the mass index: 0 ... pbp_arg->n_masses - 1
+    //if results != 0 and pbp_arg->snk_loop = 1 then results[2*Ls*midx + 2*s +0] = pbp, results[2*Ls*midx + 2*s +1] = pbg5p
+    //where midx is the mass index: 0 ... pbp_arg->n_masses - 1, and s is the 5d coord
+    void run(Float *results = 0);
 
     void runPointSource(int x, int y, int z, int t);
 };

@@ -95,6 +95,19 @@ public:
 };
 
 class VML;
+class EOFARationalDescr {
+public:
+	 bool Encode(char *filename,char *instance);
+	 bool Decode(char *filename,char *instance);
+	 bool Vml(VML *vmls,char *instance);
+	FieldType field_type;
+	int power_num;
+	int power_den;
+	long precision;
+	ApproxDescr rat_approx;
+};
+
+class VML;
 class EigenDescr {
 public:
 	 bool Encode(char *filename,char *instance);
@@ -251,6 +264,14 @@ public:
 		Float *frm_mass_val;
 	} frm_mass;
 	struct {
+		u_int bsn_mass_epsilon_len;
+		Float *bsn_mass_epsilon_val;
+	} bsn_mass_epsilon;
+	struct {
+		u_int frm_mass_epsilon_len;
+		Float *frm_mass_epsilon_val;
+	} frm_mass_epsilon;
+	struct {
 		u_int bosons_len;
 		RationalDescr *bosons_val;
 	} bosons;
@@ -258,6 +279,61 @@ public:
 		u_int fermions_len;
 		RationalDescr *fermions_val;
 	} fermions;
+	EigenDescr eigen;
+};
+
+class VML;
+class ActionEOFAArg {
+public:
+	 bool Encode(char *filename,char *instance);
+	 bool Decode(char *filename,char *instance);
+	 bool Vml(VML *vmls,char *instance);
+	   void resize (  u_int nmass ) ;
+	   void resize (  u_int mass ,  int LH_deg ,  int RH_deg ) ;
+	ActionBilinearArg bi_arg;
+	struct {
+		u_int LH_stop_rsd_fg_len;
+		Float *LH_stop_rsd_fg_val;
+	} LH_stop_rsd_fg;
+	struct {
+		u_int LH_stop_rsd_md_len;
+		Float *LH_stop_rsd_md_val;
+	} LH_stop_rsd_md;
+	struct {
+		u_int LH_stop_rsd_mc_len;
+		Float *LH_stop_rsd_mc_val;
+	} LH_stop_rsd_mc;
+	struct {
+		u_int RH_stop_rsd_fg_len;
+		Float *RH_stop_rsd_fg_val;
+	} RH_stop_rsd_fg;
+	struct {
+		u_int RH_stop_rsd_md_len;
+		Float *RH_stop_rsd_md_val;
+	} RH_stop_rsd_md;
+	struct {
+		u_int RH_stop_rsd_mc_len;
+		Float *RH_stop_rsd_mc_val;
+	} RH_stop_rsd_mc;
+	Float spread;
+	int remez_generate;
+	char *rat_poles_file;
+	struct {
+		u_int num_mass_len;
+		Float *num_mass_val;
+	} num_mass;
+	struct {
+		u_int den_mass_len;
+		Float *den_mass_val;
+	} den_mass;
+	struct {
+		u_int LH_rat_approx_len;
+		EOFARationalDescr *LH_rat_approx_val;
+	} LH_rat_approx;
+	struct {
+		u_int RH_rat_approx_len;
+		EOFARationalDescr *RH_rat_approx_val;
+	} RH_rat_approx;
 	EigenDescr eigen;
 };
 
@@ -284,6 +360,7 @@ extern  bool_t vml_BilinearDescr (VML *, char *instance, BilinearDescr*);
 extern  bool_t vml_ActionBilinearArg (VML *, char *instance, ActionBilinearArg*);
 extern  bool_t vml_ApproxDescr (VML *, char *instance, ApproxDescr*);
 extern  bool_t vml_RationalDescr (VML *, char *instance, RationalDescr*);
+extern  bool_t vml_EOFARationalDescr (VML *, char *instance, EOFARationalDescr*);
 extern  bool_t vml_EigenDescr (VML *, char *instance, EigenDescr*);
 extern  bool_t vml_ActionRationalArg (VML *, char *instance, ActionRationalArg*);
 extern  bool_t vml_SplitRange (VML *, char *instance, SplitRange*);
@@ -295,6 +372,7 @@ extern  bool_t vml_ActionFermionArg (VML *, char *instance, ActionFermionArg*);
 extern  bool_t vml_QuotientDescr (VML *, char *instance, QuotientDescr*);
 extern  bool_t vml_ActionQuotientArg (VML *, char *instance, ActionQuotientArg*);
 extern  bool_t vml_ActionRationalQuotientArg (VML *, char *instance, ActionRationalQuotientArg*);
+extern  bool_t vml_ActionEOFAArg (VML *, char *instance, ActionEOFAArg*);
 extern  bool_t vml_ActionGaugeArg (VML *, char *instance, ActionGaugeArg*);
 
 #else /* K&R C */
@@ -304,6 +382,7 @@ extern  bool_t vml_BilinearDescr (VML *, char *instance, BilinearDescr*);
 extern  bool_t vml_ActionBilinearArg (VML *, char *instance, ActionBilinearArg*);
 extern  bool_t vml_ApproxDescr (VML *, char *instance, ApproxDescr*);
 extern  bool_t vml_RationalDescr (VML *, char *instance, RationalDescr*);
+extern  bool_t vml_EOFARationalDescr (VML *, char *instance, EOFARationalDescr*);
 extern  bool_t vml_EigenDescr (VML *, char *instance, EigenDescr*);
 extern  bool_t vml_ActionRationalArg (VML *, char *instance, ActionRationalArg*);
 extern  bool_t vml_SplitRange (VML *, char *instance, SplitRange*);
@@ -315,6 +394,7 @@ extern  bool_t vml_ActionFermionArg (VML *, char *instance, ActionFermionArg*);
 extern  bool_t vml_QuotientDescr (VML *, char *instance, QuotientDescr*);
 extern  bool_t vml_ActionQuotientArg (VML *, char *instance, ActionQuotientArg*);
 extern  bool_t vml_ActionRationalQuotientArg (VML *, char *instance, ActionRationalQuotientArg*);
+extern  bool_t vml_ActionEOFAArg (VML *, char *instance, ActionEOFAArg*);
 extern  bool_t vml_ActionGaugeArg (VML *, char *instance, ActionGaugeArg*);
 
 #endif /* K&R C */

@@ -1,0 +1,156 @@
+class JobPropagatorArgs prop_arg = {
+Array props[8] = {
+class PropagatorArg props[0] = {
+struct GenericPropAttrArg generics = {
+string tag = "prop_m0.01_PRD"
+double mass = 1.000000e-02
+Vector bc[4] = {
+BndCndType bc[0] = BND_CND_PRD
+BndCndType bc[1] = BND_CND_PRD
+BndCndType bc[2] = BND_CND_PRD
+BndCndType bc[3] = BND_CND_PRD
+}
+}
+Array attributes[1] = {
+AttrType type = WALL_SOURCE_ATTR
+struct WallSourceAttrArg wall_source_attr = {
+int t = 0
+}
+}
+}
+class PropagatorArg props[1] = {
+struct GenericPropAttrArg generics = {
+string tag = "prop_m0.01_APRD"
+double mass = 1.000000e-02
+Vector bc[4] = {
+BndCndType bc[0] = BND_CND_PRD
+BndCndType bc[1] = BND_CND_PRD
+BndCndType bc[2] = BND_CND_PRD
+BndCndType bc[3] = BND_CND_APRD
+}
+}
+Array attributes[1] = {
+AttrType type = WALL_SOURCE_ATTR
+struct WallSourceAttrArg wall_source_attr = {
+int t = 0
+}
+}
+}
+class PropagatorArg props[2] = {
+struct GenericPropAttrArg generics = {
+string tag = "prop_m0.01_F"
+double mass = 1.000000e-02
+Vector bc[4] = {
+BndCndType bc[0] = BND_CND_PRD
+BndCndType bc[1] = BND_CND_PRD
+BndCndType bc[2] = BND_CND_PRD
+BndCndType bc[3] = BND_CND_APRD
+}
+}
+Array attributes[1] = {
+AttrType type = PROP_COMBINATION_ATTR
+struct PropCombinationAttrArg prop_combination_attr = {
+string prop_A = "prop_m0.01_PRD"
+string prop_B = "prop_m0.01_APRD"
+PropCombination combination = A_PLUS_B
+}
+}
+}
+class PropagatorArg props[3] = {
+struct GenericPropAttrArg generics = {
+string tag = "prop_m0.01_B"
+double mass = 1.000000e-02
+Vector bc[4] = {
+BndCndType bc[0] = BND_CND_PRD
+BndCndType bc[1] = BND_CND_PRD
+BndCndType bc[2] = BND_CND_PRD
+BndCndType bc[3] = BND_CND_APRD
+}
+}
+Array attributes[1] = {
+AttrType type = PROP_COMBINATION_ATTR
+struct PropCombinationAttrArg prop_combination_attr = {
+string prop_A = "prop_m0.01_PRD"
+string prop_B = "prop_m0.01_APRD"
+PropCombination combination = A_MINUS_B
+}
+}
+}
+class PropagatorArg props[4] = {
+struct GenericPropAttrArg generics = {
+string tag = "prop_m0.045_PRD"
+double mass = 4.500000e-02
+Vector bc[4] = {
+BndCndType bc[0] = BND_CND_PRD
+BndCndType bc[1] = BND_CND_PRD
+BndCndType bc[2] = BND_CND_PRD
+BndCndType bc[3] = BND_CND_PRD
+}
+}
+Array attributes[1] = {
+AttrType type = WALL_SOURCE_ATTR
+struct WallSourceAttrArg wall_source_attr = {
+int t = 0
+}
+}
+}
+class PropagatorArg props[5] = {
+struct GenericPropAttrArg generics = {
+string tag = "prop_m0.045_APRD"
+double mass = 4.500000e-02
+Vector bc[4] = {
+BndCndType bc[0] = BND_CND_PRD
+BndCndType bc[1] = BND_CND_PRD
+BndCndType bc[2] = BND_CND_PRD
+BndCndType bc[3] = BND_CND_APRD
+}
+}
+Array attributes[1] = {
+AttrType type = WALL_SOURCE_ATTR
+struct WallSourceAttrArg wall_source_attr = {
+int t = 0
+}
+}
+}
+class PropagatorArg props[6] = {
+struct GenericPropAttrArg generics = {
+string tag = "prop_m0.045_F"
+double mass = 4.500000e-02
+Vector bc[4] = {
+BndCndType bc[0] = BND_CND_PRD
+BndCndType bc[1] = BND_CND_PRD
+BndCndType bc[2] = BND_CND_PRD
+BndCndType bc[3] = BND_CND_APRD
+}
+}
+Array attributes[1] = {
+AttrType type = PROP_COMBINATION_ATTR
+struct PropCombinationAttrArg prop_combination_attr = {
+string prop_A = "prop_m0.045_PRD"
+string prop_B = "prop_m0.045_APRD"
+PropCombination combination = A_PLUS_B
+}
+}
+}
+class PropagatorArg props[7] = {
+struct GenericPropAttrArg generics = {
+string tag = "prop_m0.045_B"
+double mass = 4.500000e-02
+Vector bc[4] = {
+BndCndType bc[0] = BND_CND_PRD
+BndCndType bc[1] = BND_CND_PRD
+BndCndType bc[2] = BND_CND_PRD
+BndCndType bc[3] = BND_CND_APRD
+}
+}
+Array attributes[1] = {
+AttrType type = PROP_COMBINATION_ATTR
+struct PropCombinationAttrArg prop_combination_attr = {
+string prop_A = "prop_m0.045_PRD"
+string prop_B = "prop_m0.045_APRD"
+PropCombination combination = A_MINUS_B
+}
+}
+}
+}
+}

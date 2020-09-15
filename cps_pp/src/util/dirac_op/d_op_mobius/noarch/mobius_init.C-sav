@@ -56,7 +56,7 @@ void mobius_init(Mobius *mobius_p)
 //------------------------------------------------------------------
 // Allocate memory for two temporary fermion checkerboard fields  
 //------------------------------------------------------------------
-  int f_size = 24 * GJP.VolNodeSites() * GJP.SnodeSites() / 2; 
+  size_t f_size = 24 * GJP.VolNodeSites() * GJP.SnodeSites() / 2; 
 
   mobius_p->frm_tmp1 = (IFloat *) smalloc(f_size*sizeof(IFloat));
   if(mobius_p->frm_tmp1 == 0)

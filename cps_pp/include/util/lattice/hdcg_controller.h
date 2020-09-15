@@ -1,6 +1,8 @@
 #ifndef HDCGCONTROLLER_H
 #define HDCGCONTROLLER_H
 
+// HDCG not available in the BFM with Gparity at the moment
+#ifndef BFM_GPARITY
 #include<vector>
 #include<complex>
 #include<stdio.h>
@@ -281,5 +283,7 @@ template<class Float> char* HDCGController<Float>::cname = "HDCGController";
 
 
 #endif
+
+#endif //#ifndef BFM_GPARITY
 
 #endif

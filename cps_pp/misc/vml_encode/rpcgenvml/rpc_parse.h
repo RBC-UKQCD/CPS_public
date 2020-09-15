@@ -42,7 +42,8 @@ enum defkind {
 	DEF_ENUM,
 	DEF_TYPEDEF,
 	DEF_PROGRAM,
-	DEF_CLASS  /*PAB add a class definition*/
+	DEF_CLASS,  /*PAB add a class definition*/
+	DEF_INCLUDEPRAGMA /*CK add ability to include headers*/
 };
 typedef enum defkind defkind;
 
@@ -119,6 +120,7 @@ struct union_def {
 	declaration enum_decl;
 	case_list *cases;
 	declaration *default_decl;
+        decl_list *other_decls;
 };
 typedef struct union_def union_def;
 
@@ -154,6 +156,11 @@ struct program_def {
 };
 typedef struct program_def program_def;
 
+struct include_def { /*Added by CK*/
+        const char *file;
+        int is_relative; /* include with "" (1) or <> (0) */
+};
+typedef struct include_def include_def;
 struct definition {
 	const char *def_name;
 	defkind def_kind;
@@ -165,6 +172,7 @@ struct definition {
 		typedef_def ty;
 		program_def pr;
    	        class_def ct; /*PAB class definition*/
+	        include_def in;  /*CK include pragma*/
 	} def;
 };
 typedef struct definition definition;

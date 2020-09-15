@@ -23,11 +23,12 @@ AlgAction::AlgAction(AlgMomentum &momentum, ActionArg &action_arg)
   : AlgHamiltonian()
 {
   cname = "AlgAction(Matrix*)";
-  char *fname = "AlgAction(AlgMomentum&,ActionArg&)";
+  const char *fname = "AlgAction(AlgMomentum&,ActionArg&)";
   VRB.Func(cname,fname);
   mom = momentum.getMom();
   force_measure = action_arg.force_measure;
   force_label = action_arg.force_label;
+  VRB.Debug(cname,fname,"constructor force label %s\n",force_label);
 }
 
 AlgAction::AlgAction() : AlgHamiltonian()

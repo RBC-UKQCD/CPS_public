@@ -4,7 +4,7 @@ BGL_DIR = bgl
 BGL_QMP_DIR = bgl
 BGQ_DIR = bfm noarch
 NOARCH_DIR = noarch
-#NOARCH_DIR = sse
-#include ../../../../Makefile.rules.xlc
-#include ../../../../Makefile.rules.sse
+#CK for noarch-bfm, the bfm code adds an overload for the d_op_base version of InvCg
+NOARCH_BFM_DIR =  bfm noarch
+NOARCH_BFM_QMP_DIR =  bfm noarch
 include ../../../../Makefile.rules

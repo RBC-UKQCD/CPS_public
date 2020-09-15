@@ -68,6 +68,19 @@ struct vml_enum_map ChiralProj_map[] = {
 };
 
 bool_t
+vml_PrecType (VML *vmls, char *name,PrecType *objp)
+{
+	if (!vml_enum (vmls,name,(enum_t *)objp,PrecType_map))
+		return FALSE;
+	return TRUE;
+}
+struct vml_enum_map PrecType_map[] = {
+	{"PrecType","PREC_SINGLE",PREC_SINGLE},
+	{"PrecType","PREC_DOUBLE",PREC_DOUBLE},
+	{NULL,NULL,0}
+};
+
+bool_t
 vml_FclassType (VML *vmls, char *name,FclassType *objp)
 {
 	if (!vml_enum (vmls,name,(enum_t *)objp,FclassType_map))
@@ -86,12 +99,17 @@ struct vml_enum_map FclassType_map[] = {
 	{"FclassType","F_CLASS_WILSON_TM",F_CLASS_WILSON_TM},
 	{"FclassType","F_CLASS_MDWF",F_CLASS_MDWF},
 	{"FclassType","F_CLASS_BFM",F_CLASS_BFM},
-	{"FclassType","F_CLASS_BFM_TYPE2",F_CLASS_BFM_TYPE2},
 	{"FclassType","F_CLASS_MOBIUS",F_CLASS_MOBIUS},
 	{"FclassType","F_CLASS_DWF4D",F_CLASS_DWF4D},
 	{"FclassType","F_CLASS_DWF4D_PAIR",F_CLASS_DWF4D_PAIR},
 	{"FclassType","F_CLASS_ZMOBIUS",F_CLASS_ZMOBIUS},
 	{"FclassType","F_CLASS_NAIVE",F_CLASS_NAIVE},
+	{"FclassType","F_CLASS_GRID",F_CLASS_GRID},
+	{"FclassType","F_CLASS_GRID_GPARITY_MOBIUS",F_CLASS_GRID_GPARITY_MOBIUS},
+	{"FclassType","F_CLASS_GRID_MOBIUS",F_CLASS_GRID_MOBIUS},
+	{"FclassType","F_CLASS_GRID_ZMOBIUS",F_CLASS_GRID_ZMOBIUS},
+	{"FclassType","F_CLASS_GRID_GPARITY_WILSON_TM",F_CLASS_GRID_GPARITY_WILSON_TM},
+	{"FclassType","F_CLASS_GRID_WILSON_TM",F_CLASS_GRID_WILSON_TM},
 	{NULL,NULL,0}
 };
 
@@ -129,6 +147,7 @@ struct vml_enum_map StrOrdType_map[] = {
 	{"StrOrdType","DWF_5D_EOPREC",DWF_5D_EOPREC},
 	{"StrOrdType","DWF_4D_EOPREC",DWF_4D_EOPREC},
 	{"StrOrdType","DWF_4D_EOPREC_EE",DWF_4D_EOPREC_EE},
+	{"StrOrdType","S_INNER",S_INNER},
 	{NULL,NULL,0}
 };
 
@@ -242,6 +261,9 @@ vml_BndCndType (VML *vmls, char *name,BndCndType *objp)
 struct vml_enum_map BndCndType_map[] = {
 	{"BndCndType","BND_CND_PRD",BND_CND_PRD},
 	{"BndCndType","BND_CND_APRD",BND_CND_APRD},
+	{"BndCndType","BND_CND_TWISTED",BND_CND_TWISTED},
+	{"BndCndType","BND_CND_GPARITY",BND_CND_GPARITY},
+	{"BndCndType","BND_CND_GPARITY_TWISTED",BND_CND_GPARITY_TWISTED},
 	{NULL,NULL,0}
 };
 
@@ -858,6 +880,7 @@ struct vml_enum_map IntegratorType_map[] = {
 	{"IntegratorType","INT_RATIONAL",INT_RATIONAL},
 	{"IntegratorType","INT_RATIONAL_SPLIT",INT_RATIONAL_SPLIT},
 	{"IntegratorType","INT_RATIONAL_QUOTIENT",INT_RATIONAL_QUOTIENT},
+	{"IntegratorType","INT_EOFA",INT_EOFA},
 	{NULL,NULL,0}
 };
 
@@ -1006,6 +1029,7 @@ struct vml_enum_map InverterType_map[] = {
 	{"InverterType","LOWMODEAPPROX",LOWMODEAPPROX},
 	{"InverterType","CG_LOWMODE_DEFL",CG_LOWMODE_DEFL},
 	{"InverterType","HDCG",HDCG},
+	{"InverterType","FAKE",FAKE},
 	{NULL,NULL,0}
 };
 

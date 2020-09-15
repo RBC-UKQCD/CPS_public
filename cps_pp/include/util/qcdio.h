@@ -12,7 +12,6 @@
 #include <stdarg.h>
 #include <util/data_types.h>
 #include <util/lattice.h>
-#include <util/qcdio_qprintf.h>
 #include <util/ReadLatticePar.h>
 #include <util/WriteLatticePar.h>
 

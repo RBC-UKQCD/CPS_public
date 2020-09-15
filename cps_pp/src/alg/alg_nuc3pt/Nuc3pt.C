@@ -990,20 +990,23 @@ void Nuc3ptCons::InsertOp(CorrFunc& tmp,QPropW& seqQ, QPropW& Quark)
 		     dir) ;
 	
 	// fix boundary condition
-	switch( dir ) {
-	case 0:
-	  if (GJP.XnodeBc()==BND_CND_APRD) coeff = -coeff ;
-	  break;
-	case 1:
-	  if (GJP.YnodeBc()==BND_CND_APRD) coeff = -coeff ;
-	  break;
-	case 2:
-	  if (GJP.ZnodeBc()==BND_CND_APRD) coeff = -coeff ;
-	  break;
-	case 3:
-	  if (GJP.TnodeBc()==BND_CND_APRD) coeff = -coeff ;
-	  break;
-	} // end switch
+	if(GJP.Bc(dir) == BND_CND_APRD) coeff = -coeff;
+	else if(GJP.Bc(dir) != BND_CND_PRD) ERR.General(cname,fname,"BCs other than periodic or antiperiodic not implemented");
+	
+	// switch( dir ) {
+	// case 0:
+	//   if (GJP.XnodeBc()==BND_CND_APRD) coeff = -coeff ;
+	//   break;
+	// case 1:
+	//   if (GJP.YnodeBc()==BND_CND_APRD) coeff = -coeff ;
+	//   break;
+	// case 2:
+	//   if (GJP.ZnodeBc()==BND_CND_APRD) coeff = -coeff ;
+	//   break;
+	// case 3:
+	//   if (GJP.TnodeBc()==BND_CND_APRD) coeff = -coeff ;
+	//   break;
+	// } // end switch
 
       } else {
 	v0_next = Quark[lcl_next_offset] ;
@@ -1050,7 +1053,7 @@ void Nuc3ptCons::InsertOp(CorrFunc& tmp,QPropW& seqQ, QPropW& Quark)
       glb_sum_dir(&isum, 4);
       tmp[t] = Complex( rsum, isum );
     }
-    tmp[t]=tmp[t]/2;
+    tmp[t]=tmp[t]/2.;
   }
 }
 
@@ -1188,20 +1191,23 @@ void Nuc3ptCons::InsertOp(CorrFunc* tmp,QPropW& seqQ, QPropW& Quark, int Nmom, T
 		     dir) ;
 	
 	// fix boundary condition
-	switch( dir ) {
-	case 0:
-	  if (GJP.XnodeBc()==BND_CND_APRD) coeff = -coeff ;
-	  break;
-	case 1:
-	  if (GJP.YnodeBc()==BND_CND_APRD) coeff = -coeff ;
-	  break;
-	case 2:
-	  if (GJP.ZnodeBc()==BND_CND_APRD) coeff = -coeff ;
-	  break;
-	case 3:
-	  if (GJP.TnodeBc()==BND_CND_APRD) coeff = -coeff ;
-	  break;
-	} // end switch
+	if(GJP.Bc(dir) == BND_CND_APRD) coeff = -coeff;
+	else if(GJP.Bc(dir) != BND_CND_PRD) ERR.General(cname,fname,"BCs other than periodic or antiperiodic not implemented");
+
+	// switch( dir ) {
+	// case 0:
+	//   if (GJP.XnodeBc()==BND_CND_APRD) coeff = -coeff ;
+	//   break;
+	// case 1:
+	//   if (GJP.YnodeBc()==BND_CND_APRD) coeff = -coeff ;
+	//   break;
+	// case 2:
+	//   if (GJP.ZnodeBc()==BND_CND_APRD) coeff = -coeff ;
+	//   break;
+	// case 3:
+	//   if (GJP.TnodeBc()==BND_CND_APRD) coeff = -coeff ;
+	//   break;
+	// } // end switch
 
       } else {
 	v0_next = Quark[lcl_next_offset] ;
@@ -1251,7 +1257,7 @@ void Nuc3ptCons::InsertOp(CorrFunc* tmp,QPropW& seqQ, QPropW& Quark, int Nmom, T
 	glb_sum_dir(&isum, 4);
 	tmp[ip][t] = Complex( rsum, isum );
       }
-      tmp[ip][t]=tmp[ip][t]/2;
+      tmp[ip][t]=tmp[ip][t]/2.;
     }
   }
 

@@ -32,7 +32,7 @@
  * From: @(#)rpc_cout.c 1.13 89/02/22 (C) 1987 SMI
  */
 char cout_rcsid[] =
-"$Id: rpc_cout.c,v 1.7 2008/06/05 19:26:42 chulwoo Exp $";
+"$Id: rpc_cout.c,v 1.7.144.1 2012-11-15 18:17:08 ckelly Exp $";
 
 /*
  * rpc_cout.c, XDR routine outputter for the RPC protocol compiler
@@ -137,6 +137,233 @@ void print_vml_stat (int indent, const declaration * dec)
 /*
  * PAB end
  */
+ /* Added by CKelly*/
+static void 
+prpc_generate_union_typemap_emit(definition *def){
+  const char *enum_type = def->def.un.enum_decl.type;
+  const char *name = def->def_name;
+  //now do the specializations
+
+  case_list* c = def->def.un.cases;
+  case_list* l;
+  for (l = c; l != NULL; l = l->next){
+    f_print (fout, "template <> %s %s::type_map<%s>(){\n",enum_type,name,l->case_decl.type);
+    f_print (fout, "\t return %s;\n",l->case_name);
+    f_print( fout, "}\n");
+  }
+}
+
+static void 
+prpc_deepcopy_decl_list(decl_list *dl){
+  //loop over members
+  decl_list *l;
+  for (l = dl; l != NULL; l = l->next){
+    declaration *dec = &l->decl;
+    if (streq (dec->type, "rpccommand") || streq (dec->type, "") ) continue;  
+
+    if (streq (dec->type, "string")){
+      f_print (fout, "\t  rpc_deepcopy<char *>::doit(into.%s,from.%s,strlen(from.%s)+1);\n",dec->name,dec->name,dec->name); continue;
+    }
+    char buf[8];			/* enough to hold "struct ", include NUL */
+    const char *prefix = "";
+    const char *type;
+
+    if (streq (dec->type, "bool")) type = "bool_t";
+    else if (streq (dec->type, "opaque")) type = "char";
+    else{
+      if (dec->prefix){
+	s_print (buf, "%s ", dec->prefix);
+	prefix = buf;
+      }
+      type = dec->type;
+    }
+    switch (dec->rel){
+    case REL_ALIAS:
+      f_print (fout, "\t  rpc_deepcopy<%s%s>::doit(into.%s,from.%s);\n",prefix, type,dec->name,dec->name);
+      break;
+    case REL_VECTOR:
+      f_print (fout, "\t  for(int i=0;i<%s;i++) rpc_deepcopy<%s%s>::doit(into.%s[i],from.%s[i]);\n",dec->array_max ,prefix, type,dec->name,dec->name);
+      break;
+    case REL_POINTER:
+      f_print (fout, "\t  rpc_deepcopy(%s%s *)::doit(into.%s,from.%s,1);\n",prefix, type,dec->name,dec->name);
+      break;
+    case REL_ARRAY:
+      f_print (fout, "\t  into.%s.%s_len = from.%s.%s_len;\n",dec->name,dec->name,dec->name,dec->name);
+      f_print (fout, "\t  rpc_deepcopy<%s%s *>::doit(into.%s.%s_val,from.%s.%s_val,from.%s.%s_len);\n",prefix, type,dec->name,dec->name,dec->name,dec->name,dec->name,dec->name);
+      break;
+    }
+  }
+}
+static void 
+prpc_deepcopy_union(definition *def){
+  const char *name = def->def_name;
+  f_print (fout, "\t  into.type = from.type;\n",name);
+  f_print (fout, "\t  switch(from.type){\n");
+
+  case_list* c = def->def.un.cases;
+  case_list* l;
+  for (l = c; l != NULL; l = l->next){
+    const char * prefix = "";
+    if(l->case_decl.prefix) prefix = l->case_decl.prefix;
+
+    f_print( fout, "\t    case %s:\n",l->case_name);
+    f_print( fout, "\t      rpc_deepcopy<%s%s>::doit(into.%s_u.%s,from.%s_u.%s); break;\n",prefix,l->case_decl.type,name,l->case_decl.name,name,l->case_decl.name);
+  }
+  if(def->def.un.default_decl){
+    const char * prefix = "";
+    if(def->def.un.default_decl->prefix) prefix = def->def.un.default_decl->prefix;
+
+    f_print( fout, "\t    default:\n");
+    f_print( fout, "\t      rpc_deepcopy<%s%s>::doit(into.%s_u.%s,from.%s_u.%s); break;\n",prefix,def->def.un.default_decl->type,name,def->def.un.default_decl->name,name,def->def.un.default_decl->name);
+  }
+
+  f_print (  fout, "\t  };\n");     
+}
+
+void prpc_generate_deepcopy_method_emit(definition * def){
+  decl_list *dl;
+  if(def->def_kind == DEF_STRUCT) dl = def->def.st.decls;
+  else if(def->def_kind == DEF_CLASS) dl = def->def.ct.decls;
+  else if(def->def_kind == DEF_UNION) dl = def->def.un.other_decls;
+  else return;
+
+  //now specialize the deepcopy class template
+  const char *name = def->def_name;
+  f_print (fout, "void rpc_deepcopy<%s>::doit(%s &into, %s const &from){\n",name,name,name);
+  prpc_deepcopy_decl_list(dl);
+  if(def->def_kind == DEF_UNION) prpc_deepcopy_union(def);
+  f_print (fout, "}\n");
+
+  //now generate the member function
+  f_print (fout, "void %s::deep_copy(%s const &rhs){\n",name,name);
+  f_print (fout, "\trpc_deepcopy<%s>::doit(*this,rhs);\n",name);
+  f_print( fout, "}\n");
+}
+
+
+static void 
+prpc_print_decl_list(decl_list *dl){
+  //loop over members
+  decl_list *l;
+  for (l = dl; l != NULL; l = l->next){
+    declaration *dec = &l->decl;
+    if (streq (dec->type, "rpccommand") || streq (dec->type, "") ) continue;  
+
+    if (streq (dec->type, "string")){
+      f_print (fout, "\trpc_print<char *>::doit(what.%s,strlen(what.%s)+1,spaces+\" %s = \");\n",dec->name,dec->name,dec->name); continue;
+    }
+    char buf[8];			/* enough to hold "struct ", include NUL */
+    const char *prefix = "";
+    const char *type;
+
+    if (streq (dec->type, "bool")) type = "bool_t";
+    else if (streq (dec->type, "opaque")) type = "char";
+    else{
+      if (dec->prefix){
+	s_print (buf, "%s ", dec->prefix);
+	prefix = buf;
+      }
+      type = dec->type;
+    }
+    switch (dec->rel){
+    case REL_ALIAS:
+      f_print (fout, "\trpc_print<%s%s>::doit(what.%s,spaces+\" %s = \");\n",prefix, type,dec->name,dec->name);
+      break;
+    case REL_VECTOR:
+      f_print (fout,"\t{\n");
+      f_print (fout,"\t  std::ostringstream os; os << spaces << \" %s[%s] = { \";\n", dec->name, dec->array_max);
+      f_print (fout,"\t  std::string newprefix = os.str(); std::string newspaces(newprefix.size(),' ');\n");
+      f_print (fout,"\t  std::cout << newprefix << std::endl;\n", type,dec->name, dec->array_max);
+      f_print (fout,"\t  for(int i=0;i<%s;i++){ std::ostringstream tos; tos << newspaces << \" %s[\"<<i<<\"] = \"; rpc_print<%s%s>::doit(what.%s[i],tos.str()); }\n",dec->array_max,dec->name,prefix,type,dec->name);
+      f_print (fout,"\t  newspaces[newspaces.size()-1] = '}'; std::cout << newspaces << std::endl;\n");
+      f_print (fout,"\t}\n");
+      break;
+    case REL_POINTER:
+      f_print (fout, "\trpc_print(%s%s *)::doit(what.%s,1,spaces+\" %s = \");\n",prefix, type,dec->name,dec->name);
+      break;
+    case REL_ARRAY:
+      f_print (fout, "\trpc_print<%s%s *>::doit(what.%s.%s_val,what.%s.%s_len,spaces+\" %s = \");\n",prefix, type,dec->name,dec->name,dec->name,dec->name,dec->name);
+      break;
+    }
+  }
+}
+static void 
+prpc_print_union(definition *def){
+  const char *name = def->def_name;
+  f_print (fout, "\t  switch(what.type){\n");
+
+  case_list* c = def->def.un.cases;
+  case_list* l;
+  for (l = c; l != NULL; l = l->next){
+    const char * prefix = "";
+    if(l->case_decl.prefix) prefix = l->case_decl.prefix;
+
+    f_print( fout, "\t    case %s:\n",l->case_name);
+    f_print( fout, "\t      rpc_print<%s%s>::doit(what.%s_u.%s,spaces+\" union %s_u.%s = \"); break;\n",prefix,l->case_decl.type,name,l->case_decl.name,name,l->case_decl.name);
+  }
+  if(def->def.un.default_decl){
+    const char * prefix = "";
+    if(def->def.un.default_decl->prefix) prefix = def->def.un.default_decl->prefix;
+
+    f_print( fout, "\t    default:\n");
+    f_print( fout, "\t      rpc_print<%s%s>::doit(what.%s_u.%s,spaces+\" union default %s_u.%s = \"); break;\n",prefix,def->def.un.default_decl->type,name,def->def.un.default_decl->name,name,def->def.un.default_decl->name);
+  }
+
+  f_print (  fout, "\t  };\n");     
+}
+
+
+void prpc_generate_print_method_emit(definition * def){
+  decl_list *dl;
+  if(def->def_kind == DEF_STRUCT) dl = def->def.st.decls;
+  else if(def->def_kind == DEF_CLASS) dl = def->def.ct.decls;
+  else if(def->def_kind == DEF_UNION) dl = def->def.un.other_decls;
+  else return;
+
+  //now specialize the print class template
+  const char *name = def->def_name;
+  f_print (fout, "void rpc_print<%s>::doit(%s const &what, const std::string &prefix){\n",name,name);
+  f_print (fout, "\tstd::cout << prefix << \"{\\n\";\n");
+  f_print (fout, "\tstd::string spaces(prefix.size(),' ');\n");
+  prpc_print_decl_list(dl);
+  if(def->def_kind == DEF_UNION) prpc_print_union(def);
+  f_print (fout, "\tstd::cout << spaces << \"}\\n\";\n");
+  f_print (fout, "}\n");
+
+
+
+  //now generate the member function
+  f_print (fout, "void %s::print(const std::string &prefix){\n",name,name);
+  f_print (fout, "\trpc_print<%s>::doit(*this,prefix);\n",name);
+  f_print( fout, "}\n");
+}
+
+void prpccommandemit (definition * def){
+  const char *name = def->def_name;
+  decl_list *dl;
+  if(def->def_kind == DEF_STRUCT) dl = def->def.st.decls;
+  else if(def->def_kind == DEF_CLASS) dl = def->def.ct.decls;
+  else if(def->def_kind == DEF_UNION) dl = def->def.un.other_decls;
+  else return;
+   
+  decl_list *l;
+  for (l = dl; l != NULL; l = l->next)
+    {
+      if(streq (l->decl.type, "rpccommand")){
+	if(streq(l->decl.name, "GENERATE_DEEPCOPY_METHOD")){
+	  prpc_generate_deepcopy_method_emit(def);
+	}else if(streq(l->decl.name, "GENERATE_UNION_TYPEMAP")){
+	  prpc_generate_union_typemap_emit(def);
+	}else if(streq(l->decl.name, "GENERATE_PRINT_METHOD")){
+	  prpc_generate_print_method_emit(def);
+	}
+      }
+    }
+}
+   
+
+
+ /*End Ckelly*/
 /*
  * Emit the C-routine for the given definition
  */
@@ -144,6 +371,10 @@ void
 emit (definition * def)
 {
   if (def->def_kind == DEF_CONST)
+    {
+      return;
+    }
+  if(def->def_kind == DEF_INCLUDEPRAGMA)
     {
       return;
     }
@@ -218,6 +449,7 @@ emit (definition * def)
       break;
     }
   print_trailer ();
+  prpccommandemit(def); /*CK*/
 }
 
 static int
@@ -607,8 +839,15 @@ emit_union (const definition * def)
       f_print (fout, "\tdefault:\n");
       f_print (fout, "\t\treturn FALSE;\n");
     }
-
   f_print (fout, "\t}\n");
+
+  /*Added by CK*/
+  /*As the struct enter and exit code is conveniently separate, we can just reuse emit_struct
+    for the extra declarations*/
+  definition fakestruct;
+  fakestruct.def.st.decls = def->def.un.other_decls;
+  emit_struct(&fakestruct);
+  /*End CK*/
 }
 
 static void
@@ -920,6 +1159,8 @@ print_stat (int indent, const declaration * dec)
   char name[256];
 
   if ( strlen(dec->type) == 0 ) return;
+
+  if( streq (dec->type,"rpccommand") ) return;
 
   if (isvectordef (type, rel))
     {

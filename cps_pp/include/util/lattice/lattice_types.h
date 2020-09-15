@@ -2,6 +2,7 @@
 #define INCLUDED_LATTICE_TYPES_H
 
 #include <config.h>
+#include <util/lattice.h>
 
 CPS_START_NAMESPACE
 //------------------------------------------------------------------

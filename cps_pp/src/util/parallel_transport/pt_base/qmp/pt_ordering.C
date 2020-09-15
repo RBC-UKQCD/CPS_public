@@ -7,14 +7,14 @@
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
+//  $Author: ckelly $
 //  $Date: 2009/05/12 21:50:01 $
 //  $Header: /space/cvs/cps/cps++/src/util/parallel_transport/pt_base/qmp/pt_ordering.C,v 1.5 2009/05/12 21:50:01 chulwoo Exp $
 //  $Id: pt_ordering.C,v 1.5 2009/05/12 21:50:01 chulwoo Exp $
 //  $Name: v5_0_16_hantao_io_test_v7 $
 //  $Locker:  $
 //  $RCSfile: pt_ordering.C,v $
-//  $Revision: 1.5 $
+//  $Revision: 1.5.104.1 $
 //  $Source: /space/cvs/cps/cps++/src/util/parallel_transport/pt_base/qmp/pt_ordering.C,v $
 //  $State: Exp $
 //
@@ -179,6 +179,26 @@ void PT::dag_cpy (IFloat *dest, IFloat *src){
       dest[2*(3*i+j)+1]=-src[2*(3*j+i)+1];
     }
 }
+
+//CK:
+
+//dest=src.Conj()
+void PT::star_cpy (IFloat *dest, IFloat *src){
+  for(int i=0;i<18;i+=2)
+    dest[i]=src[i];
+  for(int i=1;i<18;i+=2)
+    dest[i]=-src[i];
+}
+
+//dest=src.Trans()
+void PT::trans_cpy (IFloat *dest, IFloat *src){
+  for(int i=0;i<3;i++)
+    for(int j=0;j<3;j++){
+      dest[2*(3*i+j)]=src[2*(3*j+i)];
+      dest[2*(3*i+j)+1]=src[2*(3*j+i)+1];
+    }
+}
+
 
 //Returns lexical index associated with coordinate x[4]
 //where the 0th coordinate runs fastest, 3rd coordinate runs slowest

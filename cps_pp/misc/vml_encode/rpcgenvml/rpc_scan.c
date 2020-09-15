@@ -32,7 +32,7 @@
  * From: @(#)rpc_scan.c 1.11 89/02/22 (C) 1987 SMI
  */
 char scan_rcsid[] =
-  "$Id: rpc_scan.c,v 1.4 2008/05/19 21:06:37 chulwoo Exp $";
+  "$Id: rpc_scan.c,v 1.4.144.1 2012-11-15 18:17:08 ckelly Exp $";
 
 /*
  * rpc_scan.c, Scanner for the RPC protocol compiler
@@ -310,6 +310,18 @@ get_token (token *tokp)
       tokp->kind = TOK_CHARCONST;
       findchrconst (&where, &tokp->str);
       break;
+    case '&':
+      tokp->kind = TOK_AMPERSAND; /*Added by CK*/
+      where++;
+      break;
+    /* case '#': */
+    /*   tokp->kind = TOK_HASH; /\*Added by CK*\/ */
+    /*   where++; */
+    /*   break; */
+    /* case '/': */
+    /*   tokp->kind = TOK_FWDSLASH; /\*Added by CK*\/ */
+    /*   where++; */
+    /*   break; */
 
     case '-':
     case '0':
@@ -327,7 +339,7 @@ get_token (token *tokp)
       break;
 
     default:
-      if (!(isalpha (*where) || *where == '_' || *where == '~'))
+      if (!(isalpha (*where) || *where == '_' || *where == '~' || *where == '/' || *where == '.')) /*CK added fwd slash and period to strings*/
 //      if (!(isalpha (*where) || *where == '_' ))
 	{
 	  char buf[100];
@@ -475,7 +487,13 @@ static const token symbols[] =
   {TOK_CLASS, "class"}, 
   {TOK_INHERITANCE, "inherits"},
   {TOK_MEMFUN, "memfun"},
+
+  /* CK */
+  {TOK_RPCCOMMAND, "rpccommand"},
+  {TOK_INCLUDEPRAGMA, "include"},
+
   {TOK_EOF, "??????"},
+ 
 };
 
 static void
@@ -492,7 +510,7 @@ findkind (const char **mark, token *tokp)
       len = strlen (s->str);
       if (strncmp (str, s->str, len) == 0)
 	{
-	  if (!isalnum (str[len]) && str[len] != '_')
+	  if (!isalnum (str[len]) && str[len] != '_') /*Check whitespace exists after match*/
 	    {
 	      tokp->kind = s->kind;
 	      tokp->str = s->str;
@@ -501,8 +519,9 @@ findkind (const char **mark, token *tokp)
 	    }
 	}
     }
+  /*Must be a string*/
   tokp->kind = TOK_IDENT;
-  for (len = 0; isalnum (str[len]) || str[len] == '_' ||str[len] == '~' ; len++);
+  for (len = 0; isalnum (str[len]) || str[len] == '_' ||str[len] == '~' || str[len] == '/' || str[len] == '.'; len++); /*CK added fwd slash and period*/
   tmp = alloc (len + 1);
   strncpy (tmp, str, len);
   tmp[len] = 0;

@@ -77,7 +77,7 @@ protected:
 
   //! The class name
   char *cname; 
-
+  
   int src_hyper;
   int hyper_lower[4];
   int hyper_upper[4];
@@ -101,7 +101,9 @@ protected:
       VRB.Result(cname,fname, "sc_part_file_exist=%d",sc_part_file_exist);
 	return sc_part_file_exist;
   } 
-  
+
+  void GetGaugeFixInfo(char *gfixInfo);
+  void GetFermionInfo(char *fermionInfo);
 public:
 
   Float* conserved;
@@ -112,7 +114,7 @@ public:
   int spnclr_cnt;
 
   QPropW(Lattice& lat, CommonArg* c_arg);
-
+  
   QPropW(Lattice& lat, QPropWArg* arg, CommonArg* c_arg);
 
   
@@ -137,6 +139,9 @@ public:
   virtual const QPropWGaussArg &GaussArg(void);
   virtual int   Gauss_N() const;
   virtual Float Gauss_W() const;
+
+  //Multiply propagator by factor renFac
+  static void MultiplyProp(WilsonMatrix* to, WilsonMatrix *from, const Float &renFac);
 
   //! Is sink gauge fixed?
   int GFixedSnk() const { return qp_arg.gauge_fix_snk; } 
@@ -183,6 +188,9 @@ public:
   void ShiftPropForward(int n);
   void ShiftPropBackward(int n);
 
+  //Compare two propagators and write out differences
+  void CompareProps(WilsonMatrix* prop_A, WilsonMatrix* prop_B, const Float& precision=1e-8);
+
   //! Allocates memory for prop or prop_mid
   void Allocate(int);
 
@@ -197,12 +205,19 @@ public:
 
    //! computes a*prop+b*Q
   void LinComb(QPropW& Q, Float a, Float b);
+  
+  //! computes the norm of the propagator. If global_sum is true it will return the node sum.
+  IFloat norm(const bool &global_sum = true) const;
 
   //! Comunicate Wilson Matrices...
   WilsonMatrix& GetMatrix(const int *, WilsonMatrix&) const;
 
   virtual void RestoreQProp(char*, int mid=0);
   virtual void SaveQProp(char*, int mid=0);
+
+  //Save propagator stored in 'QPropW::prop'. Also save source stored at 'source'. 'allow_save_single_src_tslice' allows us to write only a single
+  //time slice if the source type lives only on that timeslice.
+  void SaveQProp(const char*propOutfile, WilsonMatrix *source, const bool &allow_save_single_src_tslice);
 
   virtual void RestoreQPropLs(char*, int ls);
   virtual void SaveQPropLs(Vector* sol_5d, char*, int ls);
@@ -256,6 +271,13 @@ public:
   // operator functions
   
   QPropW& operator=(const QPropW& rhs);
+  /*! Alternative to operator[] that allows choice of flavor index in G-parity scenario*/
+  WilsonMatrix & SiteMatrix(const int &site_idx, const int &flavor=0){ return prop[site_idx+flavor*GJP.VolNodeSites()]; }
+  WilsonMatrix & MidPlaneSiteMatrix(const int &site_idx, const int &flavor=0){ return midprop[site_idx+flavor*GJP.VolNodeSites()]; }
+
+  const WilsonMatrix & SiteMatrix(const int &site_idx, const int &flavor=0) const{ return prop[site_idx+flavor*GJP.VolNodeSites()]; }
+  const WilsonMatrix & MidPlaneSiteMatrix(const int &site_idx, const int &flavor=0) const{ return midprop[site_idx+flavor*GJP.VolNodeSites()]; }
+
 
   /*! Returns the prop */
   WilsonMatrix& operator[](int i){ return prop[i]; }
@@ -848,6 +870,22 @@ class QPropWExpSrc : public QPropW
   SourceType SrcType(){return EXP ; }
 };
 
+
+class QPropWVolMomSrc : public QPropW {
+
+  ThreeMom mom;
+  
+public:
+  
+  // CONSTRUCTORS
+  QPropWVolMomSrc(Lattice& lat, CommonArg* c_arg);
+  QPropWVolMomSrc(const QPropWVolMomSrc& rhs);
+  QPropWVolMomSrc(Lattice& lat, QPropWArg* arg, int *p, CommonArg* c_arg);
+  
+  void SetSource(FermionVectorTp& src, int spin, int color);
+  
+  ThreeMom Mom() { return mom; } 
+};
 // =====================================================================
 
 class QPropWFactory {

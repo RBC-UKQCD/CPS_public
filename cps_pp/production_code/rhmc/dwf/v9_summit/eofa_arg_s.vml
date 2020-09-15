@@ -1,0 +1,153 @@
+class ActionEOFAArg eofa_arg_s = {
+class ActionBilinearArg bi_arg = {
+FclassType fermion = F_CLASS_MOBIUS
+Array bilinears[2] = { 
+class BilinearDescr bilinears[0] = {
+double mass =   0.0000000000000000e+00
+int max_num_iter = 100000
+}
+class BilinearDescr bilinears[1] = {
+double mass =   0.0000000000000000e+00
+int max_num_iter = 100000
+}
+}
+class ActionArg action_arg = {
+ForceMeasure force_measure = FORCE_MEASURE_YES
+string force_label = "EOFA_s"
+}
+}
+Array LH_stop_rsd_fg[2] = { 
+double LH_stop_rsd_fg[0] =   1.0000000000000001e-05
+double LH_stop_rsd_fg[1] =   9.9999999999999995e-07
+}
+Array LH_stop_rsd_md[2] = { 
+double LH_stop_rsd_md[0] =   1e-10
+double LH_stop_rsd_md[1] =   1e-10
+}
+Array LH_stop_rsd_mc[2] = { 
+double LH_stop_rsd_mc[0] =   1e-12
+double LH_stop_rsd_mc[1] =   1e-12
+}
+Array RH_stop_rsd_fg[2] = { 
+double RH_stop_rsd_fg[0] =   1.0000000000000001e-05
+double RH_stop_rsd_fg[1] =   9.9999999999999995e-07
+}
+Array RH_stop_rsd_md[2] = { 
+double RH_stop_rsd_md[0] =   1e-10
+double RH_stop_rsd_md[1] =   1e-10
+}
+Array RH_stop_rsd_mc[2] = { 
+double RH_stop_rsd_mc[0] =   1e-12
+double RH_stop_rsd_mc[1] =   1e-12
+}
+double spread =   0.0000000000000000e+00
+int remez_generate = 0
+string rat_poles_file = "eofa_s_poles.vml"
+Array num_mass[2] = { 
+double num_mass[0] =   2.1319999999999999e-02
+double num_mass[1] =   1.6300000000000001e-01
+}
+Array den_mass[2] = { 
+double den_mass[0] =   1.6300000000000001e-01
+double den_mass[1] =   1.0000000000000000e+00
+}
+Array LH_rat_approx[2] = { 
+class EOFARationalDescr LH_rat_approx[0] = {
+FieldType field_type = FERMION
+int power_num = 1
+int power_den = 2
+long precision = 50
+class ApproxDescr rat_approx = {
+RationalApproxType approx_type = RATIONAL_APPROX_POWER
+RationalBoundsType bounds_type = RATIONAL_BOUNDS_MANUAL
+double lambda_low =   9.8999999999999999e-01
+double lambda_high =   9.0000000000000000e+00
+Array stop_rsd[8] = { 
+double stop_rsd[0] =   1e-12
+double stop_rsd[1] =   1e-12
+double stop_rsd[2] =   1e-12
+double stop_rsd[3] =   1e-12
+double stop_rsd[4] =   1e-12
+double stop_rsd[5] =   1e-12
+double stop_rsd[6] =   1e-12
+double stop_rsd[7] =   1e-12
+}
+}
+}
+class EOFARationalDescr LH_rat_approx[1] = {
+FieldType field_type = FERMION
+int power_num = 1
+int power_den = 2
+long precision = 50
+class ApproxDescr rat_approx = {
+RationalApproxType approx_type = RATIONAL_APPROX_POWER
+RationalBoundsType bounds_type = RATIONAL_BOUNDS_MANUAL
+double lambda_low =   9.8999999999999999e-01
+double lambda_high =   9.0000000000000000e+00
+Array stop_rsd[8] = { 
+double stop_rsd[0] =   1e-12
+double stop_rsd[1] =   1e-12
+double stop_rsd[2] =   1e-12
+double stop_rsd[3] =   1e-12
+double stop_rsd[4] =   1e-12
+double stop_rsd[5] =   1e-12
+double stop_rsd[6] =   1e-12
+double stop_rsd[7] =   1e-12
+}
+}
+}
+}
+Array RH_rat_approx[2] = { 
+class EOFARationalDescr RH_rat_approx[0] = {
+FieldType field_type = FERMION
+int power_num = 1
+int power_den = 2
+long precision = 50
+class ApproxDescr rat_approx = {
+RationalApproxType approx_type = RATIONAL_APPROX_POWER
+RationalBoundsType bounds_type = RATIONAL_BOUNDS_MANUAL
+double lambda_low =   0.99
+double lambda_high =   9.0000000000000000e+00
+Array stop_rsd[8] = { 
+double stop_rsd[0] =   1e-12
+double stop_rsd[1] =   1e-12
+double stop_rsd[2] =   1e-12
+double stop_rsd[3] =   1e-12
+double stop_rsd[4] =   1e-12
+double stop_rsd[5] =   1e-12
+double stop_rsd[6] =   1e-12
+double stop_rsd[7] =   1e-12
+}
+}
+}
+class EOFARationalDescr RH_rat_approx[1] = {
+FieldType field_type = FERMION
+int power_num = 1
+int power_den = 2
+long precision = 50
+class ApproxDescr rat_approx = {
+RationalApproxType approx_type = RATIONAL_APPROX_POWER
+RationalBoundsType bounds_type = RATIONAL_BOUNDS_MANUAL
+double lambda_low =   0.99
+double lambda_high =   9.0000000000000000e+00
+Array stop_rsd[8] = { 
+double stop_rsd[0] =   1e-12
+double stop_rsd[1] =   1e-12
+double stop_rsd[2] =   1e-12
+double stop_rsd[3] =   1e-12
+double stop_rsd[4] =   1e-12
+double stop_rsd[5] =   1e-12
+double stop_rsd[6] =   1e-12
+double stop_rsd[7] =   1e-12
+}
+}
+}
+}
+class EigenDescr eigen = {
+EigenMeasure eigen_measure = EIGEN_MEASURE_NO
+double stop_rsd =   1.0000000000000001e-05
+int max_num_iter = 100000
+string eig_lo_stem = "eig_low"
+string eig_hi_stem = "eig_high"
+}
+}

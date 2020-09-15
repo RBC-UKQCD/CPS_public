@@ -16,24 +16,46 @@
 CPS_START_NAMESPACE
 class SpinMatrix;
 
+#define INLINE_SPIN_MATRIX
 
-enum{SPINS=4};
+
 
 //------------------------------------------------------------------
 // The SpinMatrix class.
 //------------------------------------------------------------------
 class SpinMatrix
 {
-    Float u[2*SPINS*SPINS];	// The matrix
+    enum{SPINS=4};
 
   public:
+   Float u[2*SPINS*SPINS];	// The matrix
     // CREATORS
     SpinMatrix() {}
-    SpinMatrix(Float c);
-    SpinMatrix(const Complex& c);
+    SpinMatrix(Float c){ *this = c; }
+    SpinMatrix(const Complex& c){ *this = c; }
+    SpinMatrix(Float *c){
+	for(int i =0;i<2*SPINS*SPINS;i++)
+	u[i] = *(c+i);
+    }
 
+#ifndef INLINE_SPIN_MATRIX
     SpinMatrix& operator=(Float c);
     SpinMatrix& operator=(const Complex& c);
+#else
+SpinMatrix& operator=(IFloat c) {
+  ZeroSpinMatrix();
+  u[2*(0+0*SPINS)] = u[2*(1+1*SPINS)] = u[2*(2+2*SPINS)] = u[2*(3+3*SPINS)] = c;
+  return *this;
+}
+SpinMatrix& operator=(const Complex& c) {
+  ZeroSpinMatrix();
+  ((Complex*)u)[0+0*SPINS] = 
+	((Complex*)u)[1+1*SPINS] = 
+	((Complex*)u)[2+2*SPINS] = 
+	((Complex*)u)[3+3*SPINS] = c;
+  return *this;
+}
+#endif
 
     void ZeroSpinMatrix(void) {
         for(int i=0; i<2*SPINS*SPINS; i++) u[i] = 0;
@@ -41,21 +63,11 @@ class SpinMatrix
     void UnitSpinMatrix(void);
 
     // ACCESSORS
-    Complex& operator()(int i, int j) {
-        return ((Complex*)u)[i*SPINS+j];
-    }
-
-    const Complex& operator()(int i, int j)const {
-        return ((Complex*)u)[i*SPINS+j];
-    }
-
-    Complex& operator[](int i) {
-        return ((Complex*)u)[i];
-    }
-
-    const Complex& operator[](int i)const {
-        return ((Complex*)u)[i];
-    }
+    Complex& operator()(int i, int j){ return ((Complex*)u)[i*SPINS+j]; }
+    const Complex& operator()(int i, int j) const { return ((Complex*)u)[i*SPINS+j]; }
+    inline Complex& operator[](int i) { return ((Complex*)u)[i]; }
+    inline const Complex& operator[](int i) const { return ((Complex*)u)[i]; }
+   
 
     SpinMatrix operator*(const Complex &c)const {
         SpinMatrix ret;
@@ -80,7 +92,7 @@ class SpinMatrix
         SpinMatrix ret;
         for(int i = 0; i < 4; ++i) {
             for(int j = 0; j < 4; ++j) {
-                ret(i, j) = operator()(i, j) + s(i, j);
+                ret(i, j) = operator()(i, j) + s.operator()(i, j);
             }
         }
         return ret;
@@ -89,7 +101,7 @@ class SpinMatrix
     const SpinMatrix &operator+=(const SpinMatrix &s) {
         for(int i = 0; i < 4; ++i) {
             for(int j = 0; j < 4; ++j) {
-                operator()(i, j) += s(i, j);
+                operator()(i, j) += s.operator()(i, j);
             }
         }
         return *this;
@@ -99,7 +111,7 @@ class SpinMatrix
         SpinMatrix ret;
         for(int i = 0; i < 4; ++i) {
             for(int j = 0; j < 4; ++j) {
-                ret(i, j) = operator()(i, j) - s(i, j);
+                ret(i, j) = operator()(i, j) - s.operator()(i, j);
             }
         }
         return ret;
@@ -108,7 +120,7 @@ class SpinMatrix
     const SpinMatrix &operator-=(const SpinMatrix &s) {
         for(int i = 0; i < 4; ++i) {
             for(int j = 0; j < 4; ++j) {
-                operator()(i, j) -= s(i, j);
+                operator()(i, j) -= s.operator()(i, j);
             }
         }
         return *this;
@@ -119,12 +131,15 @@ class SpinMatrix
         for(int i = 0; i < 4; ++i) {
             for(int j = 0; j < 4; ++j) {
                 for(int k = 0; k < 4; ++k) {
-                    ret(i, j) += operator()(i, k) * s(k, j);
+                    ret(i, j) += operator()(i, k) * s.operator()(k, j);
                 }
             }
         }
         return ret;
     }
+
+
+
 
     Complex Tr() const;
 
@@ -152,7 +167,7 @@ static inline Rcomplex Trace(const SpinMatrix &a, const SpinMatrix &b) {
     Rcomplex ret = 0;
     for(int i = 0; i < 4; ++i) {
         for(int j = 0; j < 4; ++j) {
-            ret += a(i, j) * b(j, i);
+            ret += a.operator()(i, j) * b.operator()(j, i);
         }
     }
     return ret;
@@ -165,7 +180,7 @@ static inline Rcomplex TraceTranspose(const SpinMatrix &a,
     Rcomplex ret = 0;
     for(int i = 0; i < 4; ++i) {
         for(int j = 0; j < 4; ++j) {
-            ret += a(i, j) * b(i, j);
+            ret += a.operator()(i, j) * b.operator()(i, j);
         }
     }
     return ret;

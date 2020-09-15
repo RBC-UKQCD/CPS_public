@@ -47,7 +47,6 @@ class AlgEig : public Alg
 
     int n_masses;
     // The number of masses in the loop
-
  public:
     AlgEig(Lattice & latt, CommonArg *c_arg, EigArg *arg);
 
@@ -56,6 +55,8 @@ class AlgEig : public Alg
     void run(void);
     void run(Float **lambda, Vector** in_eigv=0);
     void runLanczos();//Float *eval, Vector **evec);
+    //Added by CK. Call these only *after* running
+    Vector ** getEigenVectors();
 };
 
 #endif

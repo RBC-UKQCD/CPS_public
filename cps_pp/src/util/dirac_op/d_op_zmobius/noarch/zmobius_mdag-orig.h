@@ -11,7 +11,7 @@ void  zmobius_mdag_orig(Vector *out,
   //------------------------------------------------------------------
   // Initializations
   //------------------------------------------------------------------
-  const int f_size = 24 * mobius_lib_arg->vol_4d * mobius_lib_arg->ls / 2;
+  const size_t f_size = 24 * mobius_lib_arg->vol_4d * mobius_lib_arg->ls / 2;
   const int ls=mobius_lib_arg->ls;
   const int vol_4d_cb = mobius_lib_arg->vol_4d / 2;
   const int ls_stride = 24 * vol_4d_cb;
@@ -19,6 +19,10 @@ void  zmobius_mdag_orig(Vector *out,
   const int s_nodes = GJP.Snodes();
   const int global_ls = local_ls * s_nodes;
   const int s_node_coor = GJP.SnodeCoor();
+
+  VRB.Result("","zmobius_mdag_sym1","f_size=%d mobius_lib_arg->vol_4d=%d mobius_lib_arg->ls=%d mass=%g\n",
+                  f_size, mobius_lib_arg->vol_4d, mobius_lib_arg->ls,mass);
+
 
   
 #if 0
@@ -50,7 +54,7 @@ void  zmobius_mdag_orig(Vector *out,
   //------------------------------------------------------------------
   // Apply - kappa_b(s)^*  : note the minus in font of kappa_b
   //------------------------------------------------------------------
-  const Complex *kappa_b = mobius_lib_arg->zmobius_kappa_b;
+  const Complex *kappa_b = mobius_lib_arg->zmobius_kappa_b.data();
   // out<- in
   moveFloat((IFloat*)out, (IFloat*)in, f_size);
   for(int s=0;s<local_ls;++s){
@@ -63,13 +67,13 @@ void  zmobius_mdag_orig(Vector *out,
   
   // Apply Dslash^dag O <- E
   //------------------------------------------------------------------
-  zmobius_dslash_4(frm_tmp2, gauge_field, out, 0, dag, mobius_lib_arg, mass);
+  zmobius_dslash_4(frm_tmp2, gauge_field, out, 1, dag, mobius_lib_arg, mass);
   DEBUG_MOBIUS_DSLASH("mobius_dslash_4 %e\n", time_elapse());
 
   //------------------------------------------------------------------
   // Apply [M_5^-1]^dag (hopping in 5th dir + diagonal)
   //------------------------------------------------------------------
-  zmobius_m5inv(frm_tmp2, mass, dag, mobius_lib_arg,mobius_lib_arg->zmobius_kappa_ratio);
+  zmobius_m5inv(frm_tmp2, mass, dag, mobius_lib_arg,mobius_lib_arg->zmobius_kappa_ratio.data());
   DEBUG_MOBIUS_DSLASH("mobius_m5inv %e\n", time_elapse());
   
   //------------------------------------------------------------------
@@ -85,7 +89,7 @@ void  zmobius_mdag_orig(Vector *out,
   //------------------------------------------------------------------
   // Apply Dslash E <- O dag
   //------------------------------------------------------------------
-  zmobius_dslash_4(out, gauge_field, frm_tmp2, 1, dag, mobius_lib_arg, mass);
+  zmobius_dslash_4(out, gauge_field, frm_tmp2, 0, dag, mobius_lib_arg, mass);
   DEBUG_MOBIUS_DSLASH("mobius_dslash_4 %e\n", time_elapse());
   
   
@@ -106,7 +110,7 @@ void  zmobius_mdag_orig(Vector *out,
   //    3. out +=  kappa_ratio dslash_5 in
   //------------------------------------------------------------------
   zmobius_kappa_dslash_5_plus_cmplx(out, in, mass, dag, mobius_lib_arg,
-    mobius_lib_arg->zmobius_kappa_ratio);
+    mobius_lib_arg->zmobius_kappa_ratio.data());
   DEBUG_MOBIUS_DSLASH("zmobius_kappa_dslash_5_plus %e\n", time_elapse());
 
   // Flops count in this function is two AXPY = 4 flops per vector elements

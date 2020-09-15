@@ -22,31 +22,12 @@
 
 //#define DEBUG_MOBIUS_DSLASH
 //#undef DEBUG_MOBIUS_DSLASH
-#ifdef  DEBUG_MOBIUS_DSLASH
-#undef DEBUG_MOBIUS_DSLASH
-#define DEBUG_MOBIUS_DSLASH(msg,a ...) do \
-     printf("[%05d] " msg, UniqueID() ,##a); \
-  while(0);
-
-static double time_now, time_prev;
-static double time_elapse(){
-  time_now = cps::dclock();
-  double elp  = time_now - time_prev;
-  time_prev=time_now;
-  return elp;
-}
-
-#else
-#define time_elapse() 0
-#define DEBUG_MOBIUS_DSLASH(msg,a ...) {}
-#endif
-
-
+//moved zmobius.h
 
 #ifndef USE_BLAS
 #define MOVE_FLOAT( pa, pb, n )  moveFloat(pa, pb, n)
-#define VEC_TIMESEQU_FLOAT(py, fact, n ) vecTimesEquFloat( py, fact, n)
-#define AXPY(n, fact, px, py)  fTimesV1PlusV2(py, fact, px, py, n)
+#define VEC_TIMESEQU_FLOAT(py, fact, n ) vecTimesEquFloatSingle( py, fact, n)
+#define AXPY(n, fact, px, py)  fTimesV1PlusV2Single(py, fact, px, py, n)
 #else
 #define MOVE_FLOAT( pa, pb, n )  cblas_dcopy(n, pb, 1, pa, 1)
 #define VEC_TIMESEQU_FLOAT(py, fact, n ) cblas_dscal( n,  fact, py,1 )

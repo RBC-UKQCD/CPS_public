@@ -6,7 +6,10 @@
 */
 //------------------------------------------------------------------
 #include<config.h>
+#include<cstddef>
+#ifdef USE_GMP
 #include <gmp.h>
+#endif
 
 #ifdef USE_MPFR
 #include <mpfr.h>
@@ -15,8 +18,8 @@
 
 CPS_START_NAMESPACE
 
-#ifndef INCLUDED_BIGFLOAT_H
-#define INCLUDED_BIGFLOAT_H
+#ifndef CPS_INCLUDED_BIGFLOAT_H
+#define CPS_INCLUDED_BIGFLOAT_H
 
 //------------------------------------------------------------------
 //

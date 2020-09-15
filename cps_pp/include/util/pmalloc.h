@@ -5,21 +5,6 @@ CPS_START_NAMESPACE
 
   $Id: pmalloc.h,v 1.6 2004/10/27 14:30:25 zs Exp $
 */
-//--------------------------------------------------------------------
-//  CVS keywords
-//
-//  $Author: zs $
-//  $Date: 2004/10/27 14:30:25 $
-//  $Header: /space/cvs/cps/cps++/include/util/pmalloc.h,v 1.6 2004/10/27 14:30:25 zs Exp $
-// $Id: pmalloc.h,v 1.6 2004/10/27 14:30:25 zs Exp $
-//  $Name: v5_0_16_hantao_io_test_v7 $
-//  $Locker:  $
-//  $RCSfile: pmalloc.h,v $
-//  $Revision: 1.6 $
-//  $Source: /space/cvs/cps/cps++/include/util/pmalloc.h,v $
-//  $State: Exp $
-//
-//--------------------------------------------------------------------
 #ifndef _pmalloc_h
 #define _pmalloc_h             //!< Prevent multiple inclusion
 

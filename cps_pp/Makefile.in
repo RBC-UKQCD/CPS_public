@@ -2,7 +2,7 @@
 # @configure_input@
 
 SRCDIR = @abs_top_srcdir@
-BUILDDIR = @abs_builddir@
+BUILDDIR = @abs_top_builddir@
 TESTDIR = tests
 HDW_TESTDIR= hdw_tests
 DOCDIR = doc
@@ -26,9 +26,9 @@ LIBNAME := $(subst XXX_,,$(LIBNAME))
 LIBNAME := $(subst _XXX,,$(LIBNAME))
 LIBNAME := $(subst XXX,,$(LIBNAME))
 else
-LIBNAME = cps
+LIBNAME = libcps
 endif
-LIBNAME ?= cps
+LIBNAME ?= libcps
 
 AR = @AR@
 #End of Hantao's addition
@@ -39,7 +39,7 @@ else
 builddir_isnt_srcdir=
 endif
 
-LIBNAME = cps
+LIBNAME = libcps
 
 all: rpcgenvml vml cps copy_testdir archive
 

@@ -1,0 +1,21 @@
+class DoArgExt doext_arg = {
+double twist_bc_x = 0.0
+double twist_bc_y = 0.0
+double twist_bc_z = 0.0
+double twist_bc_t = 0.0
+int gparity_1f_X = 0
+int gparity_1f_Y = 0
+StartConfType start_u1_conf_kind = START_CONF_ORD
+unsigned long start_u1_conf_load_addr = 0x0
+string start_u1_conf_filename = ""
+int start_u1_conf_alloc_flag = 0
+int mult_u1_conf_flag = 0
+int save_stride = 1
+int trajectory = 0
+double mobius_b_coeff =   1.5
+double mobius_c_coeff =   0.5
+Array zmobius_b_coeff[0] = {
+}
+Array zmobius_c_coeff[0] = {
+}
+}

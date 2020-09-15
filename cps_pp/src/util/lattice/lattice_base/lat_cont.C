@@ -6,6 +6,7 @@ CPS_START_NAMESPACE
 char * LatticeContainer::cname = "LatticeContainer";
 LatticeContainer::LatticeContainer(){
 	size_t mat_size = GJP.VolNodeSites()*4;
+	if(GJP.Gparity()) mat_size *= 2;
 	gauge_p = new Matrix[mat_size];
 }
 LatticeContainer::~LatticeContainer(){

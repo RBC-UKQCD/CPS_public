@@ -11,6 +11,7 @@
 
 CPS_START_NAMESPACE
 
+
 /************************************************************************************/
 
 class IoStyle : protected QioControl {
@@ -20,6 +21,8 @@ class IoStyle : protected QioControl {
   IoStyle(const QioArg & qarg) : QioControl(), qio_arg(qarg) {  }
 
  public:
+  using QioControl::disableGparityReconstructUstarField;
+
   virtual int load(char * data, const int data_per_site, const int site_mem,
 		   const LatHeaderBase & hd, const DataConversion & dconv,
 		   const int dimension /* 4 or 5 */,
@@ -38,6 +41,7 @@ class ParallelIO : public IoStyle {
  private:
   const char * cname;
  public:
+
   ParallelIO(const QioArg & qarg) : IoStyle(qarg), cname("ParallelIO") { }
 
   virtual int load(char * data, const int data_per_site, const int site_mem,
@@ -62,6 +66,8 @@ class SerialIO : public IoStyle {
  private:
   const char * cname;
  public:
+  static bool dbl_latt_storemode;
+
   SerialIO(const QioArg & qarg) : IoStyle(qarg), cname("SerialIO") { }
 
   virtual int load(char * data, const int data_per_site, const int site_mem,
@@ -69,7 +75,20 @@ class SerialIO : public IoStyle {
 		   const int dimension /* 4 or 5 */,
 		   unsigned int * ptrcsum, unsigned int * ptrpdcsum = 0,
 		   Float * rand_sum = 0, Float * rand_2_sum = 0);
-    virtual int store(std::iostream & output,
+  virtual int store(std::iostream & output,
+		    char * data, const int data_per_site, const int site_mem,
+		    LatHeaderBase & hd, const DataConversion & dconv,
+		    const int dimension /* 4 or 5 */,
+		    unsigned int * ptrcsum, unsigned int * ptrpdcsum = 0,
+		    Float * rand_sum = 0, Float * rand_2_sum = 0);
+  virtual int storeGparityInterleaved(std::iostream & output,
+		    char * data, const int data_per_site, const int site_mem,
+		    LatHeaderBase & hd, const DataConversion & dconv,
+		    const int dimension /* 4 or 5 */,
+		    unsigned int * ptrcsum, unsigned int * ptrpdcsum = 0,
+		    Float * rand_sum = 0, Float * rand_2_sum = 0);
+
+  virtual int storeGparityXYInterleaved(std::iostream & output,
 		    char * data, const int data_per_site, const int site_mem,
 		    LatHeaderBase & hd, const DataConversion & dconv,
 		    const int dimension /* 4 or 5 */,

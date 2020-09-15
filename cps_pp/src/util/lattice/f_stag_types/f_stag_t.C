@@ -73,10 +73,6 @@ FstagTypes::FstagTypes()
 
     // set up CBUF
 
-    setCbufCntrlReg(1, CBUF_MODE1);
-    setCbufCntrlReg(2, CBUF_MODE2);
-    setCbufCntrlReg(3, CBUF_MODE3);
-    setCbufCntrlReg(4, CBUF_MODE4);
   
 }
 

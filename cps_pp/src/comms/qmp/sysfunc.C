@@ -22,11 +22,16 @@
 #include <string.h>
 #include <math.h>
 #include <qmp.h>
+#include <mpi.h>
 #if TARGET == BGL
 #include <sys/bgl/bgl_sys_all.h>
 #endif
 #if TARGET == BGP
 void spi_init();
+#endif
+#ifdef USE_GRID
+#include <Grid/Grid.h>
+#include <util/lattice/fgrid.h>
 #endif
 CPS_START_NAMESPACE
 
@@ -47,14 +52,21 @@ namespace QMPSCU {
   //! Number of grid dimensions.
   static int NDIM = 5;
  
+  static int qmpRank;        /*!< QMP Rank/identify of this  process */
   static int peRank;        /*!< Rank/identify of this  process */
   static int peNum;          /*!< Total number of processors */
 #ifdef UNIFORM_SEED_NO_COMMS
   static const int pePos[4] = {0,0,0,0};
   static const int peGrid[4] = {1,1,1,1};
 #else
-  static const int* pePos;  /*!< Position of this process in the grid.*/ 
-  static const int* peGrid; /*!< Number of processors in each direction */
+  static int* pePos;  /*!< Position of this process in the grid.*/ 
+  static int* peGrid; /*!< Number of processors in each direction */
+//    static std::vector<int> pePos;
+//    static std::vector<int> peGrid;
+
+#ifdef USE_GRID
+  static QMP_comm_t qmp_comm; // generate new comm
+#endif
 #endif
 
   //Clean up resources used by QMP
@@ -89,11 +101,12 @@ void init_qmp(int * argc, char ***argv) {
   
     QMP_thread_level_t prv;
 #ifndef UNIFORM_SEED_NO_COMMS
-    QMP_status_t init_status = QMP_init_msg_passing(argc, argv, QMP_THREAD_SINGLE, &prv);
+    QMP_status_t init_status = QMP_init_msg_passing(argc, argv, QMP_THREAD_MULTIPLE, &prv);
     if (init_status) printf("QMP_init_msg_passing returned %d\n",init_status);
-    peRank = QMP_get_node_number();
+    qmpRank = QMP_get_node_number();
     peNum = QMP_get_number_of_nodes();
-    if(!peRank)printf("QMP_init_msg_passing returned %d\n",init_status);
+    if(!qmpRank)printf("QMP_init_msg_passing returned %d\n",init_status);
+//    if(!qmpRank)printf("MPI_Initialized() returned %d\n",MPI_Initialized());
 
     if (init_status != QMP_SUCCESS) {
       QMP_error("%s\n",QMP_error_string(init_status));
@@ -101,7 +114,7 @@ void init_qmp(int * argc, char ***argv) {
 
     // check QMP thread level
     // Added by Hantao
-    if(peRank == 0) {
+    if(qmpRank == 0) {
         switch(prv) {
         case QMP_THREAD_SINGLE:
             printf("QMP thread level = QMP_THREAD_SINGLE\n");
@@ -117,6 +130,7 @@ void init_qmp(int * argc, char ***argv) {
             break;
         default:
             printf("QMP thread level = no idea what this is, boom!\n");
+            exit(-32);
         }
     }
 
@@ -127,8 +141,38 @@ void init_qmp(int * argc, char ***argv) {
     //Get information about the allocated machine
     peNum = QMP_get_number_of_nodes();
     NDIM = QMP_get_allocated_number_of_dimensions();
-    peGrid = QMP_get_allocated_dimensions();
-    pePos = QMP_get_allocated_coordinates();
+    
+    const int *peGrid_t = QMP_get_allocated_dimensions();
+    const int *pePos_t = QMP_get_allocated_coordinates();
+    peGrid = new int[NDIM];
+    pePos = new int[NDIM];
+    for(int i =0;i<NDIM;i++){
+	peGrid[i] = peGrid_t[i];
+	pePos[i] = pePos_t[i];
+//	peGrid.push_back(peGrid_t[i]);
+//	pePos.push_back(pePos_t[i]);
+    }
+#ifdef USE_GRID
+	Grid::Grid_init(argc,argv);
+	FgridBase::grid_initted=true;
+	std::vector<int> processors;
+	for(int i=0;i<NDIM;i++) processors.push_back(peGrid[i]);
+	Grid::CartesianCommunicator grid_cart(processors);
+	peRank=0;
+	for(int i=NDIM-1;i>=0;i--){
+		pePos[i] = grid_cart._processor_coor[i];
+		peRank *= peGrid[i];
+		peRank += pePos[i];
+	}
+	QMP_comm_split(QMP_comm_get_default(),0,peRank,&qmp_comm); 
+	QMP_comm_set_default(qmp_comm);
+#else
+	peRank=0;
+	for(int i=NDIM-1;i>=0;i--){
+		peRank *= peGrid[i];
+		peRank += pePos[i];
+	}
+#endif
 
     if(peRank==0){
       for(int i = 0; i<*argc;i++){
@@ -142,7 +186,6 @@ void init_qmp(int * argc, char ***argv) {
     NDIM=4;
 #endif
 
-//#if (TARGET == BGL) || (TARGET == BGP)
   if (NDIM>5){
     peNum = 1;
     for(int i = 0;i<5;i++)
@@ -151,7 +194,7 @@ void init_qmp(int * argc, char ***argv) {
   }
   int if_print=0;
   for(int i = 0;i<NDIM;i++)
-  if (pePos[i]>=2) if_print=0;
+  if (pePos[i]>=0) if_print=0;
 
   if (if_print){
       printf("Rank=%d Num=%d NDIM=%d\n",peRank,peNum,NDIM);
@@ -162,39 +205,41 @@ void init_qmp(int * argc, char ***argv) {
       printf("pos:");
       for(int i = 0;i<NDIM;i++)
         printf(" %d",pePos[i]);
-      printf("\n");
-
-#if 0
-    int rc;
-    BGLPersonality pers;
-    rts_get_personality(&pers, sizeof(pers));
-    printf("from personality: %d %d %d %d\n",pers.xCoord,pers.yCoord,pers.zCoord,rts_get_processor_id());
-#endif
-  }
+        printf("\n");
+  } 
 
 
-//     printf("from personality:\n");
-
-#if 0
-    if ( (qmp_type!= QMP_GRID) && (qmp_type !=QMP_MESH)  ) {
-      QMP_error("CPS on QMP only implemented for GRID or MESH, not (%d) machines\n",qmp_type);
-    }
-#endif
-
-//     printf("QMP_declare_logical_topology(peGrid, NDIM)\n");
 #ifndef UNIFORM_SEED_NO_COMMS
     //Declare the logical topology (Redundant for GRID machines)
     if (QMP_declare_logical_topology(peGrid, NDIM) != QMP_SUCCESS) {
       QMP_error("Node %d: Failed to declare logical topology\n",peRank);
       exit(-4);
     }
+#ifdef USE_GRID
+    pePos_t = QMP_get_logical_coordinates();
+    peRank = pePos_t[NDIM-1];
+    if(NDIM>1)
+    for(int i = NDIM-2;i>=0 ;i--) peRank = peRank*peGrid[i] + pePos_t[i];
+    for(int i = 0; i<NDIM;i++)
+    if ( pePos_t[i] != grid_cart._processor_coor[i] ) { 
+       printf("%d %d: QMP %d Grid %d\n",peRank,i,pePos_t[i],grid_cart._processor_coor[i]);
+       QMP_abort(-32);
+    }
+#endif
+ //debugging
+//    if(0){
+    if (peRank != qmpRank){
+	printf("peRank(%d) != qmpRank(%d) pePos= ",peRank,qmpRank);
+	for(int i=0;i<NDIM;i++) printf("%d ",pePos[i]);
+	printf("\n");
+    }
 #endif
     initialized = true;
-  printf("Rank=%d init_qmp() done\n",peRank);
+    if(!peRank) printf("Rank=%d init_qmp() done\n",peRank);
     
+    QMP_barrier();  
   }
-    
-}//End namespace QMPSCU {
+}
 
 
 /*-------------------------------------------------------------------------*/
@@ -291,24 +336,6 @@ if (sync_status != QMP_SUCCESS) {
 return 1;
 }
 #endif
-
-//----------------------------------------------------------------
-/*
-  On QCDSP this function returns the explicit wire
-  number (0 - 7) of the physics direction given by \a dir. In the MPI
-  version this returns the internal direction from the cartesian
-  communicator which corresponds to the given physics direction.
-  \param dir The physics (lattice) direction.
-  \return The number used by the comms layer to represents that direction.
-
-  Possibly.
-*/
-/* In this implementation, this just returns the integer value
-  associated with the direction from the SCUDir enum */
-//int SCURemap( SCUDir dir ) {
-//    return (int)dir;
-//}
-
 
 CPS_END_NAMESPACE
 #endif

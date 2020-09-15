@@ -39,11 +39,6 @@ int main(int argc,char *argv[])
   //----------------------------------------------------------------
   DoArg do_arg;
   setup_do_arg(do_arg); 
-#if TARGET==cpsMPI
-  MPISCU::set_pe_grid(do_arg.x_nodes, do_arg.y_nodes, do_arg.z_nodes, do_arg.t_nodes);
-  using MPISCU::fprintf;
-  using MPISCU::printf;  
-#endif
   GJP.Initialize(do_arg);
 
   //----------------------------------------------------------------

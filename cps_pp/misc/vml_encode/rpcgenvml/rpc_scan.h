@@ -86,6 +86,15 @@ enum tok_kind {
 	/*
 	 *END PAB
 	 */
+
+	/* CK */
+	TOK_AMPERSAND,
+	/* TOK_HASH, */
+	/* TOK_FWDSLASH, */
+	TOK_RPCCOMMAND,
+	TOK_INCLUDEPRAGMA,
+	/*END CK*/
+
 	TOK_EOF
 };
 typedef enum tok_kind tok_kind;

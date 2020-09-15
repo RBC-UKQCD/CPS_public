@@ -39,7 +39,7 @@ public:
     \param field    pointer to field
    */
   qio_writeGenericFields(char *outfile,
-			 const int n_fields, const int f_size_per_site,  void *field,
+			 const int n_fields, const size_t f_size_per_site,  void *field,
 			 int argc, char *argv[], int volFormat=QIO_VOLFMT,
 			 FP_FORMAT floatFormat=FP_AUTOMATIC):
     qio_init(argc, argv),
@@ -62,7 +62,7 @@ public:
     \param traj trajectory number
    */
   qio_writeGenericFields(char *outfile,
-			 const int n_fields, const int f_size_per_site,  void *field,
+			 const int n_fields, const size_t f_size_per_site,  void *field,
 			 const char * ensemble_id,
 			 const char * ensemble_label,
 			 const int traj,
@@ -111,7 +111,7 @@ public:
   */  
 
   void write_genericfields(char *outfile,
-			    const int n_fields, const int f_size_per_site,  void *field,
+			    const int n_fields, const size_t f_size_per_site,  void *field,
 			    int volFormat=QIO_VOLFMT,
 			    FP_FORMAT floatFormat=FP_AUTOMATIC);
 
@@ -122,7 +122,7 @@ public:
   */
   void write_genericfields_eo(
 			      char *outfile,
-			      const int n_fields, int f_size_per_site,  void *field,
+			      const int n_fields, size_t f_size_per_site,  void *field,
 			      int volFormat=QIO_VOLFMT ,
 			      FP_FORMAT floatFormat=FP_AUTOMATIC )
   {

@@ -63,6 +63,22 @@ public:
 	} frm_mc;
 };
 
+class VML;
+class EOFARemezArg {
+  public:
+    bool Encode(char* filename, char* instance);
+    bool Decode(char* filename, char* instance);
+    bool Vml(VML* vmls, char* instance);
+    struct {
+      u_int LH_len;
+      RemezArg* LH_val;
+    } LH;
+    struct {
+      u_int RH_len;
+      RemezArg* RH_val;
+    } RH;
+};
+
 /* the xdr functions */
 
 #ifdef __cplusplus
@@ -72,10 +88,12 @@ extern "C" {
 #if defined(__STDC__) || defined(__cplusplus)
 extern  bool_t vml_RemezArg (VML *, char *instance, RemezArg*);
 extern  bool_t vml_RationalQuotientRemezArg (VML *, char *instance, RationalQuotientRemezArg*);
+extern  bool_t vml_EOFARemezArg(VML*, char* instance, EOFARemezArg*);
 
 #else /* K&R C */
 extern  bool_t vml_RemezArg (VML *, char *instance, RemezArg*);
 extern  bool_t vml_RationalQuotientRemezArg (VML *, char *instance, RationalQuotientRemezArg*);
+extern  bool_t vml_EOFARemezArg(VML*, char* instance, EOFARemezArg*);
 
 #endif /* K&R C */
 

@@ -73,7 +73,7 @@ void invcg_copy_rnorm(Float *v, Float rsq, Float *X, int len)
 	}
 }
 
-void eigcg_vec_mult(Vector **V,int m, Float *QZ, int n, int f_size_cb)
+void eigcg_vec_mult(Vector **V,int m, Float *QZ, int n, size_t f_size_cb)
 //QZ is saved in column major format. 
 {
 	Float **Vptr=(Float* *)smalloc(m*sizeof(Float *));
@@ -134,7 +134,7 @@ int DiracOp::InvEigCg(Vector *sol, Vector *src, Float *true_res, const int nev, 
 
 	if(nev>0 && m<=2*nev)ERR.General(cname,fname,"m should larger than 2*nev\n");
 
-	int f_size_cb;     // Node checkerboard size of the fermion field
+	size_t f_size_cb;     // Node checkerboard size of the fermion field
 	// Set the node checkerboard size of the fermion field
 	//------------------------------------------------------------------
 	if(lat.Fclass() == F_CLASS_CLOVER) {

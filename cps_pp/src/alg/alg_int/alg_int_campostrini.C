@@ -55,6 +55,7 @@ void AlgIntCampostrini::evolve(Float dt, int steps)
 
   for (int i=0; i<steps; i++) {
     if (level == TOP_LEVEL_INTEGRATOR) CSM.SaveComment(++step_cnt);
+    if (level == TOP_LEVEL_INTEGRATOR) checkpoint(cname,fname,i,steps);
     
     B->evolve(epsilon/(Float)B_steps, B_steps);
     A->evolve((1-sigma)*epsilon/(2.0*(Float)A_steps), A_steps);

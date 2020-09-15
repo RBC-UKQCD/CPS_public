@@ -55,7 +55,7 @@ int DiracOpStagTypes::RitzLatSize() {
   char *fname = "RitzLatSize()";
   VRB.Func(cname,fname);
 
-  int f_size = GJP.VolNodeSites() * lat.FsiteSize();
+  size_t f_size = GJP.VolNodeSites() * lat.FsiteSize();
 
   switch(dirac_arg->RitzMatOper)
   {
@@ -141,9 +141,9 @@ int DiracOpStagTypes::RitzEig(Vector **psi, Float lambda_H[], int valid_eig[], E
 // Set the node checkerboard size of the fermion field
 //------------------------------------------------------------------
 //  INCONSISTENT with the definition of RitzLatSize() above!!!
-//  int f_size = RitzLatSize() / 2;
+//  size_t f_size = RitzLatSize() / 2;
 
-  int f_size = RitzLatSize() ;
+  size_t f_size = RitzLatSize() ;
     
 // Set the node checkerboard size of the fermion field
 //------------------------------------------------------------------

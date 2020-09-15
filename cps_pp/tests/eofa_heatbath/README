@@ -1,0 +1,23 @@
+David Murphy (djm2131@columbia.edu)
+03/12/2019
+
+This program tests the accuracy of a given EOFA heatbath setup.
+Since the EOFA action has the form
+	S = \phi^\dag M \phi
+we seed the initial fermion field \phi at the start of an HMC
+trajectory by generating a Gaussian noise vector \eta and
+computing
+	|\phi> = M^{-1/2} |\eta>
+using a rational approximation to the inverse square root.
+In infinite precision arithmetic we should have
+	<\eta|\eta> = <\phi|M|\phi>,
+but in practice the accuracy is limited by the number of
+poles in the rational approximation to x^{-1/2} and the
+CG stopping conditions. This program prints <\eta|\eta>
+at the start, performs the heatbath calculation 
+	|\phi> <-- M^{-1/2} |\eta>
+and then computes the Hamiltonian
+	H = <\phi|M|\phi>.
+One can then check that the relative error
+	| <\eta|\eta> - <\phi|M|\phi> | / <\eta|\eta>
+is within the desired accuracy.

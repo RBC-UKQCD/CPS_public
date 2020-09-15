@@ -154,10 +154,6 @@ DiracOpStag::~DiracOpStag() {
 void DiracOpStag::MatPcDagMatPc(Vector *out, 
 				Vector *in, 
 				Float *dot_prd){
-//  setCbufCntrlReg(1, CBUF_MODE1);
-//  setCbufCntrlReg(2, CBUF_MODE2);
-//  setCbufCntrlReg(3, CBUF_MODE3);
-//  setCbufCntrlReg(4, CBUF_MODE4);
   stag_dirac(frm_tmp, in, 0, 0);
   stag_dirac(out, frm_tmp, 1, 0);
   out->FTimesV1MinusV2(mass_sq, in, out, f_size_cb);
@@ -180,10 +176,6 @@ void DiracOpStag::Dslash(Vector *out,
 			 ChkbType cb, 
 			 DagType dag) {
 			        
-  setCbufCntrlReg(1, CBUF_MODE1);
-  setCbufCntrlReg(2, CBUF_MODE2);
-  setCbufCntrlReg(3, CBUF_MODE3);
-  setCbufCntrlReg(4, CBUF_MODE4);
 
   stag_dirac(out, 
 	in, 
@@ -225,10 +217,6 @@ void DiracOpStag::Dslash(Vector *out,
 			 DagType dag,
 			 int dir_flag) {
 
-  setCbufCntrlReg(1, CBUF_MODE1);
-  setCbufCntrlReg(2, CBUF_MODE2);
-  setCbufCntrlReg(3, CBUF_MODE3);
-  setCbufCntrlReg(4, CBUF_MODE4);
 
   stag_dirac(out, 
 	in, 
@@ -260,10 +248,6 @@ int DiracOpStag::MatInv(Vector *out,
   char *fname = "MatInv(V*,V*,F*)";
   VRB.Func(cname,fname);
 
-  setCbufCntrlReg(1, CBUF_MODE1);
-  setCbufCntrlReg(2, CBUF_MODE2);
-  setCbufCntrlReg(3, CBUF_MODE3);
-  setCbufCntrlReg(4, CBUF_MODE4);
 
   IFloat *k_e = (IFloat *)in;
   IFloat *k_o = k_e+f_size_cb;

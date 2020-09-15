@@ -4,15 +4,15 @@
 #include <util/qcdio.h>
 //#include <qalloc.h>
 CPS_START_NAMESPACE
-static FILE FAKE;
-static FILE *FAKE_P = &FAKE;
+static FILE CPS_FAKE;
+static FILE *CPS_FAKE_P = &CPS_FAKE;
 const int MAX_FILENAME =200;
 FILE *Fopen( FileIoType type, const char *filename, const char *mode){
   FILE *result = NULL;
 #ifdef UNIFORM_SEED_NO_COMMS
-  return FAKE_P;
+  return CPS_FAKE_P;
 #endif
-  if ( type == ZERO_ONLY && UniqueID() ) return FAKE_P;
+  if ( type == ZERO_ONLY && UniqueID() ) return CPS_FAKE_P;
   if(type == ADD_ID){
     char fname[MAX_FILENAME];
     if(strlen(filename)+6 >MAX_FILENAME){
@@ -33,29 +33,29 @@ FILE *Fopen( FileIoType type, const char *filename, const char *mode){
 }
 
 size_t Fwrite( const void *ptr, size_t size, size_t n, FILE *stream){
-  if ( stream == FAKE_P )  return n;
+  if ( stream == CPS_FAKE_P )  return n;
   return fwrite( ptr, size, n, stream);
 }
 
 size_t Fread(void *ptr, size_t size, size_t n, FILE *stream){
-  if ( stream == FAKE_P )
+  if ( stream == CPS_FAKE_P )
     ERR.General("","Fread()","Trying to read from invalid file stream, possibly from using Fopen with wrong flags");
   return fread( ptr, size, n, stream);
 }
 
 int Fflush(FILE *stream)
 {
-    if(stream == FAKE_P) return 0;
+    if(stream == CPS_FAKE_P) return 0;
     return fflush(stream);
 }
 
 int Fclose( FileIoType type, FILE *stream){
-  if ( stream == FAKE_P )  return 1;
+  if ( stream == CPS_FAKE_P )  return 1;
   return fclose(stream);
 }
 
 int Fprintf( FileIoType type, FILE *stream, const char *format,...){
-  if ( stream == FAKE_P )  return 1;
+  if ( stream == CPS_FAKE_P )  return 1;
   va_list args;
   va_start(args,format);
   int nb = vfprintf(stream, format, args);
@@ -64,7 +64,7 @@ int Fprintf( FileIoType type, FILE *stream, const char *format,...){
 }
 
 int Fprintf( FILE *stream, const char *format,...){
-  if ( stream == FAKE_P )  return 1;
+  if ( stream == CPS_FAKE_P )  return 1;
   va_list args;
   va_start(args,format);
   int nb = vfprintf(stream, format, args);
@@ -73,7 +73,7 @@ int Fprintf( FILE *stream, const char *format,...){
 }
 
 int Vfprintf( FileIoType type, FILE *stream, const char *format, va_list ap){
-  if ( stream == FAKE_P )  return 1;
+  if ( stream == CPS_FAKE_P )  return 1;
   return vfprintf(stream, format, ap);
 }
 CPS_END_NAMESPACE

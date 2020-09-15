@@ -1874,8 +1874,8 @@ void AlgMuon::VacPolConsLocLowMode(int t_op, int* mom, Rcomplex* VacPol,
  }
 
  // construct 4d src bilinear on 1 time slice, ubar gamma_mu u.
- int f_size_5d= GJP.VolNodeSites()*AlgLattice().FsiteSize();
- int f_size_4d= f_size_5d/n[4];
+ size_t f_size_5d= GJP.VolNodeSites()*AlgLattice().FsiteSize();
+ size_t f_size_4d= f_size_5d/n[4];
  Vector *u=(Vector *)smalloc(cname,fname,"u",f_size_4d*sizeof(Float));
  if(u==NULL)ERR.General(cname,fname,"4d vector u was not initialized\n");
  Vector *v=(Vector *)smalloc(cname,fname,"v",f_size_4d*sizeof(Float));
@@ -2738,8 +2738,8 @@ void AlgMuon::run()
 
   if(DO_VACPOL){
 
-    int f_size_5d= GJP.VolNodeSites()*AlgLattice().FsiteSize();
-    int f_size_4d= f_size_5d/GJP.SnodeSites();
+    size_t f_size_5d= GJP.VolNodeSites()*AlgLattice().FsiteSize();
+    size_t f_size_4d= f_size_5d/GJP.SnodeSites();
 
 #if 0    
     EigArg eig_arg;

@@ -213,6 +213,42 @@ vml_RationalDescr (VML *vmls, char *name,RationalDescr *objp)
 	 vml_class_end(vmls,"RationalDescr",name);
 	return TRUE;
 }
+	 bool EOFARationalDescr::Encode(char *filename,char *instance){
+		 VML vmls;
+		 if ( !vmls.Create(filename,VML_ENCODE)) return false;
+		 if ( !Vml(&vmls,instance) ) return false;
+		 vmls.Destroy(); return true;
+	 }
+
+	 bool EOFARationalDescr::Decode(char *filename,char *instance){
+		 VML vmls;
+		 if ( !vmls.Create(filename,VML_DECODE)) return false;
+		 if ( !Vml(&vmls,instance)) return false;
+		 vmls.Destroy(); return true;
+	 }
+	 bool EOFARationalDescr::Vml(VML *vmls,char *instance){
+		 if(!vml_EOFARationalDescr(vmls,instance,this)) return false;
+	 return true;
+	}
+
+
+bool_t
+vml_EOFARationalDescr (VML *vmls, char *name,EOFARationalDescr *objp)
+{
+	 vml_class_begin(vmls,"EOFARationalDescr",name);
+	 if (!vml_FieldType (vmls, "field_type", &objp->field_type))
+		 return FALSE;
+	 if (!vml_int (vmls, "power_num", &objp->power_num))
+		 return FALSE;
+	 if (!vml_int (vmls, "power_den", &objp->power_den))
+		 return FALSE;
+	 if (!vml_long (vmls, "precision", &objp->precision))
+		 return FALSE;
+	 if (!vml_ApproxDescr (vmls, "rat_approx", &objp->rat_approx))
+		 return FALSE;
+	 vml_class_end(vmls,"EOFARationalDescr",name);
+	return TRUE;
+}
 	 bool EigenDescr::Encode(char *filename,char *instance){
 		 VML vmls;
 		 if ( !vmls.Create(filename,VML_ENCODE)) return false;
@@ -585,6 +621,12 @@ vml_ActionRationalQuotientArg (VML *vmls, char *name,ActionRationalQuotientArg *
 	 if (!vml_array (vmls, "frm_mass", (char **)&objp->frm_mass.frm_mass_val, (u_int *) &objp->frm_mass.frm_mass_len, ~0,
 		sizeof (Float), (vmlproc_t) vml_Float))
 		 return FALSE;
+	 if (!vml_array (vmls, "bsn_mass_epsilon", (char **)&objp->bsn_mass_epsilon.bsn_mass_epsilon_val, (u_int *) &objp->bsn_mass_epsilon.bsn_mass_epsilon_len, ~0,
+		sizeof (Float), (vmlproc_t) vml_Float))
+		 return FALSE;
+	 if (!vml_array (vmls, "frm_mass_epsilon", (char **)&objp->frm_mass_epsilon.frm_mass_epsilon_val, (u_int *) &objp->frm_mass_epsilon.frm_mass_epsilon_len, ~0,
+		sizeof (Float), (vmlproc_t) vml_Float))
+		 return FALSE;
 	 if (!vml_array (vmls, "bosons", (char **)&objp->bosons.bosons_val, (u_int *) &objp->bosons.bosons_len, ~0,
 		sizeof (RationalDescr), (vmlproc_t) vml_RationalDescr))
 		 return FALSE;
@@ -594,6 +636,72 @@ vml_ActionRationalQuotientArg (VML *vmls, char *name,ActionRationalQuotientArg *
 	 if (!vml_EigenDescr (vmls, "eigen", &objp->eigen))
 		 return FALSE;
 	 vml_class_end(vmls,"ActionRationalQuotientArg",name);
+	return TRUE;
+}
+	 bool ActionEOFAArg::Encode(char *filename,char *instance){
+		 VML vmls;
+		 if ( !vmls.Create(filename,VML_ENCODE)) return false;
+		 if ( !Vml(&vmls,instance) ) return false;
+		 vmls.Destroy(); return true;
+	 }
+
+	 bool ActionEOFAArg::Decode(char *filename,char *instance){
+		 VML vmls;
+		 if ( !vmls.Create(filename,VML_DECODE)) return false;
+		 if ( !Vml(&vmls,instance)) return false;
+		 vmls.Destroy(); return true;
+	 }
+	 bool ActionEOFAArg::Vml(VML *vmls,char *instance){
+		 if(!vml_ActionEOFAArg(vmls,instance,this)) return false;
+	 return true;
+	}
+
+
+bool_t
+vml_ActionEOFAArg (VML *vmls, char *name,ActionEOFAArg *objp)
+{
+	 vml_class_begin(vmls,"ActionEOFAArg",name);
+	 if (!vml_ActionBilinearArg (vmls, "bi_arg", &objp->bi_arg))
+		 return FALSE;
+	 if (!vml_array (vmls, "LH_stop_rsd_fg", (char **)&objp->LH_stop_rsd_fg.LH_stop_rsd_fg_val, (u_int *) &objp->LH_stop_rsd_fg.LH_stop_rsd_fg_len, ~0,
+		sizeof (Float), (vmlproc_t) vml_Float))
+		 return FALSE;
+	 if (!vml_array (vmls, "LH_stop_rsd_md", (char **)&objp->LH_stop_rsd_md.LH_stop_rsd_md_val, (u_int *) &objp->LH_stop_rsd_md.LH_stop_rsd_md_len, ~0,
+		sizeof (Float), (vmlproc_t) vml_Float))
+		 return FALSE;
+	 if (!vml_array (vmls, "LH_stop_rsd_mc", (char **)&objp->LH_stop_rsd_mc.LH_stop_rsd_mc_val, (u_int *) &objp->LH_stop_rsd_mc.LH_stop_rsd_mc_len, ~0,
+		sizeof (Float), (vmlproc_t) vml_Float))
+		 return FALSE;
+	 if (!vml_array (vmls, "RH_stop_rsd_fg", (char **)&objp->RH_stop_rsd_fg.RH_stop_rsd_fg_val, (u_int *) &objp->RH_stop_rsd_fg.RH_stop_rsd_fg_len, ~0,
+		sizeof (Float), (vmlproc_t) vml_Float))
+		 return FALSE;
+	 if (!vml_array (vmls, "RH_stop_rsd_md", (char **)&objp->RH_stop_rsd_md.RH_stop_rsd_md_val, (u_int *) &objp->RH_stop_rsd_md.RH_stop_rsd_md_len, ~0,
+		sizeof (Float), (vmlproc_t) vml_Float))
+		 return FALSE;
+	 if (!vml_array (vmls, "RH_stop_rsd_mc", (char **)&objp->RH_stop_rsd_mc.RH_stop_rsd_mc_val, (u_int *) &objp->RH_stop_rsd_mc.RH_stop_rsd_mc_len, ~0,
+		sizeof (Float), (vmlproc_t) vml_Float))
+		 return FALSE;
+	 if (!vml_Float (vmls, "spread", &objp->spread))
+		 return FALSE;
+	 if (!vml_int (vmls, "remez_generate", &objp->remez_generate))
+		 return FALSE;
+	 if (!vml_string (vmls, "rat_poles_file", &objp->rat_poles_file, ~0))
+		 return FALSE;
+	 if (!vml_array (vmls, "num_mass", (char **)&objp->num_mass.num_mass_val, (u_int *) &objp->num_mass.num_mass_len, ~0,
+		sizeof (Float), (vmlproc_t) vml_Float))
+		 return FALSE;
+	 if (!vml_array (vmls, "den_mass", (char **)&objp->den_mass.den_mass_val, (u_int *) &objp->den_mass.den_mass_len, ~0,
+		sizeof (Float), (vmlproc_t) vml_Float))
+		 return FALSE;
+	 if (!vml_array (vmls, "LH_rat_approx", (char **)&objp->LH_rat_approx.LH_rat_approx_val, (u_int *) &objp->LH_rat_approx.LH_rat_approx_len, ~0,
+		sizeof (EOFARationalDescr), (vmlproc_t) vml_EOFARationalDescr))
+		 return FALSE;
+	 if (!vml_array (vmls, "RH_rat_approx", (char **)&objp->RH_rat_approx.RH_rat_approx_val, (u_int *) &objp->RH_rat_approx.RH_rat_approx_len, ~0,
+		sizeof (EOFARationalDescr), (vmlproc_t) vml_EOFARationalDescr))
+		 return FALSE;
+	 if (!vml_EigenDescr (vmls, "eigen", &objp->eigen))
+		 return FALSE;
+	 vml_class_end(vmls,"ActionEOFAArg",name);
 	return TRUE;
 }
 	 bool ActionGaugeArg::Encode(char *filename,char *instance){

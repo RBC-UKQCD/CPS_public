@@ -44,7 +44,7 @@ void zmobius_dslash(Vector *out,
 //------------------------------------------------------------------
 // Apply 5th-direction Dslash
 //------------------------------------------------------------------
-  Complex* kappa_ratio = mobius_lib_arg->zmobius_kappa_ratio;
+  Complex* kappa_ratio = mobius_lib_arg->zmobius_kappa_ratio.data();
   zmobius_kappa_dslash_5_plus_cmplx(out, in, mass, dag, mobius_lib_arg, kappa_ratio);
 
 }

@@ -93,9 +93,6 @@ AlgRect::~AlgRect() {
 //------------------------------------------------------------------
 void AlgRect::run()
 {
-#if TARGET==cpsMPI
-    using MPISCU::fprintf;
-#endif
   char *fname = "run()";
   VRB.Func(cname, fname);
 

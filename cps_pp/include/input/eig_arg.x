@@ -21,7 +21,9 @@ class EigArg {
     Float Mass<>;   /*!< Relevant to the ::ARRAY pattern:
 				The array of mass values for which 
                                 the eigenvalue is measured. */
-    int n_masses; 
+    Float Epsilon<>; /*!< CK: Epsilon factor for twisted mass fermions */    
+
+ //   int n_masses; 
 
     int N_eig;		/*!< The number of eigenvectors/values to calculate */
     /* CLAUDIO: added number of accurate eigenvalues to compute */
@@ -56,7 +58,8 @@ class EigArg {
 			   */
 
     Float mass;		/*!< The mass to use in the eigenvector solver */
-
+    Float epsilon;      /*< CK: Epsilon factor for twisted mass fermions */ 
+    
       // the following two variables should be added, as in QCDSP -- Sam
     string fname<>;   // should be moved from common_arg to here -- Sam
     int ncorr;

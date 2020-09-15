@@ -129,7 +129,6 @@ void GpowerRect::GforceSite(Matrix& force, int *x, int mu)
   Float tmp ;
   Float coeff = invs3;
 
-  setCbufCntrlReg(4, CBUF_MODE4);
 
   Matrix *u_off = GaugeField()+GsiteOffset(x)+mu;
 
@@ -191,7 +190,6 @@ ForceArg GpowerRect::EvolveMomGforce(Matrix *mom, Float dt){
   Float L2 = 0.0;
   Float Linf = 0.0;
 
-  setCbufCntrlReg(4, CBUF_MODE4);
 
   int x[4];
   
@@ -417,10 +415,6 @@ void GpowerRect::PowerStaple(Matrix& pstap, int *x, int mu)
   Float coeff = Float(exponent) * inv_cutoff;
   Float beta_c0 = GJP.Beta() * ( 1.0 - 8.0 * GJP.C1() );
 
-  // set cbuf
-  setCbufCntrlReg(2, CBUF_MODE2);
-  setCbufCntrlReg(4, CBUF_MODE4);
-
   const Matrix *p1;
   int offset_x = GsiteOffset(x);
   Matrix *g_offset = GaugeField()+offset_x;
@@ -623,8 +617,6 @@ void GpowerRect::PowerRectStaple(Matrix& rect, int *x, int mu)
 
   int link_site[4] ;
 
-  // set CBUF
-  setCbufCntrlReg(4, CBUF_MODE4) ;
 
   //----------------------------------------------------------------------------
   // do a dummy read from the DRAM image controlled by CBUF mode ctrl reg 0

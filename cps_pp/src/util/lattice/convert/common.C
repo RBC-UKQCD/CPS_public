@@ -1,25 +1,11 @@
 #include<config.h>
+#if 0
 CPS_START_NAMESPACE
 /*!\file
   \brief  Functions used by the data layout conversion functions.
 
   $Id: common.C,v 1.5 2004/09/02 16:59:26 zs Exp $
 */
-//--------------------------------------------------------------------
-//  CVS keywords
-//
-//  $Author: zs $
-//  $Date: 2004/09/02 16:59:26 $
-//  $Header: /space/cvs/cps/cps++/src/util/lattice/convert/common.C,v 1.5 2004/09/02 16:59:26 zs Exp $
-//  $Id: common.C,v 1.5 2004/09/02 16:59:26 zs Exp $
-//  $Name: v5_0_16_hantao_io_test_v7 $
-//  $Locker:  $
-//  $Revision: 1.5 $
-//  $Source: /space/cvs/cps/cps++/src/util/lattice/convert/common.C,v $
-//  $State: Exp $
-//
-//--------------------------------------------------------------------
-
 CPS_END_NAMESPACE
 #include <util/data_types.h>
 CPS_START_NAMESPACE
@@ -84,3 +70,4 @@ void site2dram(IFloat *src, IFloat *dst, unsigned *link_tbl, unsigned site_size)
 }
 
 CPS_END_NAMESPACE
+#endif

@@ -4,9 +4,11 @@ double Mass_init =   0.0000000000000000e+00
 double Mass_final =   0.0000000000000000e+00
 double Mass_step =   0.0000000000000000e+00
 Array Mass[1] = { 
-double Mass[0] = 0.005
+double Mass[0] = 0.00078
 }
-int n_masses = 1
+Array Epsilon[1] = { 
+double Epsilon[0] = 0.
+}
 int N_eig = 1
 int N_eigacc = 1
 int Kalk_Sim = 0
@@ -24,6 +26,7 @@ RitzMatType RitzMatOper =  NEG_MATPCDAG_MATPC
 int print_hsum = 0
 int hsum_dir = 0
 double mass =   0.00078
+double epsilon =   0.
 string fname = "./eig.log"
 int ncorr = 0
 }

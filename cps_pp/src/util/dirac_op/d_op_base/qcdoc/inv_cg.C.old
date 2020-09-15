@@ -89,7 +89,7 @@ int DiracOp::InvCg(Vector *out,
 		   Vector *in, 
 		   Float src_norm_sq, 
 		   Float *true_res){
-  int f_size_cb;     // Node checkerboard size of the fermion field
+  size_t f_size_cb;     // Node checkerboard size of the fermion field
   int itr;                       // Current number of CG iterations
   int max_itr;                       // Max number of CG iterations
   Float stp_cnd;                   // Stop if residual^2 <= stp_cnd

@@ -1,0 +1,105 @@
+class ActionEOFAArg eofa_arg = {
+class ActionBilinearArg bi_arg = {
+FclassType fermion = F_CLASS_MOBIUS
+Array bilinears[1] = { 
+class BilinearDescr bilinears[0] = {
+double mass =   0.0000000000000000e+00
+int max_num_iter = 25000
+}
+}
+class ActionArg action_arg = {
+ForceMeasure force_measure = FORCE_MEASURE_YES
+string force_label = "EOFA"
+}
+}
+Array LH_stop_rsd_fg[1] = {
+double LH_stop_rsd_fg[0] = 1.0e-12
+}
+Array LH_stop_rsd_md[1] = {
+double LH_stop_rsd_md[0] = 1.0e-12
+}
+Array LH_stop_rsd_mc[1] = {
+double LH_stop_rsd_mc[0] = 1.0e-12
+}
+Array RH_stop_rsd_fg[1] = {
+double RH_stop_rsd_fg[0] = 1.0e-12
+}
+Array RH_stop_rsd_md[1] = {
+double RH_stop_rsd_md[0] = 1.0e-12
+}
+Array RH_stop_rsd_mc[1] = {
+double RH_stop_rsd_mc[0] = 1.0e-12
+}
+double spread =   0.0000000000000000e+00
+int remez_generate = 0
+string rat_poles_file = "../vmls/s_eofa_poles.vml"
+Array num_mass[1] = { 
+double num_mass[0] = 0.032
+}
+Array den_mass[1] = { 
+double den_mass[0] = 1.0
+}
+Array LH_rat_approx[1] = { 
+class EOFARationalDescr LH_rat_approx[0] = {
+FieldType field_type = FERMION
+int power_num = 1
+int power_den = 2
+long precision = 40
+class ApproxDescr rat_approx = {
+RationalApproxType approx_type = RATIONAL_APPROX_POWER
+RationalBoundsType bounds_type = RATIONAL_BOUNDS_MANUAL
+double lambda_low = 0.95
+double lambda_high = 40.0  
+Array stop_rsd[12] = { 
+double stop_rsd[0] = 1.0e-12
+double stop_rsd[1] = 1.0e-12
+double stop_rsd[2] = 1.0e-12
+double stop_rsd[3] = 1.0e-12
+double stop_rsd[4] = 1.0e-12
+double stop_rsd[5] = 1.0e-12
+double stop_rsd[6] = 1.0e-12
+double stop_rsd[7] = 1.0e-12
+double stop_rsd[8] = 1.0e-12
+double stop_rsd[9] = 1.0e-12
+double stop_rsd[10] = 1.0e-12
+double stop_rsd[11] = 1.0e-12
+}
+}
+}
+}
+Array RH_rat_approx[1] = { 
+class EOFARationalDescr RH_rat_approx[0] = {
+FieldType field_type = FERMION
+int power_num = 1
+int power_den = 2
+long precision = 40
+class ApproxDescr rat_approx = {
+RationalApproxType approx_type = RATIONAL_APPROX_POWER
+RationalBoundsType bounds_type = RATIONAL_BOUNDS_MANUAL
+double lambda_low = 0.95
+double lambda_high = 40.0
+Array stop_rsd[12] = { 
+double stop_rsd[0] = 1.0e-12
+double stop_rsd[1] = 1.0e-12
+double stop_rsd[2] = 1.0e-12
+double stop_rsd[3] = 1.0e-12
+double stop_rsd[4] = 1.0e-12
+double stop_rsd[5] = 1.0e-12
+double stop_rsd[6] = 1.0e-12
+double stop_rsd[7] = 1.0e-12
+double stop_rsd[8] = 1.0e-12
+double stop_rsd[9] = 1.0e-12
+double stop_rsd[10] = 1.0e-12
+double stop_rsd[11] = 1.0e-12
+}
+}
+}
+}
+class EigenDescr eigen = {
+EigenMeasure eigen_measure = EIGEN_MEASURE_NO
+double stop_rsd = 1.0e-03
+int max_num_iter = 10000
+string eig_lo_stem = "eig_low"
+string eig_hi_stem = "eig_high"
+}
+}

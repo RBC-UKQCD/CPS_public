@@ -97,9 +97,6 @@ void AlgEqState::run()
   char *fname = "run()";
   VRB.Func(cname,fname);
 
-#if TARGET==cpsMPI
-    using MPISCU::fprintf;
-#endif
 
   // Set the Lattice pointer
   //----------------------------------------------------------------

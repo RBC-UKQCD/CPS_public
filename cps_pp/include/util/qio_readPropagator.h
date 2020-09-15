@@ -151,6 +151,15 @@ class qio_readPropagator: private qio_init {
   //! type of source read
   QIO_PROP_SOURCE_TYPES readSourceType;  // 0=UNKNOWN, 1=Scalar, 2=full
 
+  //! read propagator 12 pairs of sink and source
+  /*!
+    \param infile file to read from
+    \param sType  source type (full, scalar)
+    \param prop   allocated memory for propagator
+    \param source allocated memory for source
+  */
+  void read_12pairs_gparity(char *infile, void *prop, void *source, const QIO_PROP_SOURCE_TYPES sType, int volFormat=QIO_UNKNOWN);
+
  private:
 
   QIO_Reader *qio_Input;

@@ -2,21 +2,6 @@
 #ifdef USE_SSE
 #include "../sse/sse-dwf_dslash_4.C"
 #else
-//--------------------------------------------------------------------
-//  CVS keywords
-//
-//  $Author: chulwoo $
-//  $Date: 2012-12-05 19:55:38 $
-//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/quda/dwf_dslash_4.C,v 1.2 2012-12-05 19:55:38 chulwoo Exp $
-//  $Id: dwf_dslash_4.C,v 1.2 2012-12-05 19:55:38 chulwoo Exp $
-//  $Name: not supported by cvs2svn $
-//  $Locker:  $
-//  $RCSfile: dwf_dslash_4.C,v $
-//  $Revision: 1.2 $
-//  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_dwf/quda/dwf_dslash_4.C,v $
-//  $State: Exp $
-//
-//--------------------------------------------------------------------
 //------------------------------------------------------------------
 //
 // dwf_dslash_4.C

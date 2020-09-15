@@ -36,9 +36,10 @@ public:
   {;}
   
   virtual ~AlgActionDensity() {;}
-  
-  void run();
-  void smartrun();
+
+  //If result!=NULL the result will be copied to that memory address as well as saving to disk
+  void run(Float *result = NULL);
+  void smartrun(Float *result = NULL);
 
 };
 

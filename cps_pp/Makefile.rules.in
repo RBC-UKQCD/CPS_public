@@ -1,8 +1,11 @@
 # $Id: Makefile.rules.in,v 1.31 2012-08-10 21:25:11 chulwoo Exp $
 # @configure_input@
 
-SRCDIR = @abs_top_srcdir@
-BUILDDIR = @abs_top_builddir@
+SRCDIR0 = @abs_top_srcdir@
+BUILDDIR0 = @abs_top_builddir@
+
+SRCDIR = @SRCDIR@
+BUILDDIR = @BUILDDIR@
 HAVE_MAKEDEPEND=@HAVE_MAKEDEPEND@
 
 PWD := $(shell pwd)
@@ -21,7 +24,6 @@ CC_PATH = @CC_PATH@
 CFLAGS = @CFLAGS@
 CXXFLAGS = @CXXFLAGS@
 ASFLAGS = @ASFLAGS@
-XLCFLAGS = -qarch=pwr3 -O3 -D_XLC_
 
 INCLUDE_FLAGS = -I${BUILDDIR} -I${SRCDIR}/include @INCLUDE_FLAGS@
 
@@ -42,9 +44,9 @@ LIBNAME := $(subst XXX_,,$(LIBNAME))
 LIBNAME := $(subst _XXX,,$(LIBNAME))
 LIBNAME := $(subst XXX,,$(LIBNAME))
 else
-LIBNAME = cps
+LIBNAME = libcps
 endif
-LIBNAME ?= cps
+LIBNAME ?= libcps
 
 DFLAGS += @DFLAGS@
 
@@ -99,11 +101,6 @@ SOBJ=$(SSRC:.S=.o)
 OBJS_SRC = $(SOBJ) $(CCOBJ) $(COBJ)
 OBJS := $(notdir $(OBJS_SRC))
 
-XLCOBJ=$(CSRC:.c=.xlo)
-XLCCOBJ=$(CCSRC:.C=.xlo)
-XLCOBJS_SRC = $(XLCCOBJ) $(XLCOBJ)
-XLCOBJS := $(notdir $(XLCOBJS_SRC))
-
 
 %.o:%.c
 	${CC} -c $< -o $(BUILDDIR2)/$@ ${libcps_CFLAGS}
@@ -116,22 +113,6 @@ endif
 	${CXX} -c $< -o $(BUILDDIR2)/$@ ${libcps_CXXFLAGS}
 ifneq ($(CONCUR),yes)
 	cd $(BUILDDIR2) ; ${AR} rcs ${BUILDDIR}/$(LIBNAME).a $@
-endif
-
-%.xlo:%.c
-	cd $(BUILDDIR2)/ ; xlC -F$(BUILDDIR)/XLC.cfg -S $< ${XLCFLAGS}
-	xlC -F$(BUILDDIR)/XLC.cfg -c $< -o $(BUILDDIR2)/$@ ${XLCFLAGS}
-ifneq ($(CONCUR),yes)
-	cd $(BUILDDIR2) ; objcopy -R .eh_frame $@
-	cd $(BUILDDIR2) ; ar  rcs ${BUILDDIR}/$(LIBNAME).xla $@
-endif
-
-%.xlo:%.C
-	cd $(BUILDDIR2)/ ; xlC -F$(BUILDDIR)/XLC.cfg -S $< ${XLCFLAGS}
-	xlC -F$(BUILDDIR)/XLC.cfg -c $< -o $(BUILDDIR2)/$@ ${XLCFLAGS}
-ifneq ($(CONCUR),yes)
-	cd $(BUILDDIR2) ; objcopy -R .eh_frame $@
-	cd $(BUILDDIR2) ; ar  rcs ${BUILDDIR}/$(LIBNAME).xla $@
 endif
 
 %.o:%.S
@@ -147,9 +128,6 @@ depend: recurse
 ifeq ($(HAVE_MAKEDEPEND),yes)
 	cd $(SRCDIR2) ;makedepend -f$(BUILDDIR2)/Makefile_depend $(INCLUDE_FLAGS) $(DFLAGS) $(notdir $(CSRC)) $(notdir $(CCSRC))
 else
-######################################################################
-# use these lines if you don't have makedepend (is a bit slower)
-######################################################################
 	cd $(SRCDIR2) ; \
 	$(CXX) -M $(libcps_CXXFLAGS) $(notdir $(CSRC)) $(notdir $(CCSRC)) \
 	| sed -e 's/:.*\.[cC]/\:/g' > $(PWD)/Makefile_depend

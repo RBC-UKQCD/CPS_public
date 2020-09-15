@@ -1,25 +1,9 @@
 #include<config.h>
+#include<string>
 CPS_START_NAMESPACE
 /*!\file 
   \brief   Definition of Error class methods.
-
-  $Id: error.C,v 1.13.30.1 2012/11/04 15:12:14 yinnht Exp $
 */
-//--------------------------------------------------------------------
-//  CVS keywords
-//
-//  $Author: yinnht $
-//  $Date: 2012/11/04 15:12:14 $
-//  $Header: /space/cvs/cps/cps++/src/util/error/error.C,v 1.13.30.1 2012/11/04 15:12:14 yinnht Exp $
-//  $Id: error.C,v 1.13.30.1 2012/11/04 15:12:14 yinnht Exp $
-//  $Name: v5_0_16_hantao_io_test_v7 $
-//  $Locker:  $
-//  $RCSfile: error.C,v $
-//  $Revision: 1.13.30.1 $
-//  $Source: /space/cvs/cps/cps++/src/util/error/error.C,v $
-//  $State: Exp $
-//
-//--------------------------------------------------------------------
 
 CPS_END_NAMESPACE
 #include <util/qcdio.h>
@@ -38,17 +22,11 @@ CPS_START_NAMESPACE
 Error ERR;
 
 static inline void Exit(int status){
-#if TARGET == QCDOC
-#ifdef HAVE_QCDOCOS_SCU_CHECKSUM_H
-  if ( ! ScuChecksum::CsumSwap() )
-    fprintf(stderr,"SCU Checksum mismatch\n" );
-#endif
+#if 1
    Float  *tmp = (Float *)0;
    *tmp = 1.;
-   exit(status);
-#else
-  exit(status);
 #endif
+   exit(status);
 }
 
 Error::Error() {
@@ -115,7 +93,7 @@ void Error::Pointer(const char *class_name, const char *func_name,
 
   printf(error_string[pointer], class_name, func_name, ptr_name); 
 
-  if( (fp = Fopen(ALL_NODES,error_file_name, "w")) == NULL ) { 
+  if( (fp = Fopen(ADD_ID,error_file_name, "w")) == NULL ) { 
     printf(error_string[file_w], error_class_name, error_func_name, error_file_name); 
     Exit(exit_value[file_w]); 
   } 
@@ -148,7 +126,7 @@ void Error::FileR(const char *class_name, const char *func_name,
 
   printf(error_string[file_r], class_name, func_name, file_name);
 
-  if( (fp = Fopen(ALL_NODES,error_file_name, "w")) == NULL ) {
+  if( (fp = Fopen(ADD_ID,error_file_name, "w")) == NULL ) {
     printf(error_string[file_w], error_class_name, error_func_name, error_file_name);
     Exit(exit_value[file_w]);
   }
@@ -180,7 +158,7 @@ void Error::FileW(const char *class_name, const char *func_name,
 
   printf(error_string[file_w],class_name, func_name, file_name);
 
-  if( (fp = Fopen(ALL_NODES,error_file_name, "w")) == NULL ) {
+  if( (fp = Fopen(ADD_ID,error_file_name, "w")) == NULL ) {
     printf(error_string[file_w], error_class_name, error_func_name, error_file_name);
     Exit(exit_value[file_w]);
   }
@@ -212,7 +190,7 @@ void Error::FileA(const char *class_name, const char *func_name,
 
   printf(error_string[file_a], class_name, func_name, file_name);
 
-  if( (fp = Fopen(ALL_NODES,error_file_name, "w")) == NULL ) {
+  if( (fp = Fopen(ADD_ID,error_file_name, "w")) == NULL ) {
     printf(error_string[file_w], error_class_name, error_func_name, error_file_name);
     Exit(exit_value[file_w]);
   }
@@ -242,7 +220,7 @@ void Error::NotImplemented(const char *class_name, const char *func_name)
 
   printf(error_string[not_implemented], class_name, func_name);
 
-  if( (fp = Fopen(ALL_NODES,error_file_name, "w")) == NULL ) {
+  if( (fp = Fopen(ADD_ID,error_file_name, "w")) == NULL ) {
     printf(error_string[file_w], error_class_name, error_func_name, error_file_name);
     Exit(exit_value[file_w]);
   }
@@ -282,7 +260,7 @@ void Error::NotImplemented(const char *class_name, const char *func_name,
   printf(error_string[not_implemented], class_name, func_name);
   vprintf(format, args);
 
-  if( (fp = Fopen(ALL_NODES,error_file_name, "w")) == NULL ) {
+  if( (fp = Fopen(ADD_ID,error_file_name, "w")) == NULL ) {
     printf(error_string[file_w], error_class_name, error_func_name, error_file_name);
     Exit(exit_value[file_w]);
   }
@@ -321,7 +299,7 @@ void Error::Hardware(const char *class_name, const char *func_name,
   printf(error_string[hardware], class_name, func_name);
   vprintf(format, args);
 
-  if( (fp = Fopen(ALL_NODES,error_file_name, "w")) == NULL ) {
+  if( (fp = Fopen(ADD_ID,error_file_name, "w")) == NULL ) {
     printf(error_string[file_w], error_class_name, error_func_name, error_file_name);
     Exit(exit_value[file_w]);
   }
@@ -360,11 +338,31 @@ void Error::General(const char *class_name, const char *func_name,
   printf(error_string[general], class_name, func_name);
   vprintf(format, args);
 
-  if( (fp = Fopen(ALL_NODES,error_file_name, "w")) == NULL ) {
+  if( (fp = Fopen(ADD_ID,error_file_name, "w")) == NULL ) {
     printf(error_string[file_w], error_class_name, error_func_name, error_file_name);
     Exit(exit_value[file_w]);
   }
   Fprintf(fp, error_string[general], class_name, func_name);
+  Vfprintf(fp, format, args);
+  Fclose(fp);
+
+  Exit(exit_value[general]);
+}
+
+void Error::General(std::string &cname, std::string &fname,
+		    const char *format,  // format of message
+		    ...)                 // argument list of message
+{
+  FILE *fp;
+  error_func_name = "General";
+  va_list args;
+  va_start(args, format);
+
+  if( (fp = Fopen(ADD_ID,error_file_name, "w")) == NULL ) {
+    printf(error_string[file_w], error_class_name, error_func_name, error_file_name);
+    Exit(exit_value[file_w]);
+  }
+  Fprintf(fp, error_string[general], cname.c_str(), fname.c_str());
   Vfprintf(fp, format, args);
   Fclose(fp);
 

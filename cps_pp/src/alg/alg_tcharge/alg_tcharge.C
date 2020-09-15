@@ -371,7 +371,7 @@ const char* names[5] = { "1x1",
 			 "1x3" };
 
 
-void AlgTcharge::run()
+void AlgTcharge::run(Float **result)
 {
   Lattice& lattice( AlgLattice() );  
 
@@ -432,9 +432,14 @@ void AlgTcharge::run()
       for (int f2(f1);f2<nfunc;f2++)
 	{
 	  glb_sum( &tmat[f1][f2] );
+	  if(GJP.Gparity1fX()) tmat[f1][f2]/=2; //counted twice
+	  if(GJP.Gparity1fX() && GJP.Gparity1fY()) tmat[f1][f2]/=2; //counted twice more
 	}
     }
   
+
+  
+
   // Print out results
   //----------------------------------------------------------------
 
@@ -458,6 +463,12 @@ void AlgTcharge::run()
 	}
       Fclose(fp);
     }
+
+  //CK: output the results
+  if(result != NULL)
+  for (int f1(0);f1<nfunc;f1++)
+    for (int f2(0);f2<nfunc;f2++)
+      result[f1][f2] = tmat[f1][f2];
 
 }
 
@@ -755,6 +766,8 @@ void AlgTcharge::smartrun()
 {
   const char fname[] = "smartrun()";
   Lattice& lat( AlgLattice() );  
+
+  if(GJP.Gparity()) ERR.General(cname,fname,"Not implemented for G-parity");
 
   const int Slab = 3; //Expansion in each direction
   const int MatrixSize = 2 * lat.Colors() * lat.Colors();
@@ -1221,7 +1234,13 @@ void AlgTcharge::smartrun()
 
   Float tmat[nfunc][nfunc] = {0};
 
-  Float tmp[64][nfunc][nfunc] = {0};
+  const int nthread = GJP.Nthreads();
+  GJP.SetNthreads();
+  Float tmp[nthread][nfunc][nfunc];
+  for(int i=0;i<nthread;i++)
+    for(int j=0;j<nfunc;j++)
+      for(int k=0;k<nfunc;k++)
+	tmp[i][j][k] = 0;
 
   Float* process_slice_sums[64][nfunc];
   for(int p = 0; p < 64; p++) {
@@ -1234,7 +1253,6 @@ void AlgTcharge::smartrun()
   }
 
 
-//  omp_set_num_threads(64);
 #pragma omp parallel for 
   for(int i = 0; i < GJP.VolNodeSites(); ++i)
   {
@@ -1299,7 +1317,7 @@ void AlgTcharge::smartrun()
   for(int f1(0); f1 < nfunc; ++f1)
     for(int f2(f1); f2 < nfunc; ++f2)
     {
-      for(int i = 0; i < 64; ++i)
+      for(int i = 0; i < nthread; ++i)
         tmat[f1][f2] += tmp[i][f1][f2];
       glb_sum( &tmat[f1][f2] );
 //      VRB.Result(cname, fname, "tmat f1, f2 = %.6e\n", tmat[f1][f2]);

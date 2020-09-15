@@ -23,6 +23,11 @@ CPS_END_NAMESPACE
 #include <util/error.h>
 #include <util/wilson.h>
 #include <comms/glb.h>
+
+#ifdef USE_OMP
+#include <omp.h>
+#endif
+
 CPS_START_NAMESPACE
 
 //! Access to the elements of the \e SU(3) matrix
@@ -73,9 +78,10 @@ inline void cTimesC(IFloat *a, IFloat re, IFloat im)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 void g5theta(Vector *in, int vol, IFloat ctheta, IFloat stheta) {
 
-  int n, c;
-  for(n=0;n<vol;n++){
-     for(c=0;c<3;c++){
+  //Threaded by CK:
+#pragma omp parallel for
+  for(int n=0;n<vol;n++){
+    for(int c=0;c<3;c++){
 		cTimesC(PSIA(((IFloat *)in),0,c,0,n), ctheta, stheta);
 		cTimesC(PSIA(((IFloat *)in),0,c,1,n), ctheta, stheta);
 		cTimesC(PSIA(((IFloat *)in),0,c,2,n), ctheta, -stheta);
@@ -156,16 +162,16 @@ DiracOpWilsonTm::~DiracOpWilsonTm() {
 // mass is represented in vml files as mass + \imath epsilon, and in 
 // this function in polar form as \kappa (cos (theta) + \gamma_5 sin (theta))
 //------------------------------------------------------------------
-  void DiracOpWilsonTm::DiracArg(CgArg *arg){
+void DiracOpWilsonTm::DiracArg(CgArg *arg){
 
-    dirac_arg = arg;
-	 epsilon = dirac_arg->epsilon;
-	 kappa = (dirac_arg->mass + 4.0) * (dirac_arg->mass + 4.0) + epsilon * epsilon;
-	 kappa = 1.0 / sqrt(kappa);
-	 ctheta = (dirac_arg->mass + 4.0) * kappa;
-	 stheta = epsilon * kappa;
-    kappa = (1.0 / 2.0) * kappa;
-  }
+  dirac_arg = arg;
+  epsilon = dirac_arg->epsilon;
+  kappa = (dirac_arg->mass + 4.0) * (dirac_arg->mass + 4.0) + epsilon * epsilon;
+  kappa = 1.0 / sqrt(kappa);
+  ctheta = (dirac_arg->mass + 4.0) * kappa;
+  stheta = epsilon * kappa;
+  kappa = (1.0 / 2.0) * kappa;
+}
 
 //------------------------------------------------------------------
 // Dslash(Vector *out, Vector *in, ChkbType cb, DagType dag) :
@@ -184,20 +190,11 @@ void DiracOpWilsonTm::Dslash(Vector *out,
 			   ChkbType cb, 
 			   DagType dag) {
   const char* fname = "Dslash(V*,V*,ChkbType,DagType)";
-  
 #ifdef USE_BFM
   if (use_bfm) ERR.NotImplemented(cname, fname);
 #endif
-/*	    wilson_dslash((IFloat *)out, 
-			(IFloat *)gauge_field, 
-			(IFloat *)in, 
-			int(cb),
-			int(dag),
-			(Wilson *)wilson_lib_arg); */ 
-  
 
-	DiracOpWilson::Dslash(out, in, cb, dag); 
-
+  DiracOpWilson::Dslash(out, in, cb, dag); 
 }
 
 //
@@ -218,25 +215,26 @@ void DiracOpWilsonTm::Dslash_tm(Vector *out,
 /*--------------------------------------------------------------------------*/
 /* Initializations                                                          */
 /*--------------------------------------------------------------------------*/
- int vol =  ((Wilson *)wilson_lib_arg)->vol[0];
+  int vol =  ((Wilson *)wilson_lib_arg)->vol[0]; //CK: checkerboard volume (for G-parity this is the volume for each flavour individually, not both)
+  if(GJP.Gparity()) vol *=2;
 
-/*--------------------------------------------------------------------------*/
-/* if DAG_YES:  *out <-- Dslash [gamma_5(theta) * [*in]]			    */
-/*--------------------------------------------------------------------------*/
-if (dag == DAG_YES) g5theta(in, vol, ctheta, stheta);
+  /*--------------------------------------------------------------------------*/
+  /* if DAG_YES:  *out <-- Dslash [gamma_5(theta) * [*in]]			    */
+  /*--------------------------------------------------------------------------*/
+  if (dag == DAG_YES) g5theta(in, vol, ctheta, stheta);
 
-Dslash(out, in, cb, dag); 
+  Dslash(out, in, cb, dag); 
 
-/*--------------------------------------------------------------------------*/
-/* the following redundant construction is to remind that -                 */
-/* for DAG_NO:  *out <-- gamma_5(-theta) * [Dslash [*in]]                   */
-/* but must restore *in calling parameter to its original values, so        */
-/* for DAG_YES, *in <-- gamma_5(-theta) * gamma_5(theta) * [*in]            */
-/*---------------------------------------------------------------------------*/
-if (dag == DAG_NO) 
-	g5theta(out, vol, ctheta, -stheta);
-else
-	g5theta(in, vol, ctheta, -stheta);
+  /*--------------------------------------------------------------------------*/
+  /* the following redundant construction is to remind that -                 */
+  /* for DAG_NO:  *out <-- gamma_5(-theta) * [Dslash [*in]]                   */
+  /* but must restore *in calling parameter to its original values, so        */
+  /* for DAG_YES, *in <-- gamma_5(-theta) * gamma_5(theta) * [*in]            */
+  /*---------------------------------------------------------------------------*/
+  if (dag == DAG_NO) 
+    g5theta(out, vol, ctheta, -stheta);
+  else
+    g5theta(in, vol, ctheta, -stheta);
 
 }
 //------------------------------------------------------------------
@@ -266,6 +264,8 @@ void DiracOpWilsonTm::MatPc(Vector *out, Vector *in) {
 /* Initializations                                                          */
 /*--------------------------------------------------------------------------*/
   vol =  ((Wilson *)wilson_lib_arg)->vol[0];
+  if(GJP.Gparity()) vol *= 2;
+
   tmp1 = (Vector *)(((Wilson *)wilson_lib_arg)->af[0]);
 //printf("Yep, been here, matpc\n");
 //int temp_size = GJP.VolNodeSites() * lat.FsiteSize() / 2;
@@ -326,6 +326,8 @@ void DiracOpWilsonTm::MatPcDag(Vector *out, Vector *in) {
 /* Initializations                                                          */
 /*--------------------------------------------------------------------------*/
   vol =  ((Wilson *)wilson_lib_arg)->vol[0];
+  if(GJP.Gparity()) vol *= 2;
+
   tmp1 = (Vector *)(((Wilson *)wilson_lib_arg)->af[0]);
 //printf("Yep, been here, matpcdag\n");
 //int temp_size = GJP.VolNodeSites() * lat.FsiteSize() / 2;
@@ -392,6 +394,8 @@ void DiracOpWilsonTm::MatPcDagMatPc(Vector *out,
 /*--------------------------------------------------------------------------*/
 //printf("Yep, been here\n");
   vol =  ((Wilson *)wilson_lib_arg)->vol[0];
+  if(GJP.Gparity()) vol *= 2;
+
   tmp1 = (Vector *)(((Wilson *)wilson_lib_arg)->af[0]);
   tmp2 = (Vector *)(((Wilson *)wilson_lib_arg)->af[1]);
 
@@ -575,6 +579,10 @@ void DiracOpWilsonTm::MatHerm(Vector *out, Vector *in) {
   The vector \a f_field_in is \f$ -\kappa^2 M\chi \f$ on odd sites and
   \f$ -\kappa^2 D M\chi \f$ on even sites
 
+  //CK: Above is *WRONG*
+  f_field_out becomes (chi, g5theta(ctheta,-stheta)D_eo chi)
+  f_field_in  becomes ( -kappa^2 * g5theta(ctheta,stheta) Mprec chi,  -kappa^2 g5theta(ctheta,stheta) D_eo^dag g5theta(ctheta,stheta) Mprec chi )
+
   where \e M is the odd-even preconditioned fermion matrix connecting odd to
   odd parity sites and \e D is the hopping term connecting odd to
   even parity sites. Recall that \a chi is defined on odd sites only.
@@ -582,9 +590,10 @@ void DiracOpWilsonTm::MatHerm(Vector *out, Vector *in) {
 */
 //------------------------------------------------------------------
 
+//#ifndef USE_BFM_TM  //No BFM version (slower). BFM version is in d_op_wilsonTm_bfm.C
 void DiracOpWilsonTm::CalcHmdForceVecs(Vector *chi)
 {
-  char *fname = "CalcHmdForceVecs(V*)" ;
+  const char *fname = "CalcHmdForceVecs(V*) [CPS version]" ;
   VRB.Func(cname,fname) ;
 
 #ifdef USE_BFM
@@ -608,31 +617,40 @@ void DiracOpWilsonTm::CalcHmdForceVecs(Vector *chi)
   Vector *chi_new, *rho, *psi, *sigma ;
 
   int vol =  ((Wilson *)wilson_lib_arg)->vol[0];
-  int f_size_cb = 12 * GJP.VolNodeSites() ;
+  size_t f_size_cb = 12 * GJP.VolNodeSites() ;
+  if(GJP.Gparity()){ 
+    vol*=2;
+    f_size_cb *= 2; //Layout is   |   odd   |   even  |
+                    //            | f0 | f1 | f0 | f1 |
+                    //where for each checkerboard, each flavour field occupies one half-volume
+  }
 
   chi_new = f_out ;
+  rho = (Vector *)((Float *)f_out + f_size_cb) ;
+  psi = f_in ;
+  sigma = (Vector *)((Float *)f_in + f_size_cb) ;
 
   chi_new->CopyVec(chi, f_size_cb) ;
-
-  psi = f_in ;
 
   MatPc(psi,chi) ;
   g5theta(psi, vol, ctheta, stheta);
 
   psi->VecTimesEquFloat(-kappa*kappa,f_size_cb) ;
 
-  rho = (Vector *)((Float *)f_out + f_size_cb) ;
-
   Dslash(rho, chi, CHKB_ODD, DAG_NO) ;
   g5theta(rho, vol, ctheta, -stheta);
-
-  sigma = (Vector *)((Float *)f_in + f_size_cb) ;
 
   Dslash(sigma, psi, CHKB_ODD, DAG_YES) ;
   g5theta(sigma, vol, ctheta, stheta);
 
   return ;
 }
+//#endif
+
+
+
+
+
 
 //
 // alternative form with sensible variable names
@@ -651,7 +669,7 @@ void DiracOpWilsonTm::CalcHmdForceVecs(Vector *chi)
 
   int vol =  ((Wilson *)wilson_lib_arg)->vol[0];
   // size in Floats
-  int f_size_cb = 12 * GJP.VolNodeSites() ;
+  size_t f_size_cb = 12 * GJP.VolNodeSites() ;
 
 //---------------------------------------------------------
 // define v1, v2 in terms of DiracOp( ..., f_out, f_in, ... )
@@ -698,6 +716,23 @@ void DiracOpWilsonTm::CalcHmdForceVecs(Vector *chi)
   The vector \a f_field_in is \f$ -\kappa^2 M\chi \f$ on odd sites and
   \f$ -\kappa^2 D M\chi \f$ on even sites
 
+  CK: Above is *WRONG*
+  f_field_out becomes (chi, g5theta(ctheta,-stheta)D_eo chi)
+  f_field_in  becomes ( -kappa^2 g5theta(ctheta,stheta)phi, -kappa^2 g5theta(ctheta,stheta) Deo^dag g5theta(ctheta,stheta)phi )
+
+  Note that the Fermion force vectors are
+  f_field_out becomes (chi, g5theta(ctheta,-stheta)D_eo chi)
+  f_field_in  becomes ( -kappa^2 * g5theta(ctheta,stheta) Mprec chi,  -kappa^2 g5theta(ctheta,stheta) D_eo^dag g5theta(ctheta,stheta) Mprec chi )
+  hence the only difference is that we set phi = Mprec chi for the fermion part. 
+
+  For comparison the equivalent bosonic force vectors for DWF are
+    f_out = v1 = (chi, Deo chi)
+    f_in = v2 = (-kappa^2 phi, -kappa^2 Deo^dag phi)
+  and the fermionic force vectors
+    f_out = ( chi, D_eo chi )
+    f_in = ( -kappa^2 Mprec chi, -kappa^2 D_eo^dag Mprec chi )
+  which are again equal if we set phi = Mprec chi
+
   where \e M is the odd-even preconditioned fermion matrix connecting odd to
   odd parity sites and \e D is the hopping term connecting odd to
   even parity sites. Recall that \a chi is defined on odd sites only.
@@ -725,7 +760,13 @@ void DiracOpWilsonTm::CalcBsnForceVecs(Vector *chi, Vector *phi)
 
   int vol =  ((Wilson *)wilson_lib_arg)->vol[0];
   // size in Floats
-  int f_size_cb = 12 * GJP.VolNodeSites() ;
+  size_t f_size_cb = 12 * GJP.VolNodeSites() ;
+  if(GJP.Gparity()){ 
+    vol*=2;
+    f_size_cb *= 2; //Layout is   |   odd   |   even  |
+                    //            | f0 | f1 | f0 | f1 |
+                    //where for each checkerboard, each flavour field occupies one half-volume
+  }
 
 //---------------------------------------------------------
 // define v1, v2 in terms of DiracOp( ..., f_out, f_in, ... )
@@ -762,6 +803,25 @@ int DiracOpWilsonTm::RitzEig(Vector **eigenv, Float lambda[], int valid_eig[], E
 {
   return DiracOpWilsonTypes::RitzEig(eigenv, lambda, valid_eig, eig_arg);
 }
+
+  // chi_new = f_out ;
+  // rho = (Vector *)((Float *)f_out + f_size_cb) ;
+  // psi = f_in ;
+  // sigma = (Vector *)((Float *)f_in + f_size_cb) ;
+
+  // chi_new->CopyVec(chi, f_size_cb) ;
+
+  // MatPc(psi,chi) ;
+  // g5theta(psi, vol, ctheta, stheta);
+
+  // psi->VecTimesEquFloat(-kappa*kappa,f_size_cb) ;
+
+  // Dslash(rho, chi, CHKB_ODD, DAG_NO) ;
+  // g5theta(rho, vol, ctheta, -stheta);
+
+  // Dslash(sigma, psi, CHKB_ODD, DAG_YES) ;
+  // g5theta(sigma, vol, ctheta, stheta);
+
 
 
 CPS_END_NAMESPACE

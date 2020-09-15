@@ -20,6 +20,8 @@ CPS_START_NAMESPACE
 // We use standard library for Rcomplex
 typedef std::complex<IFloat> Rcomplex;
 
+//#if __cplusplus <= 201103L
+#if 0
 static inline Rcomplex operator/(const Rcomplex &a, IFloat b)
 {
     Rcomplex tmp = a;
@@ -29,6 +31,7 @@ static inline Rcomplex operator/(const Rcomplex &a, IFloat b)
 
 static inline Rcomplex operator*(const Rcomplex &a, int b) {return a * Float(b);}
 static inline Rcomplex operator*(int b, const Rcomplex &a) {return a * Float(b);}
+#endif
 
 CPS_END_NAMESPACE
 #endif

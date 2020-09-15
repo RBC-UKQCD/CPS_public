@@ -19,6 +19,7 @@ CPS_START_NAMESPACE
 // The SpinMatrix class.
 //------------------------------------------------------------------
 
+#ifndef INLINE_SPIN_MATRIX
 //------------------------------------------------------------------
 SpinMatrix::SpinMatrix(IFloat c) { *this = c; }
 
@@ -41,6 +42,7 @@ SpinMatrix& SpinMatrix::operator=(const Complex& c) {
 	((Complex*)u)[3+3*SPINS] = c;
   return *this;
 }
+#endif
 
 
 //------------------------------------------------------------------

@@ -1,0 +1,26 @@
+class LanczosArg lanczos_arg = {
+RitzMatType RitzMat_lanczos   =  MATPCDAG_MATPC
+RitzMatType RitzMat_convcheck =  MATPCDAG_MATPC
+double mass =  0.01
+int nk_lanczos_vectors = 25
+int nt_lanczos_vectors = 20
+int np_lanczos_vectors = 80
+double eigen_shift = 0.0
+double stop_residual =  1e-8
+int maxiters = 50
+int save = 0
+int conv_check = 1
+PrecType precision = PREC_SINGLE
+int mem_save = 1
+string results = "lanczos.dat"
+string file = "lanczos.output"
+class MatrixPolynomialArg cheby_arg = {
+int Npol = 40
+Array params[2] = {
+double params[0] = 2.5
+double params[1] = 0.03
+}
+bool tmp1 = 0x0
+bool tmp2 = 0x0
+}
+}

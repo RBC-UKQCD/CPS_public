@@ -16,6 +16,7 @@ class LatticeContainer{
 		
 		void Get(Lattice &lat);
 		void Set(Lattice &lat);
+		Matrix* GaugeField() const{ return gauge_p; } //Added by CK
 		
 };
 CPS_END_NAMESPACE

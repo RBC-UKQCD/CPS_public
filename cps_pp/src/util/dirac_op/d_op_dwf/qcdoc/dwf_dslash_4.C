@@ -1,20 +1,5 @@
 #include<config.h>
 CPS_START_NAMESPACE
-//--------------------------------------------------------------------
-//  CVS keywords
-//
-//  $Author: chulwoo $
-//  $Date: 2008/02/08 18:35:07 $
-//  $Header: /space/cvs/cps/cps++/src/util/dirac_op/d_op_dwf/qcdoc/dwf_dslash_4.C,v 1.5 2008/02/08 18:35:07 chulwoo Exp $
-//  $Id: dwf_dslash_4.C,v 1.5 2008/02/08 18:35:07 chulwoo Exp $
-//  $Name: v5_0_16_hantao_io_test_v7 $
-//  $Locker:  $
-//  $RCSfile: dwf_dslash_4.C,v $
-//  $Revision: 1.5 $
-//  $Source: /space/cvs/cps/cps++/src/util/dirac_op/d_op_dwf/qcdoc/dwf_dslash_4.C,v $
-//  $State: Exp $
-//
-//--------------------------------------------------------------------
 //------------------------------------------------------------------
 //
 // dwf_dslash_4.C

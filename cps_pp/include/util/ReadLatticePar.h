@@ -30,45 +30,51 @@ class  ReadLatticeParallel : public QioControl
   // which determines parallel reading or serial reading
 
  private:
-    const char *cname;
-    LatticeHeader hd;
-    bool UseParIO;
+  const char *cname;
+  LatticeHeader hd;
+  static bool UseParIO;
+  const int default_concur=16;
 
-public:
+ public:
   // ctor for 2-step loading
-    ReadLatticeParallel()
-        : QioControl(), cname("ReadLatticeParallel"), UseParIO(1)
-    {  }
+ ReadLatticeParallel()
+   : QioControl(), cname("ReadLatticeParallel")
+    { 
+      //CK set architecture-dependent default IO style rather than hardcoding it.
+      setDefault();
+    }
 
   // ctor invoking loading behavior
-    ReadLatticeParallel(Lattice &lat, const char *filename, const Float chkprec = 0.01)
-    : 
-    QioControl(),
-    cname("ReadLatticeParallel") , 
-    UseParIO(1)
-    {        
+ ReadLatticeParallel(Lattice & lat, const char * filename, const Float chkprec = 0.01): QioControl(), cname("ReadLatticeParallel")
+    {
+    //CK set architecture-dependent default IO style rather than hardcoding it.
     QioArg rd_arg(filename,chkprec);
+	rd_arg.ConcurIONumber=default_concur;
     read(lat,rd_arg);
   }
 
   // ctor invoking loading behavior
-  ReadLatticeParallel(Lattice & lat, const QioArg & rd_arg) 
-    : QioControl(), cname("ReadLatticeParallel"), UseParIO(1)
-  {
-    read(lat,rd_arg);
-  }
+ ReadLatticeParallel(Lattice & lat, const QioArg & rd_arg) 
+   : QioControl(), cname("ReadLatticeParallel")
+    {
+      //CK set architecture-dependent default IO style rather than hardcoding it.
+      setDefault();
+
+      read(lat,rd_arg);
+    }
   
   virtual ~ReadLatticeParallel() {}
 
   void read(Lattice &lat, const char *filename, const Float chkprec = 0.01){
     QioArg rd_arg(filename,chkprec);
+	rd_arg.ConcurIONumber=default_concur;
     read(lat,rd_arg);
   }
 
   void read(Lattice & lat, const QioArg & rd_arg);
 
-    std::string getEnsembleId(){ return hd.ensemble_id; } // CAREFULL: only on MasterNode!!
-    std::string getEnsembleLabel(){ return hd.ensemble_label; } // CAREFULL: only on MasterNode!!
+  std::string getEnsembleId(){ return hd.ensemble_id; } // CAREFULL: only on MasterNode!!
+  std::string getEnsembleLabel(){ return hd.ensemble_label; } // CAREFULL: only on MasterNode!!
   int getSequenceNumber();// same on all nodes!
 
  private:
@@ -76,17 +82,10 @@ public:
 			  const Float plaq_inheader, const Float linktrace_inheader);
 
  public:
-    inline void setParallel() { UseParIO = 1; }
-    inline void setSerial() { 
-#if 1
-      UseParIO = 0; 
-#else
-      const char * fname = "setSerial()";
-      VRB.Result(cname,fname,"On non-QCDOC platform, setSerial() has no effect!\n");
-      exit(-42);
-#endif
-    }
-    inline int parIO() const { return UseParIO; }
+  inline static void setParallel() { UseParIO = 1; }
+  inline static void setSerial() { UseParIO = 0; }
+  inline static void setDefault() { UseParIO = 1; }
+  inline int parIO() const { return UseParIO; }
 };
 
 

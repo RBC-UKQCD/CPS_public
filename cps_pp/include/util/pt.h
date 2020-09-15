@@ -27,6 +27,7 @@ void pt_init(Lattice &lat);  //!< Initialization for parallel transporters
 void pt_init_g();
 void pt_delete();
 void pt_delete_g();
+//NOTE: for G-parity, pt_mat assumes the matrice 'min' obey complex conjugate boundary conditions just like the gauge fields.
 void pt_mat(int n, Float **mout, Float **min, const int *dir);
 void pt_1vec(int n, Float **vout, Float **vin, int const *dir);
 void pt_2vec(int n, Float **vout, Float **vin, const int *dir);
@@ -183,7 +184,7 @@ class ParTransAsqtad : public ParTransStagTypes
 
     char *cname;         // Class name.
 
-    int f_size_cb;       //The node checkerbrd. size of the ferm. field
+    size_t f_size_cb;       //The node checkerbrd. size of the ferm. field
 
     Vector *frm_tmp;     // Temporary fermion field
 
@@ -298,7 +299,7 @@ class ParTransStaggered_cb : public ParTransStagTypes
 
     char *cname;         // Class name.
 
-    int f_size_cb;       //The node checkerbrd. size of the ferm. field
+    size_t f_size_cb;       //The node checkerbrd. size of the ferm. field
 
     Vector *frm_tmp;     // Temporary fermion field
 

@@ -109,6 +109,8 @@ public:
 	Float twist_bc_y;
 	Float twist_bc_z;
 	Float twist_bc_t;
+	int gparity_1f_X;
+	int gparity_1f_Y;
 	StartConfType start_u1_conf_kind;
 	u_long start_u1_conf_load_addr;
 	char *start_u1_conf_filename;

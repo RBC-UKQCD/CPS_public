@@ -22,6 +22,8 @@ enum EigenType {
 typedef enum EigenType EigenType;
 extern struct vml_enum_map EigenType_map[];
 
+
+#include <util/vml/vml_templates.h>
 class VML;
 class LancArg {
 public:
@@ -44,7 +46,20 @@ public:
 	bool_t lock;
 	int maxits;
 	char *fname;
+	   void deep_copy(const LancArg &rhs);
+	   void print(const std::string &prefix ="");
 };
+template<> struct rpc_deepcopy<LancArg>{
+	static void doit(LancArg &into, LancArg const &from);
+};
+
+#ifndef _USE_STDLIB
+#error "Cannot generate rpc_print commands without the standard library"
+#endif
+template<> struct rpc_print<LancArg>{
+	static void doit(LancArg const &what, const std::string &prefix="" );
+};
+
 
 /* the xdr functions */
 

@@ -66,10 +66,16 @@ AlgFourierProp::AlgFourierProp(Lattice& latt,
     ERR.Pointer(cname,fname, "arg");
   alg_FourierProp_arg = arg;
 
-  if ( GJP.Xbc() == BND_CND_PRD ) { bc[0] = 0; } else { bc[0]=1; }
-  if ( GJP.Ybc() == BND_CND_PRD ) { bc[1] = 0; } else { bc[1]=1; }
-  if ( GJP.Zbc() == BND_CND_PRD ) { bc[2] = 0; } else { bc[2]=1; }
-  if ( GJP.Tbc() == BND_CND_PRD ) { bc[3] = 0; } else { bc[3]=1; }
+  for(int i=0;i<4;i++){
+    if(GJP.Bc(i) == BND_CND_PRD) bc[0] = 0;
+    else if(GJP.Bc(i) == BND_CND_APRD) bc[1] = 1;
+    else ERR.General(cname,fname, "BC other than periodic or antiperiodic not implemented");
+  }
+
+  // if ( GJP.Xbc() == BND_CND_PRD ) { bc[0] = 0; } else { bc[0]=1; }
+  // if ( GJP.Ybc() == BND_CND_PRD ) { bc[1] = 0; } else { bc[1]=1; }
+  // if ( GJP.Zbc() == BND_CND_PRD ) { bc[2] = 0; } else { bc[2]=1; }
+  // if ( GJP.Tbc() == BND_CND_PRD ) { bc[3] = 0; } else { bc[3]=1; }
 }
 
 AlgFourierProp::~AlgFourierProp() {

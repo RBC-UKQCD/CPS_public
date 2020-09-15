@@ -19,9 +19,22 @@ CPS_START_NAMESPACE
 // using the pure gauge force.
 //------------------------------------------------------------------
 
+static void printMat(Matrix* m, int x,int y,int z,int t){
+  int idx = x + GJP.XnodeSites()*(y+GJP.YnodeSites()*(z+GJP.ZnodeSites()*t));
+  IFloat *mat = (IFloat*)(m+idx);
+  int off =0 ;
+  for(int i=0;i<3;i++){
+    for(int j=0;j<3;j++){
+      printf("(%f,%f) ",mat[off],mat[off+1]);
+      off+=2;
+    }
+    printf("\n");
+  }
+}
+
 ForceArg GimprRect::EvolveMomGforce(Matrix *mom, Float dt)
 {
-  char *fname = "EvolveMomGforce(M*,F)mod";  //Name of our function
+  char *fname = "EvolveMomGforce(M*,F)mod[QCDOC]";  //Name of our function
   VRB.Func(cname,fname);                     //Sets name of the function
 
   Float L1=0.0;
@@ -38,7 +51,7 @@ ForceArg GimprRect::EvolveMomGforce(Matrix *mom, Float dt)
   ParTrans::PTflops=0;
 #endif
 
-  static int vol = GJP.VolNodeSites();  //Local lattice volume
+  int vol = GJP.VolNodeSites();  //Local lattice volume //CK: removed 'static' keyword as we want to be able to change the volume during program execution!
   const int N = 4;                      //Num of dimensions
   Float tmp_plaq = plaq_coeff;          //1-8*c_1
   Float tmp_rect = rect_coeff;          //c_1
@@ -78,6 +91,10 @@ ForceArg GimprRect::EvolveMomGforce(Matrix *mom, Float dt)
     int dirs_p[] = {0,2,4,6,0,2,4};   //Positive directions
     int dirs_m[] = {1,3,5,7,1,3,5};   //Negative directions
 
+    //in pt.C : int mu = dir[d]; bool backwards = mu%2 ? true : false; mu /= 2;
+    //hence dirs_p corresponds destination offsets of {+x, +y, +z, +t, +x, +y, +z}
+    //      dirs_m                                    {-x, -y, -z, -t, -x, -y, -z}
+
     //Instantiate parallel transporter
     ParTransGauge pt(*this);
 
@@ -99,103 +116,113 @@ ForceArg GimprRect::EvolveMomGforce(Matrix *mom, Float dt)
     //pt.run(1,V',V,dir_Plus_mu)
     //
     //The new vector field will be indexed according to its new position.
-      for(nu = 1;nu<4;nu++){
 
-	//First calculate the staple in the positive nu direction
-        pt.run(N,tmp1,Units,dirs_m+nu);
-  	pt.run(N,result,tmp1,dirs_m);
-	pt.run(N,tmp1,result,dirs_p+nu);
+    //CK: Above explanation is very confusing for me!
+    //heres what the code actually does:
+    //if direction is 1,3,5,7 V'(x) = U^dag_mu(x-mu)V(x-mu)  where mu = x,y,z,t  
+    //if direction is 0,2,4,6 V'(x) = U_mu(x)V(x+mu) where mu = x,y,z,t
+    // 
+    for(nu = 1;nu<4;nu++){
 
-	//tmp2 contains the sum of the staples for a given link
-	for(int i = 0; i<N;i++)
-//	vaxpy3_m(tmp2[i],&tmp_plaq,tmp1[i],tmp2[i],vol*3);
+      //First calculate the staple in the positive nu direction
+      //position is 'p'
+
+      pt.run(N,tmp1,Units,dirs_m+nu); //tmp1(p) = U^dag_nu(p-\nu)   [nu = y,z,t,x]
+      pt.run(N,result,tmp1,dirs_m); //result(p) = U^dag_x(p-x) tmp1(p-x) = U^dag_x(p-x)U^dag_nu(p-\nu-x)
+      pt.run(N,tmp1,result,dirs_p+nu); //tmp1(p) = U_nu(p) result(p+\nu) = U_nu(p)U^dag_x(p-x+nu)U^dag_nu(p-x)
+
+      //tmp2 contains the sum of the staples for a given link
+      for(int i = 0; i<N;i++)
+	//	vaxpy3_m(tmp2[i],&tmp_plaq,tmp1[i],tmp2[i],vol*3);
 	tmp2[i]->FTimesV1PlusV2(tmp_plaq,tmp1[i],tmp2[i],vol);
 
-	//Calculating one rectangular staple
-	pt.run(N,tmp1,Units,dirs_p);
-	pt.run(N,result,tmp1,dirs_m+nu);
-	pt.run(N,tmp1,result,dirs_m);
-	pt.run(N,result,tmp1,dirs_m);
-	pt.run(N,tmp1,result,dirs_p+nu);
+      //Calculating one rectangular staple
+      pt.run(N,tmp1,Units,dirs_p);
+      pt.run(N,result,tmp1,dirs_m+nu);
+      pt.run(N,tmp1,result,dirs_m);
+      pt.run(N,result,tmp1,dirs_m);
+      pt.run(N,tmp1,result,dirs_p+nu);
 
-	for(int i = 0; i<N;i++)
-//	vaxpy3_m(tmp2[i],&tmp_rect,tmp1[i],tmp2[i],vol*3);
+      for(int i = 0; i<N;i++)
+	//	vaxpy3_m(tmp2[i],&tmp_rect,tmp1[i],tmp2[i],vol*3);
 	tmp2[i]->FTimesV1PlusV2(tmp_rect,tmp1[i],tmp2[i],vol);
 
-	//Calculating another rectangular staple;
-	pt.run(N,tmp1,Units,dirs_m+nu);
-	pt.run(N,result,tmp1,dirs_m);
-	pt.run(N,tmp1,result,dirs_m);
-	pt.run(N,result,tmp1,dirs_p+nu);
-	pt.run(N,tmp1,result,dirs_p);
+      //Calculating another rectangular staple;
+      pt.run(N,tmp1,Units,dirs_m+nu);
+      pt.run(N,result,tmp1,dirs_m);
+      pt.run(N,tmp1,result,dirs_m);
+      pt.run(N,result,tmp1,dirs_p+nu);
+      pt.run(N,tmp1,result,dirs_p);
 
-	for(int i = 0; i<N;i++)
-//	vaxpy3_m(tmp2[i],&tmp_rect,tmp1[i],tmp2[i],vol*3);
+      for(int i = 0; i<N;i++)
+	//	vaxpy3_m(tmp2[i],&tmp_rect,tmp1[i],tmp2[i],vol*3);
 	tmp2[i]->FTimesV1PlusV2(tmp_rect,tmp1[i],tmp2[i],vol);
 
-	//Calculating another rectangular staple;
-	pt.run(N,tmp1,Units,dirs_m+nu);
-	pt.run(N,result,tmp1,dirs_m+nu);
-	pt.run(N,tmp1,result,dirs_m);
-	pt.run(N,result,tmp1,dirs_p+nu);
-	pt.run(N,tmp1,result,dirs_p+nu);
+      //Calculating another rectangular staple;
+      pt.run(N,tmp1,Units,dirs_m+nu);
+      pt.run(N,result,tmp1,dirs_m+nu);
+      pt.run(N,tmp1,result,dirs_m);
+      pt.run(N,result,tmp1,dirs_p+nu);
+      pt.run(N,tmp1,result,dirs_p+nu);
 
-	for(int i = 0; i<N;i++)
-//	vaxpy3_m(tmp2[i],&tmp_rect,tmp1[i],tmp2[i],vol*3);
+      for(int i = 0; i<N;i++)
+	//	vaxpy3_m(tmp2[i],&tmp_rect,tmp1[i],tmp2[i],vol*3);
 	tmp2[i]->FTimesV1PlusV2(tmp_rect,tmp1[i],tmp2[i],vol);
 
-	//Calculating the staple in the negative nu direction
-	pt.run(N,tmp1,Units,dirs_p+nu);
-	pt.run(N,result,tmp1,dirs_m);
-	pt.run(N,tmp1,result,dirs_m+nu);
+      //Calculating the staple in the negative nu direction
+      pt.run(N,tmp1,Units,dirs_p+nu);
+      pt.run(N,result,tmp1,dirs_m);
+      pt.run(N,tmp1,result,dirs_m+nu);
 
-	//Add this result into tmp2
-	for(int i = 0; i<N;i++)
-//	vaxpy3_m(tmp2[i],&tmp_plaq,tmp1[i],tmp2[i],vol*3);
+      //Add this result into tmp2
+      for(int i = 0; i<N;i++)
+	//	vaxpy3_m(tmp2[i],&tmp_plaq,tmp1[i],tmp2[i],vol*3);
 	tmp2[i]->FTimesV1PlusV2(tmp_plaq,tmp1[i],tmp2[i],vol);
 
-	//Calculating one rectangular staple
-	pt.run(N,tmp1,Units,dirs_p);
-	pt.run(N,result,tmp1,dirs_p+nu);
-	pt.run(N,tmp1,result,dirs_m);
-	pt.run(N,result,tmp1,dirs_m);
-	pt.run(N,tmp1,result,dirs_m+nu);
+      //Calculating one rectangular staple
+      pt.run(N,tmp1,Units,dirs_p);
+      pt.run(N,result,tmp1,dirs_p+nu);
+      pt.run(N,tmp1,result,dirs_m);
+      pt.run(N,result,tmp1,dirs_m);
+      pt.run(N,tmp1,result,dirs_m+nu);
 
-	for(int i = 0; i<N;i++)
-//	vaxpy3_m(tmp2[i],&tmp_rect,tmp1[i],tmp2[i],vol*3);
+      for(int i = 0; i<N;i++)
+	//	vaxpy3_m(tmp2[i],&tmp_rect,tmp1[i],tmp2[i],vol*3);
 	tmp2[i]->FTimesV1PlusV2(tmp_rect,tmp1[i],tmp2[i],vol);
 
-	//Calculating another rectangular staple;
-	pt.run(N,tmp1,Units,dirs_p+nu);
-	pt.run(N,result,tmp1,dirs_m);
-	pt.run(N,tmp1,result,dirs_m);
-	pt.run(N,result,tmp1,dirs_m+nu);
-	pt.run(N,tmp1,result,dirs_p);
+      //Calculating another rectangular staple;
+      pt.run(N,tmp1,Units,dirs_p+nu);
+      pt.run(N,result,tmp1,dirs_m);
+      pt.run(N,tmp1,result,dirs_m);
+      pt.run(N,result,tmp1,dirs_m+nu);
+      pt.run(N,tmp1,result,dirs_p);
 
-	for(int i = 0; i<N;i++)
-//	vaxpy3_m(tmp2[i],&tmp_rect,tmp1[i],tmp2[i],vol*3);
+      for(int i = 0; i<N;i++)
+	//	vaxpy3_m(tmp2[i],&tmp_rect,tmp1[i],tmp2[i],vol*3);
 	tmp2[i]->FTimesV1PlusV2(tmp_rect,tmp1[i],tmp2[i],vol);
 
-	//Calculating another rectangular staple;
-	pt.run(N,tmp1,Units,dirs_p+nu);
-	pt.run(N,result,tmp1,dirs_p+nu);
-	pt.run(N,tmp1,result,dirs_m);
-	pt.run(N,result,tmp1,dirs_m+nu);
-	pt.run(N,tmp1,result,dirs_m+nu);
+      //Calculating another rectangular staple;
+      pt.run(N,tmp1,Units,dirs_p+nu);
+      pt.run(N,result,tmp1,dirs_p+nu);
+      pt.run(N,tmp1,result,dirs_m);
+      pt.run(N,result,tmp1,dirs_m+nu);
+      pt.run(N,tmp1,result,dirs_m+nu);
 
-	for(int i = 0; i<N;i++)
-//	vaxpy3_m(tmp2[i],&tmp_rect,tmp1[i],tmp2[i],vol*3);
+      for(int i = 0; i<N;i++)
+	//	vaxpy3_m(tmp2[i],&tmp_rect,tmp1[i],tmp2[i],vol*3);
 	tmp2[i]->FTimesV1PlusV2(tmp_rect,tmp1[i],tmp2[i],vol);
 
-	//Count the flops?
-        ForceFlops +=vol*288*N;
-      }
-      //Multiply on the left by our original link matrix to get force term
-      pt.run(N,result,tmp2,dirs_p);
+      //Count the flops?
+      ForceFlops +=vol*288*N;
+    }
+    //Multiply on the left by our original link matrix to get force term
+    pt.run(N,result,tmp2,dirs_p); //result(p) = U_x^dag(p)tmp2(p+x)
   }
 
+  
+
 #if 1
-#pragma omp parallel for default(shared) private(mu) reduction(+:L1,L2)
+  #pragma omp parallel for default(shared) private(mu) reduction(+:L1,L2)
   for(int index=0;index<4*vol;index++){
     Matrix mp1;
     int i = index%vol;
@@ -214,23 +241,23 @@ ForceArg GimprRect::EvolveMomGforce(Matrix *mom, Float dt)
   }
 #else
 
-      Matrix mp1;
-      for(mu = 0; mu<4;mu++)
+  Matrix mp1;
+  for(mu = 0; mu<4;mu++)
+    {
+      Matrix *mtmp = result[mu];
+      // Takes TrLessAntiHerm part to get the force
+      for(int i = 0; i<vol;i++)
 	{
-	  Matrix *mtmp = result[mu];
-	  // Takes TrLessAntiHerm part to get the force
-	  for(int i = 0; i<vol;i++)
-	    {
-	      #if 1
-	      mp1.Dagger((IFloat *)mtmp);
-	      mtmp->TrLessAntiHermMatrix(mp1);
-	      #else
-	      mtmp->TrLessAntiHermMatrix();
-	      #endif
-	      mtmp++;
-	    }
+#if 1
+	  mp1.Dagger((IFloat *)mtmp);
+	  mtmp->TrLessAntiHermMatrix(mp1);
+#else
+	  mtmp->TrLessAntiHermMatrix();
+#endif
+	  mtmp++;
 	}
-      ForceFlops += vol*60;
+    }
+  ForceFlops += vol*60;
 
   int x[4];
   
@@ -244,7 +271,7 @@ ForceArg GimprRect::EvolveMomGforce(Matrix *mom, Float dt)
 	  int uoff = GsiteOffset(x);
 	  
 	  for (int mu = 0; mu < 4; ++mu) {
-//	    GforceSite(*mp0, x, mu);   //Old force calculation
+	    //	    GforceSite(*mp0, x, mu);   //Old force calculation
 	    
 	    IFloat *ihp = (IFloat *)(mom+uoff+mu);  //The gauge momentum
 	    IFloat *dotp = (IFloat *)mp0;
@@ -260,9 +287,10 @@ ForceArg GimprRect::EvolveMomGforce(Matrix *mom, Float dt)
       }
     }
   }
-}
+  
 #endif
 
+  
 #ifdef PROFILE
   time += dclock();
   print_flops(cname,fname,ForceFlops+ParTrans::PTflops,time);

@@ -9,14 +9,14 @@ CPS_START_NAMESPACE
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2008/02/08 18:35:07 $
-//  $Header: /space/cvs/cps/cps++/src/util/dirac_op/d_op_base/qmp/inv_cg.C,v 1.4 2008/02/08 18:35:07 chulwoo Exp $
-//  $Id: inv_cg.C,v 1.4 2008/02/08 18:35:07 chulwoo Exp $
+//  $Author: ckelly $
+//  $Date: 2012-11-15 18:17:08 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/dirac_op/d_op_base/qmp/inv_cg.C,v 1.4.162.1 2012-11-15 18:17:08 ckelly Exp $
+//  $Id: inv_cg.C,v 1.4.162.1 2012-11-15 18:17:08 ckelly Exp $
 //  $Name: v5_0_16_hantao_io_test_v7 $
 //  $Locker:  $
 //  $RCSfile: inv_cg.C,v $
-//  $Revision: 1.4 $
+//  $Revision: 1.4.162.1 $
 //  $Source: /space/cvs/cps/cps++/src/util/dirac_op/d_op_base/qmp/inv_cg.C,v $
 //  $State: Exp $
 //
@@ -88,7 +88,7 @@ int DiracOp::InvCg(Vector *out,
 		   Vector *in, 
 		   Float src_norm_sq, 
 		   Float *true_res){
-  int f_size_cb;     // Node checkerboard size of the fermion field
+  size_t f_size_cb;     // Node checkerboard size of the fermion field
   int itr;                       // Current number of CG iterations
   int max_itr;                       // Max number of CG iterations
   Float stp_cnd;                   // Stop if residual^2 <= stp_cnd
@@ -99,6 +99,7 @@ int DiracOp::InvCg(Vector *out,
   Float d;
   int i, j;
   char *fname = "InvCg(V*,V*,F,F*)";
+  if(GJP.Gparity()) ERR.General(cname,fname,"(QMP subdir version) Code not written for Gparity");
 
 // Flash the LED and then turn it off
 //------------------------------------------------------------------

@@ -5,6 +5,10 @@
 #include <qmp.h>
 #endif
 
+#ifdef USE_GRID
+#include <util/lattice/fgrid.h>
+#endif
+
 #ifdef USE_QUDA
 #include <invert_quda.h>
 #endif
@@ -22,6 +26,10 @@ void Start(){
 void Start(int * argc, char *** argv) {
 //  printf("Start(%d %p)\n",*argc,*argv);
   //Initialize QMP
+#ifdef USE_GRID
+//  Grid::Grid_init(argc,argv);
+//  Fgrid::grid_initted=true;
+#endif
   QMPSCU::init_qmp(argc, argv);
   GJP.setArg(argc,argv);
 #ifdef USE_QUDA
@@ -29,14 +37,15 @@ void Start(int * argc, char *** argv) {
 #endif
 }
 void End(){
-  printf("End()\n");
-  QMPSCU::destroy_qmp();
-  printf("destroy_qmp()\n");
-//  _mcleanup();
+  // printf("End()\n");
 #ifdef USE_QUDA
   endQuda();
 #endif
-  printf("End()\n");
+// generates a lot of error messages. Turning off for now.
+//  QMPSCU::destroy_qmp();
+  // printf("destroy_qmp()\n");
+//  _mcleanup();
+  // printf("End()\n");
 }
 #else
 void Start(int * argc, char *** argv) {

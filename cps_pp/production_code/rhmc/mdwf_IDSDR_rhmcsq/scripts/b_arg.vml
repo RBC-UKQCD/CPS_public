@@ -1,0 +1,26 @@
+class BfmArg b_arg = {
+BfmSolverType solver = BFM_HmCayleyTanh
+int solveMobiusDminus = 1
+int Ls = 0
+double M5 = 1.8
+double mass = 0.
+double twistedmass = 0.
+double Csw = 0.
+double zolo_delta = 0.
+double zolo_lo = 0.
+double zolo_hi = 0.
+int list_engine = 0
+int list_length = 0
+int powerloop = 0
+int time_report_iter = 0
+int max_iter = 1000000
+double residual = 0.
+int precon_5d = 0
+int reproduce = 0
+int reproduce_checksum = 0
+int reproduce_master_check = 0
+int threads = 64
+int verbose = 0
+int onepluskappanorm = 0
+double mobius_scale = 4.00
+}

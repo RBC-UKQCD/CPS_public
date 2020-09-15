@@ -4,21 +4,31 @@
 
 CPS_START_NAMESPACE
 
+#ifndef INLINE_WILSON_MATRIX
+
 #ifndef USE_C11
 inline void cmad( Rcomplex& x, const Rcomplex& y, const Rcomplex& z )
 {
+#if 1
+  x += y*z;
+#else
   x.real()+=y.real()*z.real();
   x.real()-=y.imag()*z.imag();
   x.imag()+=y.imag()*z.real();
   x.imag()+=y.real()*z.imag();
+#endif
 }
 
 inline void cmeq( Rcomplex& x, const Rcomplex& y, const Rcomplex& z )
 {
+#if 1
+  x = y*z;
+#else
   x.real() =y.real()*z.real();
   x.real()-=y.imag()*z.imag();
   x.imag() =y.imag()*z.real();
   x.imag()+=y.real()*z.imag();
+#endif
 }
 #else
 inline void cmad( Rcomplex& x, const Rcomplex& y, const Rcomplex& z )
@@ -75,5 +85,6 @@ WilsonMatrix& eq_mult( WilsonMatrix& xmat,
     }
   return xmat;
 }
+#endif
 
 CPS_END_NAMESPACE

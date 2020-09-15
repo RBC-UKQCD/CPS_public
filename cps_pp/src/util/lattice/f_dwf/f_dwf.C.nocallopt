@@ -254,7 +254,7 @@ void Fdwf::Ffour2five(Vector *five, Vector *four, int s_u, int s_l)
 //------------------------------------------------------------------
 // Initializations
 //------------------------------------------------------------------
-  int f_size = GJP.VolNodeSites() * FsiteSize();
+  size_t f_size = GJP.VolNodeSites() * FsiteSize();
   int ls = GJP.SnodeSites();
   int vol_4d = GJP.VolNodeSites();
   int ls_stride = 24 * vol_4d;
@@ -337,7 +337,7 @@ void Fdwf::Ffive2four(Vector *four, Vector *five, int s_u, int s_l)
 // Initializations
 //------------------------------------------------------------------
   int ls = GJP.SnodeSites();
-  int f_size = GJP.VolNodeSites() * FsiteSize() / ls;
+  size_t f_size = GJP.VolNodeSites() * FsiteSize() / ls;
   int vol_4d = GJP.VolNodeSites();
   int ls_stride = 24 * vol_4d;
   int s_u_local = s_u % GJP.SnodeSites();
@@ -453,7 +453,7 @@ int Fdwf::FeigSolv(Vector **f_eigenv, Float lambda[],
     lambda[i] *= factor;
 
   // calculate chirality
-  int f_size = GJP.VolNodeSites()*2*Colors()*SpinComponents()*sizeof(Float);
+  size_t f_size = GJP.VolNodeSites()*2*Colors()*SpinComponents()*sizeof(Float);
   Vector *four = (Vector *) smalloc (f_size);
   if (four == 0)
     ERR.Pointer (cname, fname, "four");
@@ -571,9 +571,9 @@ void Fdwf::EvolveMomFforce(Matrix *mom, Vector *chi,
   // allocate space for two CANONICAL fermion fields
   //----------------------------------------------------------------
 
-  int f_size = FsiteSize() * GJP.VolNodeSites() ;
+  size_t f_size = FsiteSize() * GJP.VolNodeSites() ;
   int f_site_size_4d = 2 * Colors() * SpinComponents();
-  int f_size_4d = f_site_size_4d * GJP.VolNodeSites() ;
+  size_t f_size_4d = f_site_size_4d * GJP.VolNodeSites() ;
  
   char *str_v1 = "v1" ;
   Vector *v1 = (Vector *)smalloc(f_size*sizeof(Float)) ;
@@ -874,7 +874,7 @@ Float Fdwf::FhamiltonNode(Vector *phi, Vector *chi){
   if (chi == 0)
     ERR.Pointer(cname,fname,"chi") ;
 
-  int f_size = GJP.VolNodeSites() * FsiteSize() / 2 ;
+  size_t f_size = GJP.VolNodeSites() * FsiteSize() / 2 ;
 
   Float ret_val;
   ret_val = phi->ReDotProductNode(chi, f_size ) ;
@@ -900,7 +900,7 @@ Float Fdwf::BhamiltonNode(Vector *boson, Float mass){
   if (boson == 0)
     ERR.Pointer(cname,fname,"boson");
 
-  int f_size = GJP.VolNodeSites() * FsiteSize() / 2 ;
+  size_t f_size = GJP.VolNodeSites() * FsiteSize() / 2 ;
 
   Vector *bsn_tmp = (Vector *)
     smalloc(f_size*sizeof(Float));

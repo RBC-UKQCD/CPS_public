@@ -4,10 +4,7 @@
 #include <omp.h>
 #include <qmp.h>
 
-//#ifdef USE_BFM
-#if 0
-#include "/bgsys/drivers/ppcfloor/hwi/include/bqc/nd_rese_dcr.h"
-#endif
+#warning "Using deprecated wilson dslash"
 
 CPS_START_NAMESPACE
 /*! \file
@@ -101,6 +98,13 @@ void wilson_dslash(IFloat *chi_p_f,
 			int dag,
 			Wilson *wilson_p)
 {
+  if(GJP.Gparity()){ 
+    if(!UniqueID()) printf("Error: wilson_dslash_qmp not G-parity ready. Should be deprecated in favour of wilson_dslash_vec\n");
+    exit(-1);
+  }
+  if(!UniqueID()) printf("Using deprecated wilson_dslash\n");
+  exit(0);
+
 	char *cname = "";
 	char *fname = "wilson_dslash";
 	int lx, ly, lz, lt;
@@ -207,7 +211,7 @@ void wilson_dslash(IFloat *chi_p_f,
 //
 //
 //#ifdef USE_TEST
-//omp_set_num_threads(8);
+	omp_set_num_threads(GJP.Nthreads());
 #pragma omp parallel for default(shared) private(mu)
 	for (int dir=0;dir<8;dir++){
 	if ((called%10000==0) &&(!UniqueID())){
@@ -547,7 +551,8 @@ Printf("getMinusData((IFloat *)fbuf, (IFloat *)tmp6, SPINOR_SIZE, 1);\n");
 /* Loop over sites                                                          */
 /*--------------------------------------------------------------------------*/
 	for(int i=0;i<SPINOR_SIZE;i++) fbuf[i]=0.;
-//	omp_set_num_threads(64);
+	omp_set_num_threads(GJP.Nthreads());
+
 	int index=0;
 #pragma omp parallel for default(shared) private(mu)
 	for(index = 0; index<vol*2;index++){
@@ -578,7 +583,7 @@ Printf("getMinusData((IFloat *)fbuf, (IFloat *)tmp6, SPINOR_SIZE, 1);\n");
 	y = temp % ly; temp = temp/ly;
 	z = temp % lz; temp = temp/lz;
 	t = temp % lt; temp = temp/lt;
-	if ((called%1000000==0) &&(!UniqueID())){
+	if (!UniqueID()){
 printf("wilson_dslash: %d %d %d %d %d: thread %d of %d tmp=%p \n",index,x,y,z,t,omp_get_thread_num(),omp_get_num_threads(),tmp);
 	}
 

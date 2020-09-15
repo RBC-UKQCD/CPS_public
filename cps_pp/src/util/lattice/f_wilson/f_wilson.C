@@ -30,6 +30,7 @@ CPS_END_NAMESPACE
 #include <util/error.h>
 #include <comms/scu.h>
 #include <comms/glb.h>
+#include <util/enum_func.h> //CK: Added for NumChkb
 
 #define BENCHMARK
 #ifdef BENCHMARK
@@ -208,7 +209,8 @@ int Fwilson::FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift,
   char *fname = "FmatMInv(V*, V*, .....)";
   VRB.Func(cname,fname);
 
-  int f_size = GJP.VolNodeSites() * FsiteSize() / (FchkbEvl()+1);
+  size_t f_size = GJP.VolNodeSites() * FsiteSize() / (FchkbEvl()+1);
+  if(GJP.Gparity()) f_size *= 2;
   Float dot = f_in -> NormSqGlbSum4D(f_size);
 
   Float *RsdCG = new Float[Nshift];
@@ -255,6 +257,7 @@ void Fwilson::FminResExt(Vector *sol, Vector *source, Vector **sol_old,
 // If true_res !=0 the value of the true residual is returned
 // in true_res.
 // *true_res = |src - MatPcDagMatPc * sol| / |src|
+//CK: I don't think this is supposed to be MatPcDagMatPc!
 // cnv_frm is used to specify if f_in should be converted 
 // from canonical to fermion order and f_out from fermion 
 // to canonical. 
@@ -337,9 +340,8 @@ int Fwilson::FeigSolv(Vector **f_eigenv, Float *lambda,
   }
 
   if(cnv_frm == CNV_FRM_YES) {
-    for(i=0; i < N_eig; ++i) {
+    for(i=0; i < N_eig; ++i) 
       Fconvert(f_eigenv[i], CANONICAL, WILSON);
-    }
   }
 
   /*
@@ -350,18 +352,22 @@ int Fwilson::FeigSolv(Vector **f_eigenv, Float *lambda,
   */
   if ( iter < 0 ) { return iter ; }
 
-
   // Compute chirality
-  int f_size = (GJP.VolNodeSites() * FsiteSize());
+  int Ncb = NumChkb(cg_arg.RitzMatOper);
+  size_t f_size = (GJP.VolNodeSites() * FsiteSize()) * Ncb / 2; //CK: fixed
+  if(GJP.Gparity()) f_size *= 2;
 
   Vector* v1 = (Vector *)smalloc(f_size*sizeof(Float));
   if (v1 == 0)
     ERR.Pointer(cname, fname, "v1");
   VRB.Smalloc(cname, fname, "v1", v1, f_size*sizeof(Float));
 
+  int nspinvect = GJP.VolNodeSites() * Ncb/2;
+  if(GJP.Gparity()) nspinvect *= 2;
+
   for(i=0; i < N_eig; ++i)
   {
-    Gamma5(v1, f_eigenv[i], GJP.VolNodeSites());
+    Gamma5(v1, f_eigenv[i], nspinvect);
     chirality[i] = f_eigenv[i]->ReDotProductGlbSum4D(v1, f_size);
   }
 
@@ -391,10 +397,31 @@ int Fwilson::FeigSolv(Vector **f_eigenv, Float *lambda,
 
 
   // Slice-sum the eigenvector density to make a 1D vector
-  if (eig_arg->print_hsum)
-    for(i=0; i < N_eig; ++i)
-      f_eigenv[i]->NormSqArraySliceSum(hsum[i], FsiteSize(), eig_arg->hsum_dir);
+  if (eig_arg->print_hsum){
+    for(i=0; i < N_eig; ++i){
+      //CK: The vector needs to be in canonical ordering. Thus if CNV_FRM_NO we need to convert to CANONICAL. If Ncb==1 we have
+      //    only the odd part, so we will need to fill the even part with zeroes prior to conversion
+      Vector* tosum = f_eigenv[i];
+      if(cnv_frm == CNV_FRM_NO){
+	//Create a temp copy of the eigenvector
+	int alloc_size = f_size; if(Ncb==1) alloc_size *= 2;
+	Float* full = (Float *)smalloc(alloc_size*sizeof(Float));
+	for(int j=0;j<f_size;j++) full[j] = ((Float*)f_eigenv[i])[j];
 
+	//Fill in even part with zero for Ncb==1
+	if(Ncb==1) for(int j=f_size;j<alloc_size;j++) full[j] = 0; //zero even part
+
+	//Convert
+	if(cnv_frm == CNV_FRM_NO) Fconvert((Vector*)full, CANONICAL, WILSON);
+	tosum = (Vector*)full;
+      }
+      tosum->NormSqArraySliceSum(hsum[i], FsiteSize(), eig_arg->hsum_dir);
+
+      if(cnv_frm == CNV_FRM_NO) sfree(tosum);
+
+    }
+    
+  }
 
   // The remaining part in QCDSP version are all about "downloading
   // eigenvectors", supposedly not applicable here.
@@ -460,10 +487,13 @@ ForceArg Fwilson::EvolveMomFforce(Matrix *mom, Vector *chi,
   if (chi == 0)
     ERR.Pointer(cname,fname,"chi") ;
 
+  if (Colors() != 3)
+    ERR.General(cname,fname,"Not implemented for G-parity boundary conditions") ;
+
 //------------------------------------------------------------------
 // allocate space for two CANONICAL fermion fields.
 //------------------------------------------------------------------
-  int f_size = FsiteSize() * GJP.VolNodeSites() ;
+  size_t f_size = FsiteSize() * GJP.VolNodeSites() ;
 
   char *str_v1 = "v1" ;
   Vector *v1 = (Vector *)smalloc(f_size*sizeof(Float)) ;
@@ -669,6 +699,7 @@ ForceArg Fwilson::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
   Float Linf = 0.0;
 
   int g_size = GJP.VolNodeSites() * GsiteSize();
+  if(GJP.Gparity()) g_size *= 2;
 
   Matrix *mom_tmp;
 
@@ -726,7 +757,8 @@ Float Fwilson::BhamiltonNode(Vector *boson, Float mass){
   if (boson == 0)
     ERR.Pointer(cname,fname,"boson");
 
-  int f_size = (GJP.VolNodeSites() * FsiteSize()) >> 1 ;
+  size_t f_size = (GJP.VolNodeSites() * FsiteSize()) >> 1 ;
+  if(GJP.Gparity()) f_size*=2;
 
   Vector *bsn_tmp = (Vector *)
     smalloc(f_size*sizeof(Float));

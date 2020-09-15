@@ -41,7 +41,8 @@ enum RandomType {
 	UONE = 1,
 	ZTWO = 2,
 	NORAND = 3,
-	TEST = 4,
+	ZFOUR = 4,
+	TEST = 5,
 };
 typedef enum RandomType RandomType;
 extern struct vml_enum_map RandomType_map[];
@@ -58,6 +59,7 @@ public:
 	int y;
 	int z;
 	int t;
+	int flavor;
 	int gauge_fix_src;
 	int gauge_fix_snk;
 	int store_midprop;

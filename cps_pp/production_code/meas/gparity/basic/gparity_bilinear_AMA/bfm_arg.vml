@@ -1,0 +1,26 @@
+class BfmArg bfm_arg = {
+BfmSolverType solver = BFM_DWF
+int solveMobiusDminus = 0
+int Ls = 0
+double M5 = 1.8
+double mass = 0.1
+double twistedmass = 0.1
+double Csw = 0.0
+double zolo_delta = 0
+double zolo_lo = 0
+double zolo_hi = 0
+int list_engine = 0
+int list_length = 0
+int powerloop = 0
+int time_report_iter = 10000000
+int max_iter = 10000
+double residual = 1e-08
+int precon_5d = 1
+int reproduce = 0
+int reproduce_checksum = 0
+int reproduce_master_check = 0
+int threads = 1
+int verbose = 0
+int onepluskappanorm = 0
+double mobius_scale = 2
+}

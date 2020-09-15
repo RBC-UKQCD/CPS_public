@@ -99,7 +99,7 @@ void AlgActionBoson::heatbath() {
     
     LatticeFactory::Destroy();
 
-    traj++;
+//    traj++;
   }
 
 }

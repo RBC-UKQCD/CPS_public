@@ -41,6 +41,9 @@ void QioArg::init(const char * file, const int concur_io_number, const Float chk
   // user set params
   ConcurIONumber = concur_io_number;
   strcpy(FileName, file);
+  if(!UniqueID()){ printf("QioArg::init copied filename string '%s' from %p to %p\n",file,file,FileName); fflush(stdout); }
+  if(!UniqueID()){ printf("QioArg::init FileName = '%s'\n",FileName); fflush(stdout); }
+
   CheckPrecision = chk_prec;
   FileFpFormat = file_format;
   FileIntFormat = file_int_format;
@@ -52,7 +55,7 @@ void QioArg::init(const char * file, const int concur_io_number, const Float chk
 // QioControl members////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////
 QioControl::QioControl() 
-  : num_concur_io(0), do_log(0), cname("QioControl"), io_good(false)
+  : num_concur_io(0), do_log(0), cname("QioControl"), io_good(false), GparityReconstructUstarField(true)
 {
   //  cout << "I am on a " << GJP.Xnodes() << "x"<< GJP.Ynodes() << "x"<< GJP.Znodes() 
   //       << "x"<< GJP.Tnodes() <<"x"<<GJP.Snodes() << " machine" << endl;

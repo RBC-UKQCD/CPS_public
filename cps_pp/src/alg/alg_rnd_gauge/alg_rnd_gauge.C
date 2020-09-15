@@ -228,6 +228,11 @@ void AlgRotateGauge::run()
   //-------------------------
 
   Lattice& lat( AlgLattice() );
+
+    NX = GJP.XnodeSites();
+    NY = GJP.YnodeSites();
+    NZ = GJP.ZnodeSites();
+    NT = GJP.TnodeSites();
   
 
   //---------------------------------------
@@ -235,10 +240,15 @@ void AlgRotateGauge::run()
   // allocated with one fixing matrix per
   // lattice site landau gauge 
   //---------------------------------------
-
+  if ( lat.FixGaugeKind() == FIX_GAUGE_COULOMB_T ){
+   for(int t=0;t<NT;t++)
+   if (!lat.FixGaugePtr()[t] )
+      ERR.General(cname,fname,"Coulomb Gauge fixing matrices not allocated for t=%d\n",t);
+  }
+  else 
   if ( lat.FixGaugeKind() != FIX_GAUGE_LANDAU )
     {
-      ERR.General(cname,fname,"Gauge fixing matrices not allocated correctly\n");
+      ERR.General(cname,fname,"Supported only for Landau and Coulomb in t direciton\n");
     }
 
   //----------------------------
@@ -250,11 +260,6 @@ void AlgRotateGauge::run()
   //---------------------
   // get node parameters
   //---------------------
-
-    NX = GJP.XnodeSites();
-    NY = GJP.YnodeSites();
-    NZ = GJP.ZnodeSites();
-    NT = GJP.TnodeSites();
 
     int node_sites[4]={ NX , NY , NZ ,NT };
 
@@ -311,8 +316,8 @@ void AlgRotateGauge::run()
 		  
 		  offset_st = st[0]*m_dir_offset[0] 
 		    + st[1]*m_dir_offset[1]
-		      + st[2]*m_dir_offset[2] 
-			+ st[3]*m_dir_offset[3];
+		      + st[2]*m_dir_offset[2] ;
+//			+ st[3]*m_dir_offset[3];
 		  
 		  //===============================================
 		  // offset_st = x + y*NX + z*NX*NY + t*NX*NY*NZ
@@ -327,7 +332,10 @@ void AlgRotateGauge::run()
 		  // matrix
 		  //=======================================================
 		  
-		  m_offset = lat.FixGaugePtr()[0] + offset_st;
+  		if ( lat.FixGaugeKind() == FIX_GAUGE_COULOMB_T ){
+		  m_offset = lat.FixGaugePtr()[t] + offset_st;
+ 		} else // LANDAU
+		  m_offset = lat.FixGaugePtr()[0] + (offset_st + st[3]*m_dir_offset[3]);
 		  
 		  for(int nu=0; nu<4; nu ++)
 		    {

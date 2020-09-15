@@ -113,21 +113,26 @@ void LatRngRead::read(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
   int size_rng_chars = size_rng_ints * intconv.fileIntSize();
 
   QioArg rng_arg(rd_arg);
-  rng_arg.cutHalf();
+  rng_arg.cutHalf(); //RNGs only on 2^4 hypercubes, so cut each dimension in two
 
   unsigned int csum[2] = {0}, pos_dep_csum[2] = {0};
   Float RandSum[2]={0.0}, Rand2Sum[2]={0.0};
 
   log();
 
+  //CK user should be able to modify the type of read/write. Why not just set different defaults for
+  //different architectures rather than hardcoding it in this horrible way?
 
 //#if TARGET == QCDOC  // when on QCDOC, only Parallel (direct IO) mode is used
-#if 0
-  setParallel();
-#else
-  setSerial();
-#endif
+//#if TARGET != BGQ
+//  setParallel();
+//#else
+//  setSerial();
+//#endif
   VRB.Result(cname,fname,"parIO()=%d\n",parIO());
+
+  int nstacked = 1;
+  if(GJP.Gparity()) nstacked = 2;
 
   if(parIO()) {
 //  if(0) {
@@ -147,7 +152,7 @@ void LatRngRead::read(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
 //	       UniqueID(),csum[0],pos_dep_csum[0]);
 
 	streamoff total = (streamoff) size_rng_chars * (streamoff) rng_arg.VolSites() * 
-                     (streamoff) rng_arg.Snodes() * (streamoff) rng_arg.SnodeSites();
+                     (streamoff) rng_arg.Snodes() * (streamoff) (rng_arg.SnodeSites()*nstacked);
     hd.data_start +=  total;
  
     VRB.Flow(cname,fname, "Start Loading 4-D RNGs\n");
@@ -173,7 +178,7 @@ void LatRngRead::read(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
       ERR.General(cname, fname, "Loading failed\n");
 
 	streamoff total = (streamoff) size_rng_chars * (streamoff) rng_arg.VolSites() * 
-                     (streamoff) rng_arg.Snodes() * (streamoff) rng_arg.SnodeSites();
+                     (streamoff) rng_arg.Snodes() * (streamoff) (rng_arg.SnodeSites()*nstacked);
     hd.data_start +=  total;
 
     
@@ -245,6 +250,7 @@ void LatRngRead::read(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
   RandSum[0] += RandSum[1];
   Rand2Sum[0] += Rand2Sum[1];
   uint64_t total_rngs_4d = rng_arg.VolSites();
+  if(GJP.Gparity()) total_rngs_4d*=2;
   uint64_t total_rngs_5d = total_rngs_4d * (uint64_t)(rng_arg.Snodes() * rng_arg.SnodeSites()); 
   Float RandAvg = globalSumFloat(RandSum[0]) / (total_rngs_5d + total_rngs_4d);
   Float RandVar = globalSumFloat(Rand2Sum[0]) / (total_rngs_5d + total_rngs_4d)
@@ -312,11 +318,14 @@ void LatRngWrite::write(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
   //  cout << "size_rng_ints = " << size_rng_ints << endl;
   int size_rng_chars = size_rng_ints * intconv.fileIntSize();
 
-#if 0
-  setParallel();
-#else
-  setSerial();
-#endif
+  //CK user should be able to modify the type of read/write. Why not just set different defaults for
+  //different architectures rather than hardcoding it in this horrible way?
+
+// #if TARGET == QCDOC
+//   setParallel();
+// #else
+//   setSerial();
+// #endif
   VRB.Result(cname,fname,"parIO()=%d ConcurIONumber=%d\n",parIO(),wt_arg.ConcurIONumber);
 
   log();
@@ -380,6 +389,9 @@ void LatRngWrite::write(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
   QioArg rng_arg(wt_arg);
   rng_arg.cutHalf();
 
+  int nstacked = 1;
+  if(GJP.Gparity()) nstacked = 2;
+
   if(parIO()) {
     VRB.Flow(cname,fname,"Start Unloading 5-D RNGs\n");
 
@@ -396,7 +408,7 @@ void LatRngWrite::write(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
 
 
 	streamoff total = (streamoff) size_rng_chars * (streamoff) rng_arg.VolSites() * 
-                     (streamoff) rng_arg.Snodes() * (streamoff) rng_arg.SnodeSites();
+                     (streamoff) rng_arg.Snodes() * (streamoff) (rng_arg.SnodeSites()*nstacked);
     hd.data_start +=  total;
  
     VRB.Flow(cname,fname,"Start Unloading 4-D RNGs\n");
@@ -420,8 +432,10 @@ void LatRngWrite::write(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
 		     &csum[0], &pos_dep_csum[0], &RandSum[0], &Rand2Sum[0]))
       ERR.General(cname, fname, "Unloading Failed\n");
 
+    if(SerialIO::dbl_latt_storemode && GJP.Bc(0)==BND_CND_GPARITY && GJP.Bc(1)==BND_CND_GPARITY) nstacked*=2; //saved a quad lattice
+
 //    hd.data_start += size_rng_chars * rng_arg.VolSites() * 
-//                    rng_arg.Snodes() * rng_arg.SnodeSites();
+//                    rng_arg.Snodes() * rng_arg.SnodeSites() *nstacked;
 	hd.data_start = -1;
 
     VRB.Flow(cname,fname,"Start Unloading 4-D RNGs\n");
@@ -443,6 +457,10 @@ void LatRngWrite::write(UGrandomGenerator * ugran, UGrandomGenerator * ugran_4d,
   RandSum[0] += RandSum[1];
   Rand2Sum[0] += Rand2Sum[1];
   int total_rngs_4d = rng_arg.VolSites();
+
+  if(GJP.Gparity()) total_rngs_4d*=2;
+  if(!parIO() && SerialIO::dbl_latt_storemode && GJP.Bc(0)==BND_CND_GPARITY && GJP.Bc(1)==BND_CND_GPARITY) total_rngs_4d*=2;
+  
   int total_rngs_5d = total_rngs_4d * rng_arg.Snodes() * rng_arg.SnodeSites(); 
   Float RandAvg = globalSumFloat(RandSum[0]) / (total_rngs_5d + total_rngs_4d);
   Float RandVar = globalSumFloat(Rand2Sum[0]) / (total_rngs_5d + total_rngs_4d)

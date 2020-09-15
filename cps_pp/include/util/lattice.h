@@ -50,6 +50,10 @@ class LinkBuffer;
   fields, \e etc.  
 */
 //------------------------------------------------------------------
+
+typedef enum EvenOdd
+{ Even, Odd, All } EvenOdd;
+
 class Lattice
 {
 
@@ -107,6 +111,13 @@ class Lattice
 
     static int scope_lock;
     static int bc_applied;
+    inline void compute_coord(int x[4], const int hl[4], const int low[4], int i)
+{
+ x[0] = i % hl[0] + low[0]; i /= hl[0];
+ x[1] = i % hl[1] + low[1]; i /= hl[1];
+ x[2] = i % hl[2] + low[2]; i /= hl[2];
+ x[3] = i % hl[3] + low[3];
+}
 
  protected:
 
@@ -158,11 +169,15 @@ class Lattice
 
 	//block noisy MC;
     static int sigma_blocks[4]; 
-    
 
  public:
 
-    const Matrix * GetLink(const int *x, int mu) const;
+    size_t full_size;
+    size_t half_size;
+    
+
+
+    const Matrix * GetLink(const int *x, int mu, const int &field_idx = 0) const;
       //!< Gets the gauge link U_mu(x).
       // defined relative to the local site (0,0,0,0).
       // If the link is on-node, it returns a reference to
@@ -171,6 +186,7 @@ class Lattice
       // Since the buffer can be used by other routines as well as other
       // calls to this routine, as a general rule, the link should be
       // used immediately or else copied.
+      // CK: 09/11  field_idx is 0 for standard gauge links, 1 for stored conjugate links
 
     const Matrix * GetLinkOld(Matrix *g_offset, const int *x,
              int dir, int mu) const;
@@ -239,6 +255,13 @@ class Lattice
     Lattice();
 
     virtual ~Lattice();
+    
+    //!<Allocates memory for gauge field if not already done so
+    void AllocGauge();
+
+    //!< Frees memory associated with gauge field and sets is_allocated = 0 and is_initialized = 0.
+    //Does not take off the scope lock (destructor does this).
+    virtual void FreeGauge();
 
     Matrix *GaugeField() const {
         return gauge_field;
@@ -311,6 +334,7 @@ class Lattice
     virtual unsigned long GsiteOffset(const int *x, const int dir) const;
  
     int SigmaOffset(const int x[4], int mu, int nu) const;
+    unsigned int CheckSum(Matrix *field = gauge_field);
     int SigmaOffset(const int index, int mu, int nu) const;
 
 
@@ -338,6 +362,9 @@ class Lattice
         // GRF: consider changing the function name
         // to Lattice::PlaqStaple() for consistency.
 
+    void GparityStaple(Matrix& stap, int *x, int mu);
+    //!< Gparity staple. Automatically called by Staple.
+
     void BufferedStaple(Matrix & stap, const int *x, int mu);
         //!< Calculates the gauge field square staple sum  around a link
         //Buffered version of staple
@@ -358,6 +385,9 @@ class Lattice
         //   + U_v(x+u-v)~ U_v(x+u-2v)~ U_u(x-2v)~  U_v(x-2v)  U_v(x-v)
         // }
         //
+    void GparityRectStaple(Matrix& stap, int *x, int mu) ;
+    //!< Gparity rect staple. Automatically called by Staple.
+
     void BufferedRectStaple(Matrix& stap, const int *x, int mu);
         //!< Calculates the rectangle staple sum around a link.
         //buffered version of RectStaple 
@@ -415,6 +445,9 @@ class Lattice
         //   U_u(x) U_v(x+u) U_u(x+v)~ U_v(x)~
     Float ReU1Plaq(int *x, int mu, int nu) const;
 
+    Float GparityReTrPlaq(int *x, int mu, int nu) const;
+    //!< Equivalent to ReTrPlaq for G-parity. Automatically called by ReTrPlaq.
+
     Float SumReTrPlaqNode() const;
        //!< Calculates the local sum of the real part of the trace of the plaquette 
     Float SumReU1PlaqNode() const;
@@ -432,6 +465,9 @@ class Lattice
        //
        //   U_u(x) U_u(x+u) U_v(x+2u) U_u(x+u+v)~ U_u(x+v)~ U_v(x)~
        //
+
+    Float GparityReTrRect(int *x, int mu, int nu) const;
+    //!< G-parity equivalent of ReTrRect. Automatically called by ReTrRect
 
     Float SumReTrRectNode() const;
         //!< Calculates the local sum of the real part of the trace of the 6-link rectangle.
@@ -451,6 +487,13 @@ class Lattice
 
     Float SumReTrCube() ;
     //!< Calculates the global sum of the real part of the trace of the cube
+
+    //!< For G-parity, copy-conjugate all gauge links onto the second half of the lattice array
+    static void CopyConjMatrixField(Matrix *field, const int & nmat_per_site = 4);
+
+    void CopyConjGaugeField(){
+      return Lattice::CopyConjMatrixField(gauge_field);
+    }
 
   // Added in by Ping for anisotropic lattices
   //------------------------------------------------------------------
@@ -534,8 +577,15 @@ class Lattice
     //!< Metropolis algorithm decision.
         // 0 reject, 1 accept. If delta_h < 0 it accepts unconditionally.
 
-    void EvolveGfield(Matrix *mom, Float step_size);
+    void EvolveGfield(Matrix *mom, Float step_size, bool evolve_both_gparity_flavors = false);
         //!< Molecular dynamics evolution of the gauge field.
+//CK: For G-parity by default this only evolves the U links but not the U* links. This is because the evolving of the gauge field
+//    is most often called from the lowest level integrator, which steps back and forth between evolving the conjugate momentum 
+//    via the gauge action and then evolving the gauge field. In the evaluation of the gauge force, we can significantly reduce
+//    the number of flops by only calculating the force for the U links, ensuring only that links pulled across the G-parity boundary
+//    are complex conjugated appropriately. We can therefore wait to sync the U* fields until the lowest level integrator has finished
+//    evolving. Use evolve_both_gparity_flavors = true to sync the U* links in this function (e.g. in force gradient integrator)
+
 
     Float MomHamiltonNode(Matrix *momentum);
     //!< The kinetic energy term of the canonical Hamiltonian on the local lattice.
@@ -637,6 +687,20 @@ class Lattice
     Float FixGaugeStopCond();
       //!< Returns the stopping condition used 
 
+    const Matrix* FixGaugeMatrix(const int &site, const int &flavor = 0);
+    //!< Returns the gauge fixing matrix for the site 'site' (and G-parity flavor 'flavor')
+    //   for Coulomb gauge, if the hyperplane on which site resides has not been gauge fixed, the function will return NULL    
+
+    const Matrix* FixGaugeMatrix(int const* pos,const int &flavor = 0);
+    //!< Returns the gauge fixing matrix for the position 'pos' (and G-parity flavor 'flavor')
+    //   for Coulomb gauge, if the hyperplane on which pos resides has not been gauge fixed, the function will return NULL
+
+
+    //Determine how close the gauge fixing matrices 'gfix_mat' come to satisfying the gauge fixing condition
+    //returns an array of size 1 for Landau and NodeSites(fixdir) for Coulomb, where fixdir is the gauge fixing direction
+    //the elements of the array are the deviation from the gauge fixing condition in units of the stopping condition (not SmallFloat but a value derived from it)
+    //values < 1 mean all hyperplanes satisfy the gauge fixing condition
+    IFloat* GaugeFixCondSatisfaction(Matrix **gfix_mat, FixGaugeType gfix_type, Float SmallFloat) const;
 
     void *Aux0Ptr();
      //!< Returns a general purpose auxiliary pointer.
@@ -692,6 +756,11 @@ class Lattice
     //! Not implemented here.
     virtual void Fdslash(Vector *f_out, Vector *f_in, CgArg *cg_arg, 
 		 CnvFrmType cnv_frm, int dir_flag);
+    virtual void MatPc (Vector * f_out, Vector * f_in, Float mass, Float epsilon,
+              DagType dag){
+	ERR.NotImplemented(cname,"MatPc");
+    }
+
 
     // dir_flag is flag which takes value 0 when all direction contribute to D
     // 1 - when only the special anisotropic direction contributes to D,
@@ -794,28 +863,32 @@ class Lattice
     }
 
     //~~ added F_CLASS_WILSON_TM for twisted mass fermions
-    int FwilsonType(){
-      if (Fclass()==F_CLASS_WILSON || Fclass() ==F_CLASS_CLOVER || 
-	  Fclass() ==F_CLASS_DWF || Fclass()==F_CLASS_MOBIUS
-	  || Fclass()==F_CLASS_ZMOBIUS 
-        || Fclass() ==F_CLASS_WILSON_TM || Fclass() ==F_CLASS_NAIVE
-        || Fclass() ==F_CLASS_BFM ) return 1;
-      else return 0;
-    }
+    virtual int FwilsonType()
+#if 0
+    {return 0;}
+#else
+     {
+      if ( Fclass() ==F_CLASS_DWF || Fclass()==F_CLASS_MOBIUS) return 1;
+       if(Fclass()==F_CLASS_ZMOBIUS || Fclass() ==F_CLASS_MDWF ) return 1;
+       if(Fclass()==F_CLASS_WILSON || Fclass() ==F_CLASS_WILSON_TM ) return 1;
+       if(Fclass()==F_CLASS_WILSON || Fclass() ==F_CLASS_CLOVER ) return 1;
+#ifdef USE_BFM
+     if ( (Fclass() == F_CLASS_BFM) ) return 1;
+#endif
+#ifdef USE_GRID
+      if ( Fclass() ==F_CLASS_GRID_GPARITY_MOBIUS || Fclass()==F_CLASS_GRID_MOBIUS
+      || Fclass()==F_CLASS_GRID_ZMOBIUS ) return 1;
+      if ( Fclass() ==F_CLASS_GRID_GPARITY_WILSON_TM || Fclass()==F_CLASS_GRID_WILSON_TM )
+      return 1;
+#endif
+      return 0;
+     }
+#endif
 
     //~~ to distinguish 5D types. Currently exclude BFM, as BFM does all the 5D stuff outside CPS.
-    int F5D();
-#if 0
-{
-      if ( Fclass() ==F_CLASS_DWF || Fclass()==F_CLASS_MOBIUS 
-	   || Fclass()==F_CLASS_ZMOBIUS 
-#ifdef USE_BFM
-     || ( (Fclass() == F_CLASS_BFM) && Fbfm::arg_map.at(Fbfm::current_key_mass).solver == WilsonTM) //added by CK, moved here  by CJ
-#endif
-	   || Fclass() ==F_CLASS_MDWF ) return 1;
-      else return 0;
-    }
-#endif
+    virtual int F5D();
+
+
 
     virtual int FsiteOffsetChkb(const int *x) const = 0;
     //!< Gets the lattice site index for the odd-even (checkerboard) order.
@@ -1022,6 +1095,11 @@ class Lattice
       \return The residue of this guess.
      */
 
+    // Version used by EOFA
+    virtual void FminResExt(Vector* soln, Vector* src, Vector** soln_old, 
+			    Vector** vm, int degree, Float m1, Float m2, Float m3,
+          Float a, int pm, CgArg* cg_arg, CnvFrmType cnv_frm);
+
     virtual int eig_FmatInv(Vector **V, const int vec_len, Float *M, const int nev, const int m, float **U, Rcomplex *invH, const int def_len, const Float *restart, const int restart_len,
 			Vector *f_out, Vector *f_in, 
 			CgArg *cg_arg, 
@@ -1034,6 +1112,13 @@ class Lattice
                         Float *true_res,
 			CnvFrmType cnv_frm = CNV_FRM_YES,
 			PreserveType prs_f_in = PRESERVE_YES) = 0;
+    virtual int FmatInv(Vector *f_out, Vector *f_in,
+                CgArg *cg_arg,
+                Float *true_res,
+                CnvFrmType cnv_frm,
+                PreserveType prs_f_in, int dminus)
+	{ return FmatInv(f_out, f_in, cg_arg, true_res , cnv_frm,prs_f_in); }
+
     virtual int FmatInvTest(Vector *f_out, Vector *f_in,
                 CgArg *cg_arg,
                 Float *true_res,
@@ -1076,7 +1161,7 @@ class Lattice
 	{ return FmatEvlInv(f_out, f_in, cg_arg, 0, cnv_frm); }
 
 	virtual void Fsolfour2five(Vector *sol_5d, Vector *sol_4d, Vector *src_5d, CgArg *cg_arg){
-		char *fname = "Fsolfour2five()";
+      const char *fname = "Fsolfour2five()";
 		ERR.NotImplemented(cname,fname);
 	}
     // Recover the 5D solution from the 4D solution, without solve the equation again.
@@ -1104,7 +1189,7 @@ class Lattice
     virtual int FeigSolv(Vector **f_eigenv, Float *lambda, 
 			 LanczosArg *eig_arg, 
 			 CnvFrmType cnv_frm = CNV_FRM_YES){
-		char *fname = "FeigSolv(**V,F*,L*,C)";
+		const char *fname = "FeigSolv(**V,F*,L*,C)";
 		ERR.NotImplemented(cname,fname);
 		return -1;
 	}
@@ -1146,7 +1231,7 @@ class Lattice
 	      Float *true_res,
 	      CnvFrmType cnv_frm ,
 	      PreserveType prs_f_in)
-  {ERR.NotImplemented(cname,"FmatInv(V*,V*,M*,M*,F*,C*,P*)");} // for now
+  {ERR.NotImplemented(cname,"FmatInv(V*,V*,M*,M*,F*,C*,P*)");return 1;} // for now
 
   
     virtual Float SetPhi(Vector *phi, Vector *frm1, Vector *frm2,
@@ -1229,7 +1314,7 @@ class Lattice
     virtual void Fconvert(Vector *f_field, 
 		   	  StrOrdType to,
 			  StrOrdType from, int cb=2){
-		char *fname = "Fconvert(*V,O,O)";
+		const char *fname = "Fconvert(*V,O,O)";
 		ERR.NotImplemented(cname,fname);
 	}
     //!< Converts the field layout.
@@ -1268,7 +1353,7 @@ class Lattice
     // added by Hantao to facilitate doing force statistics.
     void updateForce(ForceArg &f_arg, const Matrix &m)const {
         Float a2 = m.norm();
-        Float a = sqrt(a2);
+        Float a = ::sqrt(a2);
 
         f_arg.L1 += a;
         f_arg.L2 += a2;
@@ -1282,6 +1367,28 @@ class Lattice
     virtual void BondCond();
     Float GetReTrPlaq(const int x[4],Float *ReTrPlaq);
     int BcApplied(){return bc_applied;}
+   
+    virtual void SetMassArg(Float mass){}
+    void Dump(const char *fname, Vector *vec, EvenOdd eo){}
+
+    //--------------------------------------------------------------
+    // DJM: Routines for EOFA
+
+    //!< Not implemented here
+    virtual void SetEOFAParams(Float mq1, Float mq2, Float mq3, Float a, int pm);
+    virtual void ChiralProj(Vector* f_out, const Vector* f_in, int pm);
+    virtual Float kt(Float m1, Float m2);
+    virtual void g5R5(Vector* f_out, Vector* f_in);
+    virtual void Omega(Vector* f_out, Vector* f_in, int pm, int dag);
+    virtual void Delta(Vector* f_out, Vector* f_in, Float m1, Float m2, int pm);
+    virtual void Dtilde(Vector* f_out, Vector* f_in, Float m);
+    void Dtilde(Vector* f_out, Float m) { Dtilde(f_out, f_out, m); }
+    virtual void DtildeInv(Vector* f_out, Vector* f_in, Float m);
+    void DtildeInv(Vector* f_out, Float m) { DtildeInv(f_out, f_out, m); }
+    virtual void HeofapaD_proj(Vector* f_out, Vector* f_in, Float m1,
+        Float m2, Float m3, Float a, int pm);
+    virtual int FmatEvlMeofa(Vector* f_out, Vector* f_in, CgArg* cg_arg,
+        Float m1, Float m2, Float m3, Float a, int pm, Vector* prec_soln = nullptr);
 };
 
 //------------------------------------------------------------------
@@ -2341,5 +2448,6 @@ CPS_END_NAMESPACE
 
 #include <util/lattice/f_wilson_types.h>
 #include <util/lattice/lattice_types.h>
+//#include <util/lattice/fgrid.h>
 
 #endif

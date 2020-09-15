@@ -344,9 +344,6 @@ void QuarkPropS::setWallSrc(Matrix **gm, StagQuarkSrc& qs, int color )
 
 void QuarkPropS::getQuarkPropS(char *results)
 {
-#if TARGET==cpsMPI
-    using MPISCU::fprintf;
-#endif
     char *fname = "getQuarkPropS(const char *)";
     VRB.Func(cname, fname);
 

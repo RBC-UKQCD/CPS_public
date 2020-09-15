@@ -393,7 +393,7 @@ void Verbose::Flow(const char *class_name, const char *func_name,
 #endif
     }
     else {
-//	printf("\n\t");
+	if (!UniqueID()) printf("\n");
     }
     
 }
@@ -711,7 +711,7 @@ void Verbose::RNGSeed(const char *class_name, const char *func_name,
  */
 void Verbose::ActivateLevel(VerboseLevelType value){
 
-//  if (!UniqueID()) printf("Node %d: %s::ActiveLevel(): %d activated ",UniqueID(),cname,(int)value);
+//  if (!UniqueID()) printf("Node %d: %s::ActiveLevel(): %d activated\n",UniqueID(),cname,(int)value);
     active[value] = 1;
 
 }

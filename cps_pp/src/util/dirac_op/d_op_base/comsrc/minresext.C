@@ -51,7 +51,7 @@ void DiracOp::MinResExt(Vector *psi, Vector *phi, Vector **v,
   char *fname = "MinResExt(V*, V*, V**, V**, int)";
   VRB.Func(cname,fname);
 
-  int f_size;
+  size_t f_size;
 
   if(lat.Fclass() == F_CLASS_CLOVER) {
     f_size = GJP.VolNodeSites() * lat.FsiteSize() / 2;

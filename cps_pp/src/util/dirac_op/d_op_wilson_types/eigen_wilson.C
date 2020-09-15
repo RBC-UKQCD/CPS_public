@@ -55,10 +55,10 @@ CPS_END_NAMESPACE
 #include <math.h>
 CPS_START_NAMESPACE
 void MatHermElements( DiracOpWilsonTypes * dirac_op,
-		      Vector ** psi, int n_vec, int f_size, 
+		      Vector ** psi, int n_vec, size_t f_size, 
  		      Float * diag, Complex * off_diag );
 
-inline void PrintDot(char *fname, char *vname, Vector *tmp, int f_size){
+inline void PrintDot(char *fname, char *vname, Vector *tmp, size_t f_size){
 //      printf("%s: %s=%e\n",fname,vname,tmp->ReDotProductGlbSum(tmp, f_size));
 }
 
@@ -67,7 +67,7 @@ inline void PrintDot(char *fname, char *vname, Vector *tmp, int f_size){
   should be normalised
 */
 
-inline Float Norm( Vector* psi, int f_size )
+inline Float Norm( Vector* psi, size_t f_size )
 {
   Float norm( sqrt(psi->NormSqGlbSum(f_size)) );
 //  printf("Norm=%e\n",norm);
@@ -77,7 +77,7 @@ inline Float Norm( Vector* psi, int f_size )
 
 Float GramSchmNorm( Vector* psi, 
                     Vector* vec, 
-                    int f_size  )
+                    size_t f_size  )
 {
   const Complex xp(vec->CompDotProductGlbSum(psi, f_size));
   psi->CTimesV1PlusV2  (-xp, vec, psi, f_size);
@@ -141,7 +141,7 @@ int DiracOpWilsonTypes::RitzEig(Vector **psi, Float lambda_H[], int valid_eig[],
 
 // Set the node checkerboard size of the fermion field
 //------------------------------------------------------------------
-  const int f_size = RitzLatSize();
+  const size_t f_size = RitzLatSize();
 
   // Local vars 
   Float lambda_t, del_lamb;
@@ -326,7 +326,6 @@ int DiracOpWilsonTypes::RitzEig(Vector **psi, Float lambda_H[], int valid_eig[],
       NCG_tot += Ritz(psi, n, lambda_t, RsdR_a, RsdR_r, Rsdlam, 0.0 /*rsdl_sq*/,
 		      n_renorm, 0, 0, 0, Cv_fact, MaxCG, ProjApsiP);
 
-//      printf("lambda_old[%d]=%e\n",i,lambda_t);
       lambda_old[i] = lambda_t;
       VRB.Debug(cname,fname,"no KS: lambda[%d] = %g\n",i,(IFloat)lambda_old[i]);
 
@@ -707,7 +706,7 @@ int DiracOpWilsonTypes::RitzEig(Vector **psi, Float lambda_H[], int valid_eig[],
 // and half of the complex off-diagonal elements are calculated.
 //-------------------------------------------------------------------
 void MatHermElements( DiracOpWilsonTypes * dirac_op,
-		      Vector ** psi, int n_vec, int f_size, 
+		      Vector ** psi, int n_vec, size_t f_size, 
  		      Float * diag, Complex * off_diag ){
 
   char * fname  = "MatHermElements";

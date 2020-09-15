@@ -110,7 +110,7 @@ ForceArg Fp4::RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
   enum{plus, minus, n_sign};
 
   const int vol = GJP.VolNodeSites();
-  const int f_size = vol*FsiteSize()/2;
+  const size_t f_size = vol*FsiteSize()/2;
     
   for (int i=0; i<degree; i++)
     sol[i]->VecTimesEquFloat(alpha[i], f_size);

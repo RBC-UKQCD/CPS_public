@@ -1,0 +1,17 @@
+# This directory contains main program and input file currently in use for DWF ensemble production on summit.
+# Below config command used on summit 
+BASE=/gpfs/alpine/phy138/proj-shared/phy138flavor/chulwoo/
+QUDA=${BASE}/QUDA/develop4/SciDAC
+SCIDAC=${BASE}/CPS/LIBS/install/
+../cps_pp/configure --enable-openmp  --enable-c11 --enable-c11-rng --enable-gmp \
+CC=mpicc CXX=mpicxx CXXFLAGS='-fopenmp' \
+LDFLAGS=' -fopenmp -lz  -lfftw3f -lfftw3  ' \
+CFLAG='-qoffload' \
+CXXFLAG='-qoffload' \
+DFLAGS=' -DQUDA_NEW_INTERFACE ' \
+--build=powerpc64le-none-linux-gnu \
+--host=powerpc64le-none-linux-gnu \
+--target=powerpc64le-none-linux-gnu \
+--enable-quda=$QUDA \
+--enable-cuda=$OLCF_CUDA_ROOT \
+--enable-qmp=$SCIDAC --enable-qio

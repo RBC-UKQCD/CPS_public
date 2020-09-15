@@ -94,7 +94,7 @@ int DiracOpStagTypes::RitzLatSize() {
   char *fname = "RitzLatSize()";
   VRB.Func(cname,fname);
 
-  int f_size = GJP.VolNodeSites() * lat.FsiteSize();
+  size_t f_size = GJP.VolNodeSites() * lat.FsiteSize();
 
   switch(dirac_arg->RitzMatOper)
   {

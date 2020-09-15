@@ -4,19 +4,19 @@ CPS_START_NAMESPACE
 /*!\file
   \brief Definitions of the AlgPlaq class methods.
   
-  $Id: alg_plaq.C,v 1.10 2005/05/12 20:14:10 chulwoo Exp $
+  $Id: alg_plaq.C,v 1.10.324.1 2012-11-15 18:17:08 ckelly Exp $
 */
 //--------------------------------------------------------------------
 //  CVS keywords
 //
-//  $Author: chulwoo $
-//  $Date: 2005/05/12 20:14:10 $
-//  $Header: /space/cvs/cps/cps++/src/alg/alg_plaq/alg_plaq.C,v 1.10 2005/05/12 20:14:10 chulwoo Exp $
-//  $Id: alg_plaq.C,v 1.10 2005/05/12 20:14:10 chulwoo Exp $
+//  $Author: ckelly $
+//  $Date: 2012-11-15 18:17:08 $
+//  $Header: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/alg/alg_plaq/alg_plaq.C,v 1.10.324.1 2012-11-15 18:17:08 ckelly Exp $
+//  $Id: alg_plaq.C,v 1.10.324.1 2012-11-15 18:17:08 ckelly Exp $
 //  $Name: v5_0_16_hantao_io_test_v7 $
 //  $Locker:  $
 //  $RCSfile: alg_plaq.C,v $
-//  $Revision: 1.10 $
+//  $Revision: 1.10.324.1 $
 //  $Source: /space/cvs/cps/cps++/src/alg/alg_plaq/alg_plaq.C,v $
 //  $State: Exp $
 //
@@ -70,7 +70,6 @@ AlgPlaq::AlgPlaq(Lattice& latt,
   int total_sites = GJP.VolNodeSites() * GJP.Xnodes() *
                     GJP.Ynodes() * GJP.Znodes() * GJP.Tnodes();
   norm_fac = 1.0 / ( 6.0 * Float(total_sites) );
-
 }
 
 
@@ -96,16 +95,15 @@ AlgPlaq::~AlgPlaq() {
   -# minimum plaquette
   -# mean temporal plaquette
   -# mean spatial plaquette
+  //CK: if results pointer is non-zero, the results are stored
+  //    results should be an array with 6 elements
 */
 //------------------------------------------------------------------
-void AlgPlaq::run()
+void AlgPlaq::run(Float *results)
 {
   char *fname = "run()";
   VRB.Func(cname,fname);
 
-#if TARGET==cpsMPI
-  using MPISCU::fprintf;
-#endif
   
   // Set the Lattice pointer
   //----------------------------------------------------------------
@@ -166,7 +164,6 @@ void AlgPlaq::run()
   glb_max(&p_max) ;
   glb_sum(&p_spatial);
   glb_sum(&p_temporal);
-  
 
   Float one_third = 1.0 / 3.0 ;
 
@@ -175,12 +172,22 @@ void AlgPlaq::run()
   p_min    *= one_third ;
   p_max    *= one_third ;
 
-  Float p_var = norm_fac * (1.0 + norm_fac) \
-                * (p_sq_sum - norm_fac*p_sum*p_sum) ;
+  Float p_var = norm_fac * (1.0 + norm_fac) * (p_sq_sum - norm_fac*p_sum*p_sum) ;
+
+  if(GJP.Gparity1fX() && !GJP.Gparity1fY()){
+    //doubled lattice, second half complex conjugate duplicate of first.
+    //true measure of variance should be derived only from the first half
+    //(note: norm ~ 1/V so norm -> norm*2 for just first half of lattice)
+    p_var = norm_fac*2.0 * (1.0 + norm_fac*2.0) * (p_sq_sum/2.0 - norm_fac*2.0*p_sum/2.0*p_sum/2.0) ;
+  }else if(GJP.Gparity1fX() && GJP.Gparity1fY()){
+    //quad lattice, all quartiles other than first are either direct or complex conjugate duplicates of first.
+    //true measure of variance should be derived only from the first quartile
+    p_var = norm_fac*4.0 * (1.0 + norm_fac*4.0) * (p_sq_sum/4.0 - norm_fac*4.0*p_sum/4.0*p_sum/4.0) ;
+  }
+
   p_sum *= norm_fac ;
   p_spatial *= 2.0*norm_fac*one_third;
   p_temporal *= 2.0*norm_fac*one_third;
-
 
   // Print out results
   //----------------------------------------------------------------
@@ -195,6 +202,15 @@ void AlgPlaq::run()
 	     p_max, p_min,
 	     p_temporal, p_spatial);
     Fclose(fp);
+  }
+
+  if(results!=0){
+    results[0] = p_sum;
+    results[1] = p_var;
+    results[2] = p_max;
+    results[3] = p_min;
+    results[4] = p_temporal;
+    results[5] = p_spatial;
   }
 
 }

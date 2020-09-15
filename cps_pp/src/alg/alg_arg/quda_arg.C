@@ -74,6 +74,16 @@ vml_QudaArg (VML *vmls, char *name,QudaArg *objp)
 		 return FALSE;
 	 if (!vml_int (vmls, "device", &objp->device))
 		 return FALSE;
+	 if (!vml_int (vmls, "maxiter_precondition", &objp->maxiter_precondition))
+		 return FALSE;
+	 if (!vml_int (vmls, "Ls_cheap", &objp->Ls_cheap))
+		 return FALSE;
+	 if (!vml_bool (vmls, "perform_mspcg_madwf_ml_training", &objp->perform_mspcg_madwf_ml_training))
+		 return FALSE;
+	 if (!vml_bool (vmls, "use_mspcg_madwf_ml_training", &objp->use_mspcg_madwf_ml_training))
+		 return FALSE;
+	 if (!vml_Float (vmls, "mu", &objp->mu))
+		 return FALSE;
 	 vml_class_end(vmls,"QudaArg",name);
 	return TRUE;
 }

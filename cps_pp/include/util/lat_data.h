@@ -43,7 +43,7 @@ class LatData{
     ~LatData();
     Float *Field(int pos=0, int n=0)
       { return (data+pos*size+n);}
-    const int Size(){return size*vol;}
+    int Size(){return size*vol;}
 
     friend void glb_sum_multi_dir(LatData &dat, int dir);
 

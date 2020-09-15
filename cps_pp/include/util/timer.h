@@ -122,7 +122,13 @@ inline bool compareTimeInfoP(TimerInfo *p1, TimerInfo *p2) {
   return p1->accumulated_time < p2->accumulated_time;
 }
 
+
 class Timer {
+ protected:
+  static Float dtime_begin;
+  static Float dtime_last;
+  static double autodisplay_interval;
+  static double show_stop;
 
   public :
 
@@ -142,19 +148,27 @@ class Timer {
     long long start_flops;
     long long stop_flops;
 
-    static double& minimum_autodisplay_interval() {
-      static double time = 60;
-      return time;
+    static double& set_autodisplay_interval(Float _time) {
+      autodisplay_interval=_time;
+      return autodisplay_interval;
     }
 
+    static double& minimum_autodisplay_interval() {
+      return autodisplay_interval;
+    }
+
+    static double& set_duration_for_show_stop_info( Float _time) {
+      show_stop = _time ;
+      return show_stop;
+    }
     static double& minimum_duration_for_show_stop_info() {
-      static double time = 0.1;
-      return time;
+      return show_stop;
     }
 
     static double& minimum_duration_for_show_start_info() {
-      static double time = 0.1;
-      return time;
+//      static double time = 0.1;
+//      return time;
+      return show_stop;
     }
 
     Timer() {
@@ -239,6 +253,11 @@ class Timer {
         display("autodisplay");
       }
     }
+  static void reset();
+  //Time since last reset
+  static Elapsed elapsed_time();
+  //Time since last call to this function
+  static Elapsed relative_time();
 
 };
 

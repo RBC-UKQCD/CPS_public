@@ -118,8 +118,6 @@ void GpowerPlaq::GforceSite(Matrix& force, int *x, int mu)
   char *fname = "GforceSite(M&,i*,i)";
   VRB.Func(cname,fname);
 
-  setCbufCntrlReg(4, CBUF_MODE4);
-
   Matrix *u_off = GaugeField()+GsiteOffset(x)+mu;
 
 
@@ -167,7 +165,6 @@ ForceArg GpowerPlaq::EvolveMomGforce(Matrix *mom, Float dt){
   Float L2=0.0;
   Float Linf=0.0;
 
-  setCbufCntrlReg(4, CBUF_MODE4);
 
   int x[4];
   
@@ -362,8 +359,6 @@ void GpowerPlaq::PowerStaple(Matrix& pstap, int *x, int mu)
   Float beta = GJP.Beta();
 
   // set cbuf
-  setCbufCntrlReg(2, CBUF_MODE2);
-  setCbufCntrlReg(4, CBUF_MODE4);
 
   const Matrix *p1;
   int offset_x = GsiteOffset(x);

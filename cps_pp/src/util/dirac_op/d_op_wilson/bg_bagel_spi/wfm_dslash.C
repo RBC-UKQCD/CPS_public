@@ -68,7 +68,7 @@ void wfm::decom(Float *psi,
     gauge_par = (Float *)u ;
   }
 
-  nthread=1;
+  nthread=1; //why is this fixed to 1?
   /*Turn global checkerboard into the checkerboard within this node*/
   cb = lcb;
 

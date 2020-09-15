@@ -7,13 +7,16 @@
 CPS_START_NAMESPACE
 using namespace std;
 
+bool ReadLatticeParallel::UseParIO=false;
+
 #define PROFILE
+
 void ReadLatticeParallel::read(Lattice & lat, const QioArg & rd_arg)
 {
   const char * fname = "read()";
   VRB.Func(cname,fname);
   
-  char loginfo[100];
+  char loginfo[strlen(rd_arg.FileName) + 10];
   sprintf(loginfo,"Load %s",rd_arg.FileName);
   startLogging(loginfo);
 
@@ -30,8 +33,8 @@ void ReadLatticeParallel::read(Lattice & lat, const QioArg & rd_arg)
     ifstream input(rd_arg.FileName);
     if ( !input.good() )
       {
-	//	VRB.Flow(cname,fname,"Could not open file [%s] for input.\n",rd_arg.FileName);
-	//	VRB.Flow(cname,fname,"USER: maybe you should kill the process!!\n");
+	if(!UniqueID()){ printf("%s:%s Could not open file ptr %p for input.\n",cname,fname,rd_arg.FileName); fflush(stdout); }
+	if(!UniqueID()){ printf("%s:%s Filename %s\n",cname,fname,rd_arg.FileName); fflush(stdout); }
 	error = 1;
       }
 
@@ -117,16 +120,21 @@ void ReadLatticeParallel::read(Lattice & lat, const QioArg & rd_arg)
   // read lattice data, using parallel style or serial (all on node 0) style
   unsigned int csum;
 
-
-#if TARGET == NOARCH
-  setSerial();
-#endif
+  //CK: removed hardcoded IO style. Replaced with default IO style in constructor
+// #if TARGET != QCDOC
+//   setSerial();
+// #endif
 
   log();
 
   VRB.Flow(cname,fname,"Reading configuation to address: %p\n", rd_arg.StartConfLoadAddr);
   if(parIO()) {
     ParallelIO pario(rd_arg);
+    if(!doGparityReconstructUstarField() ){
+      if(!UniqueID()) printf("ReadLatticeParallel is disabling reconstruction bit on the ParallelIO object\n");
+      pario.disableGparityReconstructUstarField();
+    }
+
     if(! pario.load((char*)rd_arg.StartConfLoadAddr, data_per_site, sizeof(Matrix)*4,
 		    hd, fpconv, 4, &csum))  
       ERR.General(cname,fname,"Load Failed\n");  // failed to load
@@ -134,6 +142,8 @@ void ReadLatticeParallel::read(Lattice & lat, const QioArg & rd_arg)
 #if 1
   else {
     SerialIO serio(rd_arg);
+    if(!doGparityReconstructUstarField() ) serio.disableGparityReconstructUstarField();
+
     if(! serio.load((char*)rd_arg.StartConfLoadAddr, data_per_site, sizeof(Matrix)*4,
 		    hd, fpconv, 4, &csum))
       ERR.General(cname,fname,"Load Failed\n");  // failed to load
@@ -177,8 +187,14 @@ void ReadLatticeParallel::read(Lattice & lat, const QioArg & rd_arg)
 
   if(hd.recon_row_3) {
     VRB.Flow(cname,fname,"Reconstructing row 3\n");
+    int nstacked = 1;
+    
+    //CK: rather than saving/loading the U* links, we save just the U links and reconstruct the U* links at load-time
+    if(GJP.Gparity() && !doGparityReconstructUstarField() ) nstacked = 2;     //if this option is turned off, load and check both the U and U* links
+
+    for(int stk=0;stk<nstacked;stk++){
     for(int mat=0; mat<size_matrices; mat++) {
-      Float * rec = (Float*)&lpoint[mat];
+	Float * rec = (Float*)&lpoint[mat + stk*size_matrices];
       // reconstruct the 3rd row
       rec[12] =  rec[2] * rec[10] - rec[3] * rec[11] - rec[4] * rec[8] + rec[5] * rec[9];
       rec[13] = -rec[2] * rec[11] - rec[3] * rec[10] + rec[4] * rec[9] + rec[5] * rec[8];
@@ -186,6 +202,14 @@ void ReadLatticeParallel::read(Lattice & lat, const QioArg & rd_arg)
       rec[15] =  rec[0] * rec[11] + rec[1] * rec[10] - rec[4] * rec[7] - rec[5] * rec[6];
       rec[16] =  rec[0] * rec[ 8] - rec[1] * rec[ 9] - rec[2] * rec[6] + rec[3] * rec[7];
       rec[17] = -rec[0] * rec[ 9] - rec[1] * rec[ 8] + rec[2] * rec[7] + rec[3] * rec[6];
+    }
+    }
+  }
+
+  if(GJP.Gparity() && doGparityReconstructUstarField() ){
+    //regenerate U* links
+    for(int mat=0;mat<size_matrices; mat++) {
+      lpoint[mat + size_matrices].Conj(lpoint[mat]);
     }
   }
 
@@ -216,6 +240,10 @@ bool ReadLatticeParallel::CheckPlaqLinktrace(Lattice &lat, const QioArg & rd_arg
   int error = 0;
 
   Float plaq = lat.SumReTrPlaq() / 18.0 / rd_arg.VolSites() ;
+
+  //some old lattices that did not use the reconstruct option also did not divide the plaquette by 2
+  if(GJP.Gparity() && doGparityReconstructUstarField() ) plaq/=2;
+
   Float devplaq(0.0);
   if(isRoot()) {
     devplaq = fabs(  (plaq - plaq_inheader) / plaq ) ;
@@ -223,6 +251,11 @@ bool ReadLatticeParallel::CheckPlaqLinktrace(Lattice &lat, const QioArg & rd_arg
 	     cname,fname,plaq, plaq_inheader, devplaq);
   }
 
+  //CK: G-parity; ReTr should be the same for U and U*
+  //int nstacked = 1;
+  //if(GJP.Gparity()) nstacked = 2;
+
+  //for(int stk=0;stk<nstacked;stk++){ //after 1 iteration, m will point to second stacked field
   Float linktrace(0);
   int is;
   Matrix *m =  lat.GaugeField(); 
@@ -250,8 +283,9 @@ bool ReadLatticeParallel::CheckPlaqLinktrace(Lattice &lat, const QioArg & rd_arg
     if(devplaq > chkprec) {
       VRB.Flow(cname,fname, "Plaquette different from header\n");
       error = 1;
+      }
     }
-  }
+  //}
 
   if(synchronize(error) != 0) return false;
 

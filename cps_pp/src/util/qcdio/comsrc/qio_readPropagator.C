@@ -429,116 +429,118 @@ void qio_readPropagator::read(char *infile, int spin, int color, void *prop, voi
 
   qio_FileRecordInfo = QIO_create_usqcd_propfile_info(0, "");
   
-		  qio_openInput(infile, record_file, volFormat);
+  qio_openInput(infile, record_file, volFormat);
 
-		  QIO_decode_usqcd_propfile_info( qio_FileRecordInfo, record_file);
+  QIO_decode_usqcd_propfile_info( qio_FileRecordInfo, record_file);
 
-		  int type = QIO_get_usqcd_propfile_type(qio_FileRecordInfo);
-		  char *file_info = QIO_get_usqcd_propfile_info(qio_FileRecordInfo); 
-
-
-		  VRB.Result(cname,fname," read file info:\n%s\n",file_info);
+  int type = QIO_get_usqcd_propfile_type(qio_FileRecordInfo);
+  char *file_info = QIO_get_usqcd_propfile_info(qio_FileRecordInfo); 
 
 
-		  char detectType('U');  // U: UNKNOWN, A: scalarSource+12sinks, B: SourceSinkPairs, C: ScalarSourceSinkPairs
-
-		  if( type == QIO_USQCDPROPFILETYPE_C1D12 )
-			detectType = 'A';
-
-		  if( type == QIO_USQCDPROPFILETYPE_DD_PAIRS )
-			detectType = 'B';
-
-		  if( type == QIO_USQCDPROPFILETYPE_CD_PAIRS )
-			detectType = 'C';
-
-		  if( detectType == 'U' )
-			{
-			  ERR.General(cname, fname,"ERROR QIO-Prop: don't know how to handle type: %i\n", type);
-			  return;
-			} 
-
-		  qio_closeInput();
-
-		  // check, if size fits and call read-function (if supported format)
-		  switch (detectType){
-
-		  case 'B':
-			// pairs, full Source
-			VRB.Result(cname,fname," found prop. type, full source + sink pair\n");
-
-			req_Float_prop = 24*GJP.VolNodeSites();
-			req_Float_source = 24*GJP.VolNodeSites();
-
-			if( (max_Float_prop >= req_Float_prop) && (max_Float_source >= req_Float_source) )
-			  read_pair(infile, spin, color, prop, source,QIO_FULL_SOURCE, volFormat);
-			else 
-			  ERR.General(cname, fname,"not enough memory allocated to store source/sink\n need:  src: %i snk: %i Floats\n avail: src: %i snk: %i Floats\n NO PROPAGATOR WILL BE READ\n",
-				  req_Float_prop, req_Float_source, max_Float_prop, max_Float_source);
-
-			break;
-
-		  default:
-
-			ERR.General(cname,fname,"ERROR: unrecognized or unsupported  propagator format-type\n");
-			exit(-1);
-
-		  }
-
-		  // readProps, readSources, readSourceType are set in specific reader funcs
-
-		  // clean-up
-		  QIO_string_destroy(record_file);
-		  QIO_destroy_usqcd_propfile_info(qio_FileRecordInfo);
-
-		  VRB.FuncEnd(cname,fname);
-
-		}
+  VRB.Result(cname,fname," read file info:\n%s\n",file_info);
 
 
+  char detectType('U');  // U: UNKNOWN, A: scalarSource+12sinks, B: SourceSinkPairs, C: ScalarSourceSinkPairs
+
+  if( type == QIO_USQCDPROPFILETYPE_C1D12 )
+    detectType = 'A';
+
+  if( type == QIO_USQCDPROPFILETYPE_DD_PAIRS )
+    detectType = 'B';
+
+  if( type == QIO_USQCDPROPFILETYPE_CD_PAIRS )
+    detectType = 'C';
+
+  if( detectType == 'U' )
+    {
+      ERR.General(cname, fname,"ERROR QIO-Prop: don't know how to handle type: %i\n", type);
+      return;
+    } 
+
+  qio_closeInput();
+
+  // check, if size fits and call read-function (if supported format)
+  switch (detectType){
+
+  case 'B':
+    // pairs, full Source
+    VRB.Result(cname,fname," found prop. type, full source + sink pair\n");
+
+    req_Float_prop = 24*GJP.VolNodeSites();
+    req_Float_source = 24*GJP.VolNodeSites();
+
+    if( (max_Float_prop >= req_Float_prop) && (max_Float_source >= req_Float_source) )
+      read_pair(infile, spin, color, prop, source,QIO_FULL_SOURCE, volFormat);
+    else 
+      ERR.General(cname, fname,"not enough memory allocated to store source/sink\n need:  src: %i snk: %i Floats\n avail: src: %i snk: %i Floats\n NO PROPAGATOR WILL BE READ\n",
+		  req_Float_prop, req_Float_source, max_Float_prop, max_Float_source);
+
+    break;
+
+  default:
+
+    ERR.General(cname,fname,"ERROR: unrecognized or unsupported  propagator format-type\n");
+    exit(-1);
+
+  }
+
+  // readProps, readSources, readSourceType are set in specific reader funcs
+
+  // clean-up
+  QIO_string_destroy(record_file);
+  QIO_destroy_usqcd_propfile_info(qio_FileRecordInfo);
+
+  VRB.FuncEnd(cname,fname);
+
+}
 
 
-		void qio_readPropagator::read_pair(char *infile, int spin, int color, void *prop, void *source, const QIO_PROP_SOURCE_TYPES sType, int volFormat)
-		{
-
-		  char * fname="read_pairs(...)";
-		  VRB.Func(cname,fname);
 
 
-		  VRB.Result(cname,fname,"trying to read pair of %s source and sink\n    from %s \n",
-				 ( sType==QIO_FULL_SOURCE ? "full" : ( sType==QIO_SCALAR_SOURCE ? "scalar" : "unknown") ),
-				 infile );
+void qio_readPropagator::read_pair(char *infile, int spin, int color, void *prop, void *source, const QIO_PROP_SOURCE_TYPES sType, int volFormat)
+{
 
-		  int return_val(0);
+  char * fname="read_pairs(...)";
+  if(GJP.Gparity()) ERR.General(cname,fname,"Not currently implemented for G-parity\n");
 
-		  const int sizepersite(QIO_PROP_SPIN_MAX*QIO_PROP_COLOR_MAX);
-
-		  int readColor, readSpin;
-
-		  QIO_RecordInfo *record_prop;
-		  QIO_String *record_xml_prop;
-
-		  QIO_RecordInfo *record_source;
-		  QIO_String *record_xml_source;
-
-		  QIO_String *record_file;
-
-		  record_xml_prop = QIO_string_create();
-		  record_xml_source = QIO_string_create();
-		  record_file = QIO_string_create();
-		  
-		  
-		  qio_setLayout();
-
-		  // create the record info
-		  record_prop         = QIO_create_record_info(0, NULL, NULL, 0, "", "", 0, 0, 0, 0);
-		  record_source       = QIO_create_record_info(0, NULL, NULL, 0, "", "", 0, 0, 0, 0);
+  VRB.Func(cname,fname);
 
 
-		  QIO_USQCDPropFileInfo *qio_FileRecordInfo;
+  VRB.Result(cname,fname,"trying to read pair of %s source and sink\n    from %s \n",
+	     ( sType==QIO_FULL_SOURCE ? "full" : ( sType==QIO_SCALAR_SOURCE ? "scalar" : "unknown") ),
+	     infile );
 
-		  qio_FileRecordInfo = QIO_create_usqcd_propfile_info(0, "");
-		  
-		  qio_openInput(infile, record_file, volFormat);
+  int return_val(0);
+
+  const int sizepersite(QIO_PROP_SPIN_MAX*QIO_PROP_COLOR_MAX);
+
+  int readColor, readSpin;
+
+  QIO_RecordInfo *record_prop;
+  QIO_String *record_xml_prop;
+
+  QIO_RecordInfo *record_source;
+  QIO_String *record_xml_source;
+
+  QIO_String *record_file;
+
+  record_xml_prop = QIO_string_create();
+  record_xml_source = QIO_string_create();
+  record_file = QIO_string_create();
+  
+  
+  qio_setLayout();
+
+  // create the record info
+  record_prop         = QIO_create_record_info(0, NULL, NULL, 0, "", "", 0, 0, 0, 0);
+  record_source       = QIO_create_record_info(0, NULL, NULL, 0, "", "", 0, 0, 0, 0);
+
+
+  QIO_USQCDPropFileInfo *qio_FileRecordInfo;
+
+  qio_FileRecordInfo = QIO_create_usqcd_propfile_info(0, "");
+  
+  qio_openInput(infile, record_file, volFormat);
 
   QIO_decode_usqcd_propfile_info( qio_FileRecordInfo, record_file);
   
@@ -679,6 +681,7 @@ void qio_readPropagator::read(char *infile, int spin, int color, void *prop, voi
 
 void qio_readPropagator::read_12pairs(char *infile, void *prop, void *source, const QIO_PROP_SOURCE_TYPES sType, int volFormat)
 {
+  if(GJP.Gparity()) return read_12pairs_gparity(infile,prop,source,sType,volFormat);
 
   char * fname="read_12pairs(...)";
   VRB.Func(cname,fname);
@@ -2275,7 +2278,319 @@ void qio_readPropagator::qio_guessSpinColor(int &spin, int &color)
 
 
 
+void qio_readPropagator::read_12pairs_gparity(char *infile, void *prop, void *source, const QIO_PROP_SOURCE_TYPES sType, int volFormat)
+{
+  char * fname="read_12pairs_gparity(...)";
+  if(!GJP.Gparity()) ERR.General(cname,fname,"Function not valid for non-gparity lattices\n");
+  VRB.Func(cname,fname);
 
+  VRB.Result(cname,fname,"trying to read 12 pairs of %s source and sink\n    from %s \n",
+	     ( sType==QIO_FULL_SOURCE ? "full" : ( sType==QIO_SCALAR_SOURCE ? "scalar" : "unknown") ),
+	     infile );
+
+  int return_val(0);
+
+  const int sizepersite(QIO_PROP_SPIN_MAX*QIO_PROP_COLOR_MAX);
+
+  int readColor, readSpin;
+
+  QIO_RecordInfo *record_prop;
+  QIO_String *record_xml_prop;
+
+  QIO_RecordInfo *record_source;
+  QIO_String *record_xml_source;
+
+  QIO_String *record_file;
+
+  record_xml_prop = QIO_string_create();
+  record_xml_source = QIO_string_create();
+  record_file = QIO_string_create();
+  
+  
+  qio_setLayout();
+
+  // create the record info
+  record_prop         = QIO_create_record_info(0, NULL, NULL, 0, "", "", 0, 0, 0, 0);
+  record_source       = QIO_create_record_info(0, NULL, NULL, 0, "", "", 0, 0, 0, 0);
+
+
+  QIO_USQCDPropFileInfo *qio_FileRecordInfo;
+
+  qio_FileRecordInfo = QIO_create_usqcd_propfile_info(0, "");
+  
+  qio_openInput(infile, record_file, volFormat);
+
+  QIO_decode_usqcd_propfile_info( qio_FileRecordInfo, record_file);
+  
+
+  int type = QIO_get_usqcd_propfile_type(qio_FileRecordInfo);
+  //UNUSED  char *file_info = QIO_get_usqcd_propfile_info(qio_FileRecordInfo); 
+
+
+  char detectType('U');  // U: UNKNOWN, A: scalarSource+12sinks, B: SourceSinkPairs, C: ScalarSourceSinkPairs
+
+  //if(strcmp(type, "USQCD_DiracFermion_ScalarSource_TwelveSink") == 0)
+  if( type == QIO_USQCDPROPFILETYPE_C1D12 )
+    detectType = 'A';
+
+  //if(strcmp(type, "USQCD_DiracFermion_Source_Sink_Pairs") == 0)
+  if( type == QIO_USQCDPROPFILETYPE_DD_PAIRS )
+    detectType = 'B';
+
+  //if(strcmp(type, "USQCD_DiracFermion_ScalarSource_Sink_Pairs") == 0)
+  if( type == QIO_USQCDPROPFILETYPE_CD_PAIRS )
+    detectType = 'C';
+
+
+  if( detectType == 'U' )
+    {
+      ERR.General(cname, fname,"ERROR QIO-Prop: don't know how to handle type: %i\n", type);
+      return;
+    } 
+
+
+
+  #ifdef DEBUG_ReadPropagator
+   printf("UID: %i, qio_readField intermediate with filename: %s\n",UniqueID(),infile);
+  #endif // DEBUG_ReadPropagator
+
+
+   Float *rprop_f0 = (Float *)prop;
+   Float *rsource_f0 = (Float *)source;
+
+   if( sType != QIO_FULL_SOURCE ) ERR.General(cname,fname,"Not sure G-parity format for scalar source type\n");
+   
+   Float *rprop_f1 = (Float *)prop + GJP.VolNodeSites()*sizepersite*sizepersite*2;
+   Float *rsource_f1 = (Float *)source + GJP.VolNodeSites()*2*sizepersite;
+
+   int source_size(0);
+
+   switch (detectType)
+     {
+
+     case 'A':
+       // ScalarSource + 12 sinks....
+
+       ERR.General(cname,fname,"ERROR: trying to read ScS_12sink format in pairs\n");
+       exit(-1);
+	
+       break;
+
+
+     case 'B':
+       // pairs with full source
+
+       if(sType == QIO_FULL_SOURCE)
+	 source_size = sizepersite;
+       else
+	 {
+	   ERR.General(cname,fname,"ERROR: wrong sourceType (%s) for reading full source pairs\n", sType);
+	   exit(-1);
+	 }
+	   
+
+
+       break;
+
+     case 'C':
+       // pairs with scalar source
+
+       if(sType == QIO_SCALAR_SOURCE)
+	 source_size =1 ;
+       else
+	 {
+	   ERR.General(cname,fname,"ERROR: wrong sourceType (%s) for reading scalar source pairs\n", sType);
+	   exit(-1);
+	 }
+
+       break;
+
+
+     default:
+
+       ERR.General(cname,fname,"ERROR: unrecognized format-type...\n");
+       exit(-1);
+
+     
+
+     }
+
+
+   #ifdef DEBUG_ReadPropagator
+   printf("UID: %i, qio_readField intermediate with filenames: %s\n",UniqueID(),infile);
+   #endif // DEBUG_ReadPropagator
+
+
+   // now do the reading
+
+   Float *tmpSrc = (Float*) smalloc(2*GJP.VolNodeSites()*2*source_size*sizeof(Float));
+
+   for(int ii(0); ii < 12; ++ii){
+
+     
+     // we have to introduce a tmp - source, since spin, color will only determined after reading the prop!
+   
+     // zero src 
+     for(int jj(0); jj<2*GJP.VolNodeSites()*2*source_size;++jj)
+       *(tmpSrc +jj) =0.0;
+  
+     return_val += qio_readTmpSourceRecord(sType, tmpSrc);
+     return_val += qio_readTmpSourceRecord(sType, tmpSrc + GJP.VolNodeSites()*2*source_size);
+
+     // read next sink record (pass spin, color) -> precision
+     return_val += qio_readNextPropPairRecord(rprop_f0, readSpin, readColor);
+     return_val += qio_readNextPropPairRecord(rprop_f1, readSpin, readColor);
+
+#ifdef DEBUG_ReadSpinColor
+  printf("finished reading source spin %i color %i \n",readSpin, readColor);
+#endif
+
+
+     // now move tmpSrc to right position (spin, color)
+     for(int site(0); site < GJP.VolNodeSites(); ++site){
+	
+       Float *putSource = rsource_f0 + site*QIO_PROP_SPIN_MAX*QIO_PROP_COLOR_MAX*2*source_size + 2*readSpin*QIO_PROP_COLOR_MAX+2*readColor;
+       for(int jj(0); jj < source_size; ++jj){
+	 *(putSource +2*QIO_PROP_COLOR_MAX*QIO_PROP_SPIN_MAX*jj) = *(tmpSrc + 2*source_size*site + 2*jj);
+	 *(putSource +2*QIO_PROP_COLOR_MAX*QIO_PROP_SPIN_MAX*jj + 1 ) = *(tmpSrc + 2*source_size*site + 2*jj + 1 );
+       }
+       putSource = rsource_f1 + site*QIO_PROP_SPIN_MAX*QIO_PROP_COLOR_MAX*2*source_size + 2*readSpin*QIO_PROP_COLOR_MAX+2*readColor;
+       Float *from = tmpSrc + GJP.VolNodeSites()*2*source_size;
+       for(int jj(0); jj < source_size; ++jj){
+	 *(putSource +2*QIO_PROP_COLOR_MAX*QIO_PROP_SPIN_MAX*jj) = *(from + 2*source_size*site + 2*jj);
+	 *(putSource +2*QIO_PROP_COLOR_MAX*QIO_PROP_SPIN_MAX*jj + 1 ) = *(from + 2*source_size*site + 2*jj + 1 );
+       }
+
+     }
+       
+
+#ifdef DEBUG_PAIRRECORD
+     // only works if S-direction is local
+
+     printf(" checking for source-index %i %i...\n",readSpin, readColor);
+
+     Float err_cnt(0.);
+
+     for(int site(0); site < GJP.VolNodeSites(); ++site){
+       for( int mm(0); mm < 4; ++mm)
+	 for( int cc(0); cc < 3; ++cc){
+	   
+	   Float index = ( readColor + 3*readSpin + 12*cc + 36*mm)/1000.; 
+
+	   Float *tmp_r = rprop_f0 +     2*readColor + 6*readSpin + 24*cc + 72*mm + 288*site;  
+	   Float *tmp_i = rprop_f0 + 1 + 2*readColor + 6*readSpin + 24*cc + 72*mm + 288*site;  
+	   
+
+#ifdef DEBUG_PAIRRECORD_STD
+	   if( (fabs(0.5*(*tmp_r - *tmp_i) - index) > 1e-5)){
+#else
+	   if( (fabs(*tmp_r - site - index) > 1e-5) || (fabs(*tmp_i - site +index) > 1e-5 ) ){
+#endif
+	     ++ err_cnt;
+	     printf("mismatch f0 propagator at %i %i %i %i %i, read: (%f, %f) expected: (%f, %f)\n",site, mm, cc, readSpin, readColor, *tmp_r, *tmp_i, (site+index), (site-index));
+	   }
+
+	   tmp_r = rprop_f1 +     2*readColor + 6*readSpin + 24*cc + 72*mm + 288*site;  
+	   tmp_i = rprop_f1 + 1 + 2*readColor + 6*readSpin + 24*cc + 72*mm + 288*site;  
+	   
+
+#ifdef DEBUG_PAIRRECORD_STD
+	   if( (fabs(0.5*(*tmp_r - *tmp_i) - index) > 1e-5)){
+#else
+	   if( (fabs(*tmp_r - site - index) > 1e-5) || (fabs(*tmp_i - site +index) > 1e-5 ) ){
+#endif
+	     ++ err_cnt;
+	     printf("mismatch f1 propagator at %i %i %i %i %i, read: (%f, %f) expected: (%f, %f)\n",site, mm, cc, readSpin, readColor, *tmp_r, *tmp_i, (site+index), (site-index));
+	   }	   
+
+	 }
+
+       for( int ii(0); ii < source_size; ++ii){
+
+	 Float index = ( readColor + 3*readSpin + 12*ii)/1000.;
+
+	 Float *tmp_r = rsource_f0 +     2*readColor + 6*readSpin + 24*ii + 24*source_size*site;  
+	 Float *tmp_i = rsource_f0 + 1 + 2*readColor + 6*readSpin + 24*ii + 24*source_size*site;  
+	   
+#ifdef DEBUG_PAIRRECORD_STD
+	 if( (fabs(0.5*(*tmp_r - *tmp_i) - index) > 1e-5)){
+#else
+	 if( (fabs(*tmp_r - site - index) > 1e-5) || (fabs(*tmp_i - site +index) > 1e-5 ) ){
+#endif
+	   ++ err_cnt;
+	   printf("mismatch f0 source at %i %i %i %i, read: (%f, %f) expected: (%f, %f)\n",site, ii, readSpin, readColor, *tmp_r, *tmp_i, (site+index), (site-index));
+	 }
+
+	 tmp_r = rsource_f1 +     2*readColor + 6*readSpin + 24*ii + 24*source_size*site;  
+	 tmp_i = rsource_f1 + 1 + 2*readColor + 6*readSpin + 24*ii + 24*source_size*site;  
+	   
+#ifdef DEBUG_PAIRRECORD_STD
+	 if( (fabs(0.5*(*tmp_r - *tmp_i) - index) > 1e-5)){
+#else
+	 if( (fabs(*tmp_r - site - index) > 1e-5) || (fabs(*tmp_i - site +index) > 1e-5 ) ){
+#endif
+	   ++ err_cnt;
+	   printf("mismatch f1 source at %i %i %i %i, read: (%f, %f) expected: (%f, %f)\n",site, ii, readSpin, readColor, *tmp_r, *tmp_i, (site+index), (site-index));
+	 }
+
+       } 
+
+     }
+
+     glb_sum_five(&err_cnt);
+
+      printf(" ...error-cnt: %f\n",err_cnt);
+
+#endif      
+ 
+
+
+   }
+
+   sfree(tmpSrc);
+
+
+   if ( return_val == 0 )
+     VRB.Result(cname,fname,"QIO_read  successfull...\n");
+   else
+     ERR.General(cname,fname,"ERROR QIO: QIO_read   returned %i \n",return_val );
+
+   // communicate T-chunks in S-direction
+   if( GJP.Snodes() > 1){ 
+     qio_communicateTchunks(rprop_f0, 12*sizepersite); qio_communicateTchunks(rsource_f0, 12*source_size);
+     qio_communicateTchunks(rprop_f1, 12*sizepersite); qio_communicateTchunks(rsource_f1, 12*source_size);
+   }
+
+   readProps = 12;
+   readSources = 12;
+   readSourceType = sType;
+   
+
+  // clean-up
+   QIO_destroy_record_info(record_prop);
+   QIO_destroy_record_info(record_source);
+   
+   qio_closeInput();
+   QIO_string_destroy(record_xml_prop);
+   QIO_string_destroy(record_xml_source);
+
+
+   QIO_string_destroy(record_file);
+
+
+   QIO_destroy_usqcd_propfile_info(qio_FileRecordInfo);
+
+
+#ifdef DEBUG_ReadPropagator
+  printf("UID: %i, qio_readField finished with filenames: %s\n",UniqueID(),infile);
+#endif // DEBUG_ReadPropagator
+  
+  VRB.FuncEnd(cname,fname);
+
+
+
+
+} 
 
 CPS_END_NAMESPACE
 #endif

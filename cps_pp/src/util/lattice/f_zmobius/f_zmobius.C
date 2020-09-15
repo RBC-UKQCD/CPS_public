@@ -28,7 +28,7 @@ CPS_END_NAMESPACE
 #include <util/enum_func.h>
 #include <util/dwf.h>
 #include <util/zmobius.h> 
-USING_NAMESPACE_CPS
+CPS_START_NAMESPACE
 
 using cps::Complex;
 
@@ -46,9 +46,9 @@ void zTimesV1PluszTimesV2(Complex *a, Complex b, const Complex *c,
 Fzmobius::Fzmobius() : FdwfBase(){
   cname = "Fzmobius";
 
-  ((Zmobus*)f_dirac_op_init_ptr)->zmobius_kappa_b=0;
-  ((Zmobus*)f_dirac_op_init_ptr)->zmobius_kappa_c=0;
-  ((Zmobus*)f_dirac_op_init_ptr)->zmobius_kappa_ratio=0;
+//  ((Zmobus*)f_dirac_op_init_ptr)->zmobius_kappa_b=0;
+//  ((Zmobus*)f_dirac_op_init_ptr)->zmobius_kappa_c=0;
+//  ((Zmobus*)f_dirac_op_init_ptr)->zmobius_kappa_ratio=0;
 
   // default preconditioning
   ((Zmobus*)f_dirac_op_init_ptr)->pc_type=ZMOB_PC_SYM2;
@@ -57,9 +57,9 @@ Fzmobius::Fzmobius() : FdwfBase(){
  
 Fzmobius::~Fzmobius(){
   Zmobus* dwfarg=(Zmobus*)f_dirac_op_init_ptr;
-  if(dwfarg->zmobius_kappa_b) delete [] dwfarg->zmobius_kappa_b;
-  if(dwfarg->zmobius_kappa_c) delete [] dwfarg->zmobius_kappa_c;
-  if(dwfarg->zmobius_kappa_ratio) delete [] dwfarg->zmobius_kappa_ratio;
+//  if(dwfarg->zmobius_kappa_b) delete [] dwfarg->zmobius_kappa_b;
+//  if(dwfarg->zmobius_kappa_c) delete [] dwfarg->zmobius_kappa_c;
+//  if(dwfarg->zmobius_kappa_ratio) delete [] dwfarg->zmobius_kappa_ratio;
   
 }
 
@@ -95,11 +95,9 @@ int Fzmobius::FmatInv(Vector *f_out, Vector *f_in,
   DiracOpZMobius dop(*this, f_out, f_in, cg_arg, cnv_frm);
 
   // First multiply D_- to source
-//#if 1
-  if(dminus) dop. Dminus(dminus_in, f_in);
-//#else
+  if(dminus==1) dop. Dminus(dminus_in, f_in);
+  else if(dminus==-1){ dop. Dminus(f_out, f_in); return 0;}
   else moveFloat((IFloat*)dminus_in, (IFloat*)f_in, size);
-//#endif
 
 #if 1  
   // Multiply 2*kappa
@@ -108,8 +106,8 @@ int Fzmobius::FmatInv(Vector *f_out, Vector *f_in,
     for(int s=0; s<local_ls;++s){
       int glb_s = s + local_ls*s_node_coor;
       const Complex kappa_b =
-	1.0 / ( 2 * (GJP.ZMobius_b()[glb_s]
-		     *(4 - GJP.DwfHeight()) + GJP.DwfA5Inv()) );
+	1.0 / ( 2. * (GJP.ZMobius_b()[glb_s]
+		     *(4. - GJP.DwfHeight()) + GJP.DwfA5Inv()) );
  	VRB.Flow(cname,fname,"s=%d Zmobius_b=%e %e kappa_b=%e %e\n",
 	glb_s,GJP.ZMobius_b()[glb_s].real(),GJP.ZMobius_b()[glb_s].imag(),kappa_b.real(),kappa_b.imag());
       int idx = s*ls_stride/2;// "/2" is for complex
@@ -117,7 +115,6 @@ int Fzmobius::FmatInv(Vector *f_out, Vector *f_in,
 			 2.0*kappa_b, ls_stride);
     }
   }
-  //moveFloat((IFloat*)f_in,(IFloat*)dminus_in, size);
 #endif
   
   // solve it
@@ -144,24 +141,6 @@ int Fzmobius::FmatInv(Vector *f_out, Vector *f_in,
   //if(!UniqueID()) printf("f_mobius  Norm Mat*out %.14e\n",norm);
   
 
-#if 0  
-  // divide by2*kappa
-  // do even / odd 
-  for(int ieo=0;ieo<2;++ieo){
-    for(int s=0; s<local_ls;++s){
-      int glb_s = s + local_ls*s_node_coor;
-      const Complex kappa_b =
-	1.0 / ( 2 * (GJP.ZMobius_b()[glb_s]
-		     *(4 - GJP.DwfHeight()) + GJP.DwfA5Inv()) );
-      int idx = s*ls_stride/2;// "/2" is for complex
-      vecTimesEquComplex((Complex*)f_out+idx+ieo*size/4,
-			 (2.0*kappa_b), ls_stride);
-    }
-  }
-  //moveFloat((IFloat*)f_in,(IFloat*)dminus_in, size);
-#endif
-
-  
   sfree(cname, fname,  "dminus_in",  dminus_in);
   // commented out above, so do here too. TB if(prs_f_in==PRESERVE_YES) 
     sfree(cname, fname,  "temp",  temp);
@@ -271,8 +250,8 @@ int Fzmobius::FmatInv(Vector *f_out,
     for(int s=0; s<local_ls;++s){
       int glb_s = s + local_ls*s_node_coor;
       const Complex kappa_b =
-	1.0 / ( 2 * (GJP.ZMobius_b()[glb_s]
-		     *(4 - GJP.DwfHeight()) + GJP.DwfA5Inv()) );
+	1.0 / ( 2. * (GJP.ZMobius_b()[glb_s]
+		     *(4. - GJP.DwfHeight()) + GJP.DwfA5Inv()) );
       int idx = s*ls_stride/2;// "/2" is for complex
       vecTimesEquComplex((Complex*)dminus_in+idx+ieo*size/4,
 			 2.0*kappa_b, ls_stride);
@@ -511,7 +490,7 @@ int Fzmobius::FeigSolv(Vector **f_eigenv, Float *lambda,
 
   // calculate chirality
   int Ncb = NumChkb(cg_arg.RitzMatOper);
-  int f_size = GJP.VolNodeSites()*2*Colors()*SpinComponents()*Ncb/2;
+  size_t f_size = GJP.VolNodeSites()*2*Colors()*SpinComponents()*Ncb/2;
   Vector *four = (Vector *) smalloc (cname,fname, "four", f_size * sizeof(Float));
   Vector *fourg5 = (Vector *) smalloc (cname,fname, "fourg5", f_size * sizeof(Float));
   Float help;
@@ -668,4 +647,15 @@ void Fzmobius::Fdslash(Vector *f_out, Vector *f_in, CgArg *cg_arg,
 
 }
 
-//CPS_END_NAMESPACE
+    void Fzmobius::MatPc (Vector * f_out, Vector * f_in, Float mass, Float epsilon,
+              DagType dag){
+	CgArg cg_arg; 
+	cg_arg.mass=mass;
+	cg_arg.epsilon=epsilon;
+	DiracOpZMobius dirac(*this,f_out,f_in,&cg_arg,CNV_FRM_NO);
+	if (dag==DAG_NO) dirac.MatPc(f_out,f_in);
+	else dirac.MatPcDag(f_out,f_in);
+	
+    }
+
+CPS_END_NAMESPACE

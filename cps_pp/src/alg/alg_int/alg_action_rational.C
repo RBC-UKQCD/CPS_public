@@ -89,28 +89,27 @@ AlgActionRational::AlgActionRational(AlgMomentum &mom,
     if (fermion == F_CLASS_DWF) {
       
       //!< For dwf we need the solution vector contiguous in memory
-      frmn = (Vector**) smalloc(max_size*sizeof(Vector*), "frmn", fname, cname);
+      frmn = (Vector**) smalloc("frmn", fname, cname,max_size*sizeof(Vector*));
       
-      frmn[0] = (Vector*) smalloc(f_size*max_size*sizeof(Float), 
-				  "frmn[0]", fname, cname);
+      frmn[0] = (Vector*) smalloc("frmn[0]", fname, cname,f_size*max_size*sizeof(Float));
       
       for (int i=1; i<max_size; i++) frmn[i] = frmn[0] + i*f_vec_count;
       
       frmn_d = 0;
     } else {
       //!< For asqtad we need them checkerboarded with dslash applied
-      frmn = (Vector**)smalloc(total_size*sizeof(Vector*), "frmn", fname, cname);
+      frmn = (Vector**)smalloc("frmn", fname, cname,total_size*sizeof(Vector*));
       frmn_d = (Vector**)
-	smalloc(total_size*sizeof(Vector*), "frmn_d", fname, cname);
+	smalloc("frmn_d", fname, cname,total_size*sizeof(Vector*));
       
       for (int i=0; i<total_size; i++) {
-	frmn[i] = (Vector*) smalloc(2*f_size*sizeof(Float), "frmn[i]", fname, cname);
+	frmn[i] = (Vector*) smalloc( "frmn[i]", fname, cname,2*f_size*sizeof(Float));
 	frmn_d[i] = frmn[i] + f_vec_count;
       }
       
     }
 
-    all_res = (Float *)smalloc(total_size*sizeof(Float),"all_res",fname,cname);
+    all_res = (Float *)smalloc("all_res",fname,cname,total_size*sizeof(Float));
     frmn_tmp = (Vector**)smalloc(total_size*sizeof(Vector*),"frmn_tmp",fname,cname);
 
 
@@ -153,7 +152,7 @@ void AlgActionRational::init(int traj_num) {
   evolved = 1;
   heatbathEval = 0;
   energyEval = 0;
-  traj = traj_num-1;  
+//  traj = traj_num-1;  
   VRB.FuncEnd(cname,fname);
 }
 
@@ -207,6 +206,7 @@ void AlgActionRational::heatbath() {
 
   //!< Only evaluate heatbath if necessary
   if (!heatbathEval) {
+    if(!UniqueID()) printf("AlgActionRational::heatbath\n");
 
     //!< Create an appropriate lattice
     Lattice &lat = LatticeFactory::Create(fermion, G_CLASS_NONE);  
@@ -217,6 +217,41 @@ void AlgActionRational::heatbath() {
       //!< Potentially can merge all these three functions
       //!, Certainly can for 2 and 3
       lat.RandGaussVector(frmn[0], 0.5, Ncb);
+      
+      if(GJP.Gparity1fX() && GJP.Gparity1fY()){
+      	if(!UniqueID()){ printf("Putting minus sign on fermion source in UR quadrant\n"); fflush(stdout); }
+      //make source on upper-right quadrant negative (RNGs should be correct)
+      	for(int s=0;s<GJP.SnodeSites();s++){
+      	  for(int t=0;t<GJP.TnodeSites();t++){
+      	    for(int z=0;z<GJP.ZnodeSites();z++){
+      	      for(int y=0;y<GJP.YnodeSites();y++){
+      		for(int x=0;x<GJP.XnodeSites();x++){
+      		  if( (x+y+z+t+s)%2 == 0) continue; //ferm vect is odd parity only
+
+      		  int gx = x+GJP.XnodeCoor()*GJP.XnodeSites();
+      		  int gy = y+GJP.YnodeCoor()*GJP.YnodeSites();
+
+      		  if(gx>=GJP.Xnodes()*GJP.XnodeSites()/2 && gy>=GJP.Ynodes()*GJP.YnodeSites()/2){
+      		    int pos[5] = {x,y,z,t,s};
+      		    int f_off = lat.FsiteOffsetChkb(pos) * lat.SpinComponents();
+
+      		    for(int spn=0;spn<lat.SpinComponents();spn++) *(frmn[0]+f_off+spn) *=-1;
+      		  }
+      		}
+      	      }
+      	    }
+      	  }
+      	}
+      }
+
+
+      {//for testing
+	Float norm = dotProduct((IFloat *)frmn[0],(IFloat *)frmn[0],f_size);
+	if(GJP.Gparity1fY()) norm/=2; //quad lattice has 2 copies of the 2-flavour G-parity source
+	glb_sum_five(&norm);
+	if(!UniqueID()) printf("pseudofermion source %d norm %f\n",i,norm);
+      }
+
       h_init += lat.FhamiltonNode(frmn[0],frmn[0]);
       phi[i] -> 
 	VecEqualsVecTimesEquFloat(frmn[0], remez_arg_mc[i].norm_inv, f_size);
@@ -226,6 +261,13 @@ void AlgActionRational::heatbath() {
 				frm_cg_arg_mc[i], CNV_FRM_NO, SINGLE,
 				remez_arg_mc[i].residue_inv);
       
+      {//for testing
+	Float norm = dotProduct((IFloat *)phi[i],(IFloat *)phi[i],f_size);
+	if(GJP.Gparity1fY()) norm/=2;
+	glb_sum_five(&norm);
+	if(!UniqueID()) printf("phi %d norm %f\n",i,norm);
+      }
+
       updateCgStats(frm_cg_arg_mc[i][0]);
     }
 
@@ -235,7 +277,7 @@ void AlgActionRational::heatbath() {
     heatbathEval = 1;
     energyEval = 0;
   }
-  traj++;
+//  traj++;
 
 }
 
@@ -273,6 +315,13 @@ Float AlgActionRational::energy() {
       // shift this evaluation into minvcg?
       h += lat.FhamiltonNode(frmn[0], frmn[0]);
     }
+
+    {
+      Float hlat = h;
+      glb_sum_five(&hlat);
+      if(!UniqueID()) printf("AlgActionRational energy %f\n",hlat);
+    }
+
 
     LatticeFactory::Destroy();
 
@@ -360,6 +409,8 @@ void AlgActionRational::evolve(Float dt, int nsteps, int **fractionSplit)
   if (n_masses <= 0) return;
   Float trueMass;
     
+  if(!UniqueID()) printf("Entered AlgActionRational::evolve\n");
+
   //!< Variables required for ASQTAD partial fraction splitting
   int total_split_degree = 0;
   for (int i=0; i<n_masses; i++)
@@ -378,12 +429,31 @@ void AlgActionRational::evolve(Float dt, int nsteps, int **fractionSplit)
       int isz = fractionSplit[0][i];
 	
       if (deg > 0) {
+	{
+	  unsigned int gcsum = lat.CheckSum();
+
+	  if(GJP.Gparity() && GJP.Gparity1f2fComparisonCode()){
+	    gcsum += lat.CheckSum(lat.GaugeField() + 4*GJP.VolNodeSites());
+	  }
+
+	  QioControl qc;
+	  gcsum = qc.globalSumUint(gcsum);
+	  if(UniqueID()==0) printf("AlgActionRational::evolve step %d lattice checksum %u\n",steps,gcsum);
+	}
 
         cg_iter = lat.FmatEvlMInv(frmn+shift+isz, phi[i], 
                                   remez_arg_md[i].pole+isz, deg, isz, 
                                   frm_cg_arg_md[i]+isz, CNV_FRM_NO, 
                                   frmn_d+shift+isz);
-	  
+
+	{//for testing
+	  Float norm1 = dotProduct((IFloat *)phi[i],(IFloat *)phi[i],f_size);
+	  glb_sum_five(&norm1);
+	  Float norm2 = dotProduct((IFloat *)frmn[shift+isz],(IFloat *)frmn[shift+isz],f_size);
+	  glb_sum_five(&norm2);
+	  if(!UniqueID()) printf("AlgActionRational::evolve step %d, phi[%d] norm %f, out norm %f\n",steps,i,norm1,norm2);
+	}
+
         updateCgStats(frm_cg_arg_md[i][isz]);
 
         if (force_measure == FORCE_MEASURE_YES ||
@@ -595,10 +665,21 @@ void AlgActionRational::generateCgArg(Float *mass,
                                       CgArg ****cg_arg_fg,
                                       CgArg ****cg_arg_md, 
 				      CgArg ****cg_arg_mc, const char *label, 
+				      RationalDescr *rat){
+  const char *fname = "generateCgArg(F*,Cg****,Cg***,Cg***,char*,RationalDescr*)";
+  if(fermion == F_CLASS_WILSON_TM) ERR.General(cname,fname,"Must specify epsilon parameters for twisted mass fermions");
+  return generateCgArg(mass,NULL,cg_arg_fg,cg_arg_md,cg_arg_mc,label,rat);
+}
+
+void AlgActionRational::generateCgArg(Float *mass,
+				      Float *epsilon,
+                                      CgArg ****cg_arg_fg,
+                                      CgArg ****cg_arg_md, 
+				      CgArg ****cg_arg_mc, const char *label, 
 				      RationalDescr *rat)
 {
 
-  char *fname = "generateCgArg(F*,Cg****,Cg***,Cg***,char*,RationalDescr*)";
+  const char *fname = "generateCgArg(F*,F*,Cg****,Cg***,Cg***,char*,RationalDescr*)";
   char fg_label[100], fg_label_i[100], fg_label_ij[100];
   char md_label[100], md_label_i[100], md_label_ij[100];
   char mc_label[100], mc_label_i[100], mc_label_ij[100];
@@ -619,34 +700,41 @@ void AlgActionRational::generateCgArg(Float *mass,
 				  
 
   for(int i=0; i<n_masses; i++) {
-    (*cg_arg_fg)[i] = (CgArg**)smalloc(rat[i].md_approx.stop_rsd.stop_rsd_len*
-				       sizeof(CgArg*),fg_label_i,fname,cname);
-
-    (*cg_arg_md)[i] = (CgArg**)smalloc(rat[i].md_approx.stop_rsd.stop_rsd_len*
-				       sizeof(CgArg*),md_label_i,fname,cname);
-				    
-    (*cg_arg_mc)[i] = (CgArg**)smalloc(rat[i].mc_approx.stop_rsd.stop_rsd_len*
-				       sizeof(CgArg*),mc_label_i,fname,cname);
+    (*cg_arg_fg)[i] = (CgArg**)smalloc(rat[i].md_approx.stop_rsd.stop_rsd_len* sizeof(CgArg*),fg_label_i,fname,cname);
+    (*cg_arg_md)[i] = (CgArg**)smalloc(rat[i].md_approx.stop_rsd.stop_rsd_len* sizeof(CgArg*),md_label_i,fname,cname);
+    (*cg_arg_mc)[i] = (CgArg**)smalloc(rat[i].mc_approx.stop_rsd.stop_rsd_len* sizeof(CgArg*),mc_label_i,fname,cname);
 
     for (int j=0; j<rat[i].md_approx.stop_rsd.stop_rsd_len; j++) {
       // currently force gradient step is using the same CG arg as the
       // normal MD step, except that the stopping condition is different.
-      (*cg_arg_fg)[i][j] = (CgArg*)smalloc(sizeof(CgArg),fg_label_ij,fname,cname);
+//      (*cg_arg_fg)[i][j] = (CgArg*)smalloc(sizeof(CgArg),fg_label_ij,fname,cname);
+      (*cg_arg_fg)[i][j] = new CgArg;
       (*cg_arg_fg)[i][j]->mass = mass[i];
+      //CK: added for twisted mass fermions
+      if(epsilon) (*cg_arg_fg)[i][j]->epsilon = epsilon[i];
+
       (*cg_arg_fg)[i][j]->max_num_iter = max_num_iter[i];
       (*cg_arg_fg)[i][j]->stop_rsd = rat[i].stop_rsd_fg_mult *
 	rat[i].md_approx.stop_rsd.stop_rsd_val[j];
 
-      (*cg_arg_md)[i][j] = (CgArg*)smalloc(sizeof(CgArg),md_label_ij,fname,cname);
+//      (*cg_arg_md)[i][j] = (CgArg*)smalloc(sizeof(CgArg),md_label_ij,fname,cname);
+      (*cg_arg_md)[i][j] = new CgArg;
       (*cg_arg_md)[i][j]->mass = mass[i];
+      //CK: added for twisted mass fermions
+      if(epsilon) (*cg_arg_md)[i][j]->epsilon = epsilon[i];
+
       (*cg_arg_md)[i][j]->max_num_iter = max_num_iter[i];
       (*cg_arg_md)[i][j]->stop_rsd = 
 	rat[i].md_approx.stop_rsd.stop_rsd_val[j];
     }
 
     for (int j=0; j<rat[i].mc_approx.stop_rsd.stop_rsd_len; j++) {
-      (*cg_arg_mc)[i][j] = (CgArg*)smalloc(sizeof(CgArg),mc_label_ij,fname,cname);
+//      (*cg_arg_mc)[i][j] = (CgArg*)smalloc(sizeof(CgArg),mc_label_ij,fname,cname);
+      (*cg_arg_mc)[i][j] = new CgArg;
       (*cg_arg_mc)[i][j]->mass = mass[i];
+      //CK: added for twisted mass fermions
+      if(epsilon) (*cg_arg_mc)[i][j]->epsilon = epsilon[i];
+
       (*cg_arg_mc)[i][j]->max_num_iter = max_num_iter[i];
       (*cg_arg_mc)[i][j]->stop_rsd = 
 	rat[i].mc_approx.stop_rsd.stop_rsd_val[j];
@@ -680,11 +768,14 @@ void AlgActionRational::destroyCgArg(CgArg ***cg_arg_fg,
 
   for (int i=0; i<n_masses; i++) {
     for (int j=0; j<remez_arg_mc[i].degree; j++) {
-      sfree(cg_arg_mc[i][j], mc_label_ij, fname, cname);
+//      sfree(cg_arg_mc[i][j], mc_label_ij, fname, cname);
+        delete cg_arg_mc[i][j];
     }
     for (int j=0; j<remez_arg_md[i].degree; j++) {
-      sfree(cg_arg_fg[i][j], fg_label_ij, fname, cname);
-      sfree(cg_arg_md[i][j], md_label_ij, fname, cname);
+//      sfree(cg_arg_fg[i][j], fg_label_ij, fname, cname);
+        delete cg_arg_fg[i][j];
+//      sfree(cg_arg_md[i][j], md_label_ij, fname, cname);
+        delete cg_arg_md[i][j];
     }
     sfree(cg_arg_mc[i], mc_label_i, fname, cname);
     sfree(cg_arg_md[i], md_label_i, fname, cname);
@@ -703,6 +794,12 @@ void AlgActionRational::generateEigArg(EigenDescr eigen) {
   eig_arg.Mass.Mass_len = n_masses;
   eig_arg.Mass.Mass_val = 
     (Float*) smalloc(n_masses*sizeof(Float),"Mass_val", fname, cname);
+
+  //CK: added for twisted mass fermions
+  eig_arg.Epsilon.Epsilon_len = n_masses;
+  eig_arg.Epsilon.Epsilon_val = 
+    (Float*) smalloc(n_masses*sizeof(Float),"Epsilon_val", fname, cname);
+
   eig_arg.N_eig = 1;
   eig_arg.Kalk_Sim = 0;
   eig_arg.MaxCG = eigen.max_num_iter;
@@ -743,7 +840,7 @@ void AlgActionRational::destroyEigArg() {
   sfree(lambda_high,"lambda_high",fname, cname);
   
   sfree(eig_arg.Mass.Mass_val, "Mass_val", fname, cname);
-
+  sfree(eig_arg.Epsilon.Epsilon_val, "Epsilon_val", fname, cname);
 }
 
 //!< Set mass i, pole j as being included (used when splitting time scales)
@@ -761,7 +858,7 @@ void AlgActionRational::setSplit(int i, int j) {
 
 //!< Check that all of the partial fractions have been accounted for
 void AlgActionRational::checkSplit() {
-  char *fname = "checkSplit()";
+  const char *fname = "checkSplit()";
   for (int i=0; i<n_masses; i++) {
     for (int j=0; j<remez_arg_md[i].degree; j++) {
       if (!splitCheck[i][j]) 
@@ -772,13 +869,22 @@ void AlgActionRational::checkSplit() {
 
 }
 
-
 //!< Check that the approximation bounds are still valid for the mc approx
 void AlgActionRational::checkApprox(Float *mass, RemezArg *remez_arg, 
+				    EigenDescr eigen){
+  const char *fname = "checkApprox()";
+  if(fermion == F_CLASS_WILSON_TM){
+    ERR.General(cname,fname,"Epsilon parameters must be specified for Wilson fermions");
+  }
+  return checkApprox(mass, NULL, remez_arg, eigen);
+}
+
+//Can use epsilon = NULL for non-twisted-mass fermions
+void AlgActionRational::checkApprox(Float *mass, Float *epsilon, RemezArg *remez_arg, 
 				    EigenDescr eigen) 
 {
 
-  char *fname = "checkApprox()";
+  const char *fname = "checkApprox()";
   
   // Necessary so that functions called by AlgEig know what Ls Fbfm is using:
 #ifdef USE_BFM
@@ -788,11 +894,14 @@ void AlgActionRational::checkApprox(Float *mass, RemezArg *remez_arg,
   Lattice &lat = LatticeFactory::Create(fermion, G_CLASS_NONE);
   
   //!< First setup the masses
-  for (int i=0; i<n_masses; i++) eig_arg.Mass.Mass_val[i] = mass[i];
+  for (int i=0; i<n_masses; i++){
+    eig_arg.Mass.Mass_val[i] = mass[i];
+    if(epsilon!=NULL) eig_arg.Epsilon.Epsilon_val[i] = epsilon[i];
+  }
 
   {
     //!< Measure the lowest eigenvalue
-    sprintf(eig_file,"%s.%d",eigen.eig_lo_stem,traj);
+    sprintf(eig_file,"%s.%d",eigen.eig_lo_stem,traj_num);
     eig_arg.fname = eig_file;
     // CJ: rescaling RsdR_a to be in range with rational approximation 
     eig_arg.RsdR_a = eig_arg.RsdR_r * remez_arg[0].lambda_high;
@@ -817,7 +926,7 @@ void AlgActionRational::checkApprox(Float *mass, RemezArg *remez_arg,
   
   {
     //!< Measure the highest eigenvalue
-    sprintf(eig_file,"%s.%d",eigen.eig_hi_stem,traj);
+    sprintf(eig_file,"%s.%d",eigen.eig_hi_stem,traj_num);
     eig_arg.fname = eig_file;    
     eig_arg.RitzMatOper = NEG_MATPCDAG_MATPC;
     

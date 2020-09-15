@@ -37,6 +37,11 @@ CPS_END_NAMESPACE
 #include <util/vector.h>
 #include <util/verbose.h>
 #include <util/error.h>
+
+#ifdef USE_BFM
+#include <util/lattice/fbfm.h>
+#endif
+
 CPS_START_NAMESPACE
 
 #define POINT
@@ -70,7 +75,7 @@ AlgPbp::AlgPbp(Lattice& latt,
   // Set the node size of the full (non-checkerboarded) fermion field
   //----------------------------------------------------------------
   f_size = GJP.VolNodeSites() * latt.FsiteSize();
-
+  if(GJP.Gparity()) f_size*=2;
 
   // Allocate memory for the source.
   //----------------------------------------------------------------
@@ -114,18 +119,15 @@ AlgPbp::~AlgPbp() {
   structure.
 */
 //------------------------------------------------------------------
-void AlgPbp::run()
+void AlgPbp::run(Float *results)
 {
-#if TARGET==cpsMPI
-    using MPISCU::fprintf;
-#endif
   int iter;
   int ls;
   int ls_glb;
-  Float pbp= 0., pbd0p, pbdip;
+  Float pbp= 0., pbd0p =0, pbdip=0;
   Float pbg5p= 0.;
-  Float pbp_norm;
-  Float true_res;
+  Float pbp_norm =0;
+  Float true_res =0;
   PbpArg *pbp_arg;
   CgArg cg_arg_struct;
   CgArg *cg_arg = &cg_arg_struct;
@@ -155,7 +157,16 @@ void AlgPbp::run()
   //----------------------------------------------------------------
   // Domain Wall fermions
   //----------------------------------------------------------------
-  if(lat.Fclass() == F_CLASS_DWF || lat.Fclass() == F_CLASS_BFM){
+  bool is_5d_fbfm = false;
+  bool is_4d_fbfm = false;
+#ifdef USE_BFM
+  if( lat.Fclass() == F_CLASS_BFM ){
+    if( Fbfm::CurrentSolver() != WilsonTM && Fbfm::CurrentSolver() != WilsonFermion ) is_5d_fbfm = true;
+    else is_4d_fbfm = true;
+  }
+#endif
+
+  if(lat.Fclass() == F_CLASS_DWF || is_5d_fbfm){
     ls = GJP.SnodeSites();
     ls_glb = GJP.Snodes() * GJP.SnodeSites();
 
@@ -183,6 +194,30 @@ void AlgPbp::run()
 
     // initialize 4-dimensional source
     lat.RandGaussVector(src_4d, 0.5, FOUR_D);
+
+    if(GJP.Gparity1fX() && GJP.Gparity1fY()){
+      //1f G-parity source in upper-right quadrant needs minus sign
+      for(int t=0;t<GJP.TnodeSites();t++){
+	for(int z=0;z<GJP.ZnodeSites();z++){
+	  for(int y=0;y<GJP.YnodeSites();y++){
+	    for(int x=0;x<GJP.XnodeSites();x++){
+
+	      int gx = x+GJP.XnodeCoor()*GJP.XnodeSites();
+	      int gy = y+GJP.YnodeCoor()*GJP.YnodeSites();
+
+	      if(gx>=GJP.Xnodes()*GJP.XnodeSites()/2 && gy>=GJP.Ynodes()*GJP.YnodeSites()/2){
+		int f_off = x + GJP.XnodeSites()*(y + GJP.YnodeSites()*(z + GJP.ZnodeSites()*t));
+		f_off*=lat.SpinComponents();
+
+		for(int spn=0;spn<lat.SpinComponents();spn++) *(src_4d+f_off+spn) *=-1;
+	      }
+	    }
+	  }
+	}
+      }
+    }
+
+    cg_arg->epsilon = 0.0;
 
     // set the 5-dimensional source
     lat.Ffour2five(src, src_4d, pbp_arg->src_u_s, pbp_arg->src_l_s);
@@ -220,6 +255,8 @@ void AlgPbp::run()
 
       // Calculate the pbp normalization factor 
       pbp_norm = GJP.VolSites() * lat.Colors() * lat.SpinComponents();
+      if(GJP.Gparity()) pbp_norm *=2;
+
       if(lat.Fclass() == F_CLASS_DWF) {
           pbp_norm *= 4.0 + GJP.DwfA5Inv() - GJP.DwfHeight();
       }
@@ -228,6 +265,8 @@ void AlgPbp::run()
       //   * ( lat.FsiteSize() / (2 * GJP.SnodeSites()) );  
 
       VRB.Result(cname, fname, "pbp_norm = %17.10e\n", pbp_norm);
+
+      int g5sites = GJP.VolNodeSites(); if(GJP.Gparity()) g5sites*=2;
 
       if (pbp_arg->snk_loop) {
 	// Loop over sink - source separation
@@ -240,7 +279,7 @@ void AlgPbp::run()
 	             / pbp_norm;
 
           // Calculate pbg5p = Tr[ PsiBar * Gamma5 * Psi]
-	  lat.Gamma5(sol_4d, sol_4d, GJP.VolNodeSites());
+	  lat.Gamma5(sol_4d, sol_4d,g5sites);
           pbg5p_all[i] = sol_4d->ReDotProductGlbSum4D(src_4d, f_size/ls)
 	               / pbp_norm;
         }
@@ -253,7 +292,7 @@ void AlgPbp::run()
         pbp = sol_4d->ReDotProductGlbSum4D(src_4d, f_size/ls) / pbp_norm;
 
 	// Calculate pbg5p = Tr[ PsiBar * Gamma5 * Psi]
-	lat.Gamma5(sol_4d, sol_4d, GJP.VolNodeSites());
+	lat.Gamma5(sol_4d, sol_4d, g5sites);
 	pbg5p = sol_4d->ReDotProductGlbSum4D(src_4d, f_size/ls) / pbp_norm;
       }
 
@@ -286,6 +325,18 @@ void AlgPbp::run()
 		  IFloat(true_res));
         }
 	Fclose(fp);
+      }
+
+      if(results!=0){
+	if (pbp_arg->snk_loop) {
+	  for (int i = 0; i < ls_glb; i++) {
+	    results[2*ls_glb*m + 2*i] = pbp_all[i];
+	    results[2*ls_glb*m + 2*i + 1] = pbg5p_all[i];
+	  }
+	}else{
+	  results[2*m] = pbp;
+	  results[2*m + 1] = pbg5p;
+	}
       }
 
       // If there is another mass loop iteration ahead, we should
@@ -321,7 +372,19 @@ void AlgPbp::run()
   // Wilson or Clover fermions
   //----------------------------------------------------------------
   else if (   (lat.Fclass() == F_CLASS_WILSON) 
-	   || (lat.Fclass() == F_CLASS_CLOVER)   ) {  
+	      || (lat.Fclass() == F_CLASS_CLOVER) || lat.Fclass() == F_CLASS_WILSON_TM || is_4d_fbfm ) {  
+
+    //CK: twisted mass parameter is not specified in pbp_arg so we cannot do WilsonTm quarks (could add it if it is ever used)
+    if( lat.Fclass() == F_CLASS_WILSON_TM 
+#ifdef USE_BFM
+	|| (is_4d_fbfm && 
+	( ( lat.Fclass() == F_CLASS_BFM ) && ( Fbfm::CurrentSolver() == WilsonTM )) 
+	)
+//Fbfm::bfm_args[Fbfm::current_arg_idx].solver == WilsonTM )
+#endif
+	)
+      ERR.General(cname,fname,"Twisted Mass quarks but PbpArg does not contain the twisted mass parameter");
+      
 
     // Allocate memory for gamma_5 * solution
     Vector *sol_g5 = (Vector *) smalloc(f_size * sizeof(Float));
@@ -586,9 +649,6 @@ structure,
 //------------------------------------------------------------------
 void AlgPbp::runPointSource(int x, int y, int z, int t)
 {
-#if TARGET==cpsMPI
-    using MPISCU::fprintf;
-#endif
   int i;
   int iter;
   int ls;
@@ -623,7 +683,7 @@ void AlgPbp::runPointSource(int x, int y, int z, int t)
   //----------------------------------------------------------------
   // Domain Wall fermions
   //----------------------------------------------------------------
-  if(lat.Fclass() == F_CLASS_DWF || lat.Fclass() == F_CLASS_BFM){
+  if(lat.F5D()){
     ls = GJP.SnodeSites();
     ls_glb = GJP.Snodes() * GJP.SnodeSites();
 

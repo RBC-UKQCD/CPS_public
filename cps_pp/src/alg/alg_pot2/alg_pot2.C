@@ -79,9 +79,6 @@ AlgPot2::~AlgPot2() {
 //------------------------------------------------------------------
 void AlgPot2::run()
 {
-#if TARGET==cpsMPI
-  using MPISCU::fprintf;
-#endif
   
   char *fname = "run()";
   VRB.Func(cname,fname);

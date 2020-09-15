@@ -1,0 +1,78 @@
+class GparityAMAarg ama_arg = {
+Array bilinear_args[4] = {
+struct ContractionTypeAllBilinears bilinear_args[0] = {
+string prop_1 = "prop_f0_m0.01_m1m10"
+string prop_2 = "prop_f0_m0.01_110"
+Array momenta[1] = {
+struct MomArg momenta[0] = {
+Vector p[3] = {
+double p[0] = 0.125
+double p[1] = 0.125
+double p[2] = 0
+}
+}
+}
+string file = "results/result_220.dat"
+}
+struct ContractionTypeAllBilinears bilinear_args[1] = {
+string prop_1 = "prop_f0_m0.01_110"
+string prop_2 = "prop_f0_m0.01_m1m10"
+Array momenta[1] = {
+struct MomArg momenta[0] = {
+Vector p[3] = {
+double p[0] = -0.125
+double p[1] = -0.125
+double p[2] = 0
+}
+}
+}
+string file = "results/result_m2m20.dat"
+}
+struct ContractionTypeAllBilinears bilinear_args[2] = {
+string prop_1 = "prop_f0_m0.01_m1m10"
+string prop_2 = "prop_f0_m0.01_1m30"
+Array momenta[1] = {
+struct MomArg momenta[0] = {
+Vector p[3] = {
+double p[0] = 0.125
+double p[1] = -0.125
+double p[2] = 0
+}
+}
+}
+string file = "results/result_2m20.dat"
+}
+struct ContractionTypeAllBilinears bilinear_args[3] = {
+string prop_1 = "prop_f0_m0.01_110"
+string prop_2 = "prop_f0_m0.01_m130"
+Array momenta[1] = {
+struct MomArg momenta[0] = {
+Vector p[3] = {
+double p[0] = -0.125
+double p[1] = 0.125
+double p[2] = 0
+}
+}
+}
+string file = "results/result_m220.dat"
+}
+}
+Array exact_solve_timeslices[2] = {
+int exact_solve_timeslices[0] = 0
+int exact_solve_timeslices[1] = 16
+}
+double exact_precision = 1e-08
+double sloppy_precision = 0.0001
+string config_fmt = "configurations/ckpoint_lat.%d"
+int conf_start = 300
+int conf_incr = 50
+int conf_lessthan = 900
+struct FixGaugeArg fix_gauge = {
+FixGaugeType fix_gauge_kind = FIX_GAUGE_COULOMB_T
+int hyperplane_start = 0
+int hyperplane_step = 1
+int hyperplane_num = 32
+double stop_cond = 1e-08
+int max_iter_num = 10000
+}
+}

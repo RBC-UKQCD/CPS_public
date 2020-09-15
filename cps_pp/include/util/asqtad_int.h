@@ -138,7 +138,7 @@ class AsqD : public AsqDArg{
     int coord_nn[4];
     int coord_knn[4];
     int vol;
-    int f_size_cb;
+    size_t f_size_cb;
     int non_local_chi_3[2][4];
     int non_local_chi[2];
     int local_chi[2];

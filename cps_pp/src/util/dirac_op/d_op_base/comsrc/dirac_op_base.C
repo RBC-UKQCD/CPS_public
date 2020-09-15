@@ -36,22 +36,42 @@ static int bc[4] = {0,0,0,0};	// boundary condition on this node
 
 static void BondCond(Lattice& lat, Matrix *u_base)
 {
-      int x[4];
+  //printf("BondCond %d %d %d %d\n",bc[0],bc[1],bc[2],bc[3]);
+  Complex twist_phase;
+  int uconj_offset = 4*GJP.VolNodeSites();
+  int x[4];
   for(int u = 0; u < 4; ++u) {
-    if(bc[u]) {
+    if(bc[u]) { //is 1 if Bc(u) is not BND_CND_PRD and on right-most node in direction u
+      if(GJP.Bc(u) == BND_CND_TWISTED || GJP.Bc(u) == BND_CND_GPARITY_TWISTED) twist_phase = GJP.TwistPhase(u);
+
       for(x[0] = 0; x[0] < nx[0]; ++x[0]) {
         for(x[1] = 0; x[1] < nx[1]; ++x[1]) {
           for(x[2] = 0; x[2] < nx[2]; ++x[2]) {
             for(x[3] = 0; x[3] < nx[3]; ++x[3]) {
 	      if(x[u]==nx[u]-1) {
-	        Matrix *m = u_base+lat.GsiteOffset(x)+u;
-	        *m *= -1;
+		//If GPBC in this direction, we apply the minus sign or twist only on the second flavour
+		int site_off = lat.GsiteOffset(x);
+	        Matrix *m = u_base+site_off+u;
+		if(GJP.Bc(u) == BND_CND_APRD)
+		  *m *= -1;
+		else if(GJP.Bc(u) == BND_CND_TWISTED)
+		  *m *= twist_phase;
+
+		if(GJP.Gparity()){ //do BC on second quark flavour
+		  //for example, APBC in time direction
+		  m = u_base+uconj_offset+site_off+u;
+		  if(GJP.Bc(u) == BND_CND_APRD || GJP.Bc(u) == BND_CND_GPARITY)
+		    *m *= -1;
+		  else if(GJP.Bc(u) == BND_CND_TWISTED || GJP.Bc(u) == BND_CND_GPARITY_TWISTED)
+		    *m *= twist_phase;	  
+		}	
 	      }
 	    }
           }
 	}
       }
     }
+
   }
 }
 
@@ -105,35 +125,43 @@ DiracOp::DiracOp(Lattice & latt,           // Lattice object
   //----------------------------------------------------------------
   // Save the circular buffer control register values
   //----------------------------------------------------------------
-  saveCbufCntrlReg();
+//  saveCbufCntrlReg();
 
   //----------------------------------------------------------------
   // Initialize boundary condition on this node
   //----------------------------------------------------------------
-  bc[0] = 0;
-  bc[1] = 0;
-  bc[2] = 0;
-  bc[3] = 0;
-  if(GJP.Xbc() == BND_CND_APRD)
-  	bc[0] = GJP.XnodeCoor() == (GJP.Xnodes()-1) ? 1 : 0;
-  if(GJP.Ybc() == BND_CND_APRD)
-  	bc[1] = GJP.YnodeCoor() == (GJP.Ynodes()-1) ? 1 : 0;
-  if(GJP.Zbc() == BND_CND_APRD)
-  	bc[2] = GJP.ZnodeCoor() == (GJP.Znodes()-1) ? 1 : 0;
-  if(GJP.Tbc() == BND_CND_APRD)
-  	bc[3] = GJP.TnodeCoor() == (GJP.Tnodes()-1) ? 1 : 0;
+  for(int i=0;i<4;i++){
+    bc[i] = 0;
+    if(GJP.Bc(i) != BND_CND_PRD && GJP.NodeCoor(i) == GJP.Nodes(i)-1) bc[i] = 1;
+    nx[i] = GJP.NodeSites(i);
+  }
 
-  nx[0] = GJP.XnodeSites();
-  nx[1] = GJP.YnodeSites();
-  nx[2] = GJP.ZnodeSites();
-  nx[3] = GJP.TnodeSites();
+
+  // bc[0] = 0;
+  // bc[1] = 0;
+  // bc[2] = 0;
+  // bc[3] = 0;
+  // if(GJP.Xbc() == BND_CND_APRD)
+  // 	bc[0] = GJP.XnodeCoor() == (GJP.Xnodes()-1) ? 1 : 0;
+  // if(GJP.Ybc() == BND_CND_APRD)
+  // 	bc[1] = GJP.YnodeCoor() == (GJP.Ynodes()-1) ? 1 : 0;
+  // if(GJP.Zbc() == BND_CND_APRD)
+  // 	bc[2] = GJP.ZnodeCoor() == (GJP.Znodes()-1) ? 1 : 0;
+  // if(GJP.Tbc() == BND_CND_APRD)
+  // 	bc[3] = GJP.TnodeCoor() == (GJP.Tnodes()-1) ? 1 : 0;
+
+  // nx[0] = GJP.XnodeSites();
+  // nx[1] = GJP.YnodeSites();
+  // nx[2] = GJP.ZnodeSites();
+  // nx[3] = GJP.TnodeSites();
 
 
   //----------------------------------------------------------------
   // turn on the boundary condition
   //----------------------------------------------------------------
   if (ParTrans::scope_lock == 0)
-  BondCond(latt, gauge_field);
+//  BondCond(latt, gauge_field);
+  latt.BondCond();
 
   //???
 
@@ -164,14 +192,15 @@ DiracOp::~DiracOp() {
   // turn off the boundary condition
   //----------------------------------------------------------------
   if (ParTrans::scope_lock == 0)
-  BondCond(lat, gauge_field);
+//  BondCond(lat, gauge_field);
+  lat.BondCond();
 
   VRB.Clock(cname,fname,"Exiting\n");
 
   //----------------------------------------------------------------
   // Restore the circular buffer control register values
   //----------------------------------------------------------------
-  restoreCbufCntrlReg();
+//  restoreCbufCntrlReg();
 
 
   //----------------------------------------------------------------

@@ -59,6 +59,10 @@ extern void glb_min(Float * float_p);
 //--------------------------------------------------------------
 extern void 
 slice_sum(Float * float_p, int blcklength, int dir);
+extern int glb_sum(long * float_p, const long n_elem);
+extern int glb_sum(uint32_t * float_p, const long n_elem);
+extern int glb_sum(int * float_p, const long n_elem);
+extern int glb_sum(double * float_p, const long n_elem);
 
 /*! @} */
 

@@ -43,6 +43,7 @@ public:
     // measure the L1/L2/Linf norm, mom is an array of momenta defined
     // on each link.
     void measure(const Matrix mom[]);
+
     void print(Float dt, char *label)const;
 };
 

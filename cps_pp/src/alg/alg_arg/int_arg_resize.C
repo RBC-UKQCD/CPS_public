@@ -116,6 +116,45 @@ void ActionRationalQuotientArg::resize(u_int mass, int frm_deg_md, int frm_deg_m
 
 }
 
+void ActionEOFAArg::resize(u_int nmass)
+{
+  bi_arg.resize(nmass);
+  LH_stop_rsd_fg.LH_stop_rsd_fg_len = nmass;
+  LH_stop_rsd_fg.LH_stop_rsd_fg_val = new Float[nmass];
+  LH_stop_rsd_mc.LH_stop_rsd_mc_len = nmass;
+  LH_stop_rsd_mc.LH_stop_rsd_mc_val = new Float[nmass];
+  LH_stop_rsd_md.LH_stop_rsd_md_len = nmass;
+  LH_stop_rsd_md.LH_stop_rsd_md_val = new Float[nmass];
+  RH_stop_rsd_fg.RH_stop_rsd_fg_len = nmass;
+  RH_stop_rsd_fg.RH_stop_rsd_fg_val = new Float[nmass];
+  RH_stop_rsd_mc.RH_stop_rsd_mc_len = nmass;
+  RH_stop_rsd_mc.RH_stop_rsd_mc_val = new Float[nmass];
+  RH_stop_rsd_md.RH_stop_rsd_md_len = nmass;
+  RH_stop_rsd_md.RH_stop_rsd_md_val = new Float[nmass];
+  num_mass.num_mass_len = nmass;
+  num_mass.num_mass_val = new Float[nmass];
+  den_mass.den_mass_len = nmass;
+  den_mass.den_mass_val = new Float[nmass];
+  LH_rat_approx.LH_rat_approx_len = nmass;
+  LH_rat_approx.LH_rat_approx_val = new EOFARationalDescr[nmass];
+  RH_rat_approx.RH_rat_approx_len = nmass;
+  RH_rat_approx.RH_rat_approx_val = new EOFARationalDescr[nmass];
+}
+
+void ActionEOFAArg::resize(u_int midx, int LH_deg, int RH_deg)
+{
+  if((LH_rat_approx.LH_rat_approx_len > midx) && (RH_rat_approx.RH_rat_approx_len > midx)) {
+    LH_rat_approx.LH_rat_approx_val[midx].rat_approx.stop_rsd.stop_rsd_len = LH_deg;
+    LH_rat_approx.LH_rat_approx_val[midx].rat_approx.stop_rsd.stop_rsd_val = new Float[LH_deg];
+    RH_rat_approx.RH_rat_approx_val[midx].rat_approx.stop_rsd.stop_rsd_len = RH_deg;
+    RH_rat_approx.RH_rat_approx_val[midx].rat_approx.stop_rsd.stop_rsd_val = new Float[RH_deg];
+  } else {
+    char* cname = "ActionEOFAArg";
+    char* fname = "resize(u_int, int, int)";
+    ERR.General(cname, fname, "mass > Nmass");
+  }
+}
+
 ApproxDescr::ApproxDescr(){
   approx_type=RATIONAL_APPROX_POWER;
   bounds_type=RATIONAL_BOUNDS_AUTOMATIC;

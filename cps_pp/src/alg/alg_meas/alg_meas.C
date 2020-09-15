@@ -5,18 +5,22 @@
 #include <util/lattice/f_dwf4d.h>
 #endif
 
+#ifdef USE_GRID
+#include <util/lattice/fgrid.h>
+#endif
+
 #include <alg/no_arg.h>
 #include <alg/common_arg.h>
 #include <alg/pbp_arg.h>
 #include <alg/fix_gauge_arg.h>
-#include <alg/w_spect_arg.h>
+//#include <alg/w_spect_arg.h>
 #include <alg/eig_arg.h>
 #include <alg/pot_arg.h>
 
 #include <alg/alg_plaq.h>
 #include <alg/alg_pbp.h>
 #include <alg/alg_fix_gauge.h>
-#include <alg/alg_w_spect.h>
+//#include <alg/alg_w_spect.h>
 #include <alg/alg_eig.h>
 #include <alg/alg_pot.h>
 
@@ -61,7 +65,7 @@ CPS_START_NAMESPACE
   \param arg A dummy argument structure.
  */
 //------------------------------------------------------------------
-static WspectOutput woe;
+//static WspectOutput woe;
 
 AlgMeas::AlgMeas(CommonArg *c_arg,
 	         MeasArg *arg) : 
@@ -135,8 +139,9 @@ void AlgMeas::RunTask(MeasTask *task)
      * Take the cwd to get back.
      */
   if ( task->Measurement == MeasAlgWspect ) { 
-    strcpy(output_tmp,output_file);
-    output_directory = output_tmp;
+    ERR.General("AlgMeas","RunTask","AlgWspect no longer supported\n");
+    // strcpy(output_tmp,output_file);
+    // output_directory = output_tmp;
   } else { 
     TruncateFile(output_file);
     strcpy(output_tmp,output_file);
@@ -171,37 +176,37 @@ void AlgMeas::RunTask(MeasTask *task)
       Document(output_directory,task);
     }
     break;
-  case MeasAlgWspect:
-    {
+  // case MeasAlgWspect:
+  //   {
 
-      WspectArg wa; 
-      CgArg cg; 
-      if ( ! wa.Decode(task->ArgFilename,"dummy") ) exit(-1);
-      if ( ! woe.Decode(wa.WspectOutputFile,"dummy") ) exit(-1);
-      if ( ! cg.Decode(wa.CgArgFile,"dummy") ) exit (-1);
-      ca.results = (void *) &woe;
-      AlgWspect ws(AlgLattice(),&ca,&wa,&cg,1);
+  //     WspectArg wa; 
+  //     CgArg cg; 
+  //     if ( ! wa.Decode(task->ArgFilename,"dummy") ) exit(-1);
+  //     if ( ! woe.Decode(wa.WspectOutputFile,"dummy") ) exit(-1);
+  //     if ( ! cg.Decode(wa.CgArgFile,"dummy") ) exit (-1);
+  //     ca.results = (void *) &woe;
+  //     AlgWspect ws(AlgLattice(),&ca,&wa,&cg,1);
 
-      /*
-       * Wspect doesnt respect output names so use a nifty little "chdir" and back again to work
-       * around this.
-       */
-      mkdir(output_directory,0777);
-      chdir(output_directory);
-      TruncateWspectFiles();
-      Document("./",task);
-      sprintf(meta_file,"%s/w_spect_arg.%d",output_directory,alg_meas_arg->TrajCur);
-      ws.run();
-      if ( UniqueID() == 0 ) {
-	wa.Encode(meta_file,"WspectArg");
-	sprintf(meta_file,"%s/cg_arg.%d",output_directory,alg_meas_arg->TrajCur);
-	cg.Encode(meta_file,"CgArg");
-	sprintf(meta_file,"%s/w_spect_output.%d",output_directory,alg_meas_arg->TrajCur);
-	woe.Encode(meta_file,"WspectOutput");
-      }
-      chdir(alg_meas_arg->WorkDirectory);
-    }
-    break;
+  //     /*
+  //      * Wspect doesnt respect output names so use a nifty little "chdir" and back again to work
+  //      * around this.
+  //      */
+  //     mkdir(output_directory,0777);
+  //     chdir(output_directory);
+  //     TruncateWspectFiles();
+  //     Document("./",task);
+  //     sprintf(meta_file,"%s/w_spect_arg.%d",output_directory,alg_meas_arg->TrajCur);
+  //     ws.run();
+  //     if ( UniqueID() == 0 ) {
+  // 	wa.Encode(meta_file,"WspectArg");
+  // 	sprintf(meta_file,"%s/cg_arg.%d",output_directory,alg_meas_arg->TrajCur);
+  // 	cg.Encode(meta_file,"CgArg");
+  // 	sprintf(meta_file,"%s/w_spect_output.%d",output_directory,alg_meas_arg->TrajCur);
+  // 	woe.Encode(meta_file,"WspectOutput");
+  //     }
+  //     chdir(alg_meas_arg->WorkDirectory);
+  //   }
+  //   break;
   case MeasAlgEig:
     {
       EigArg ea; 
@@ -261,22 +266,22 @@ void AlgMeas::Document(char * output_directory,MeasTask *task)
   return;
 }
 
-Lattice *LatticeFactory::lat_p;
+Lattice *LatticeFactory::lat_p(NULL);
 
 void LatticeFactory::Destroy(void)
 {
-  delete lat_p;
+  if(lat_p!=NULL) delete lat_p;
 }
 
 Lattice & LatticeFactory::Create(FclassType fermion,GclassType gluon)
 {
   /* BFM VALENCE ANALYSIS */
 #ifdef USE_BFM
-  if ( (fermion == F_CLASS_BFM) && (gluon == G_CLASS_NONE ) ) {
+  if ( (fermion == F_CLASS_BFM ) && (gluon == G_CLASS_NONE ) ) {
     lat_p = new GnoneFbfm;
     return *lat_p; 
   }
-  if ( (fermion == F_CLASS_BFM) && (gluon == G_CLASS_IMPR_RECT ) ) {
+  if ( (fermion == F_CLASS_BFM ) && (gluon == G_CLASS_IMPR_RECT ) ) {
     lat_p = new GimprRectFbfm;
     return *lat_p;
   }
@@ -436,6 +441,31 @@ Lattice & LatticeFactory::Create(FclassType fermion,GclassType gluon)
     return *lat_p;
   }
 
+#ifdef USE_GRID
+  if ( (fermion == F_CLASS_GRID_WILSON_TM) && (gluon == G_CLASS_NONE ) ) {
+    FgridParams params; // needs for constructor. Params needs to be overwritten later
+    lat_p = new GnoneFgridWilsonTM(params);
+    return *lat_p;
+  }
+  if ( (fermion == F_CLASS_GRID_MOBIUS) && (gluon == G_CLASS_NONE ) ) {
+    FgridParams params; // needs for constructor. Params needs to be overwritten later
+    params.mobius_scale = GJP.GetMobius();
+    lat_p = new GnoneFgridMobius(params);
+    return *lat_p;
+  }
+  if ( (fermion == F_CLASS_GRID_GPARITY_MOBIUS) && (gluon == G_CLASS_NONE ) ) {
+    FgridParams params; // needs for constructor. Params needs to be overwritten later
+    params.mobius_scale = GJP.GetMobius();
+    lat_p = new GnoneFgridGparityMobius(params);
+    return *lat_p;
+  }
+  if ( (fermion == F_CLASS_GRID_GPARITY_WILSON_TM) && (gluon == G_CLASS_NONE ) ) {
+    FgridParams params; // needs for constructor. Params needs to be overwritten later
+    lat_p = new GnoneFgridGparityWilsonTM(params);
+    return *lat_p;
+  }
+#endif
+
   /* F_NONE VALENCE ANALYSIS */
   if ( (fermion == F_CLASS_NONE) && (gluon == G_CLASS_NONE ) ) {
     lat_p = new GnoneFnone;
@@ -461,6 +491,8 @@ Lattice & LatticeFactory::Create(FclassType fermion,GclassType gluon)
   ERR.General("LatticeFactory","Create()",
 	      "Lattice type (fermion = %d, gluon = %d) not defined\n",
 	      fermion, gluon);
+  lat_p = new GnoneFnone;
+  return *lat_p;
 
 }
 char *AlgMeas::Dirname (char *path)
@@ -492,80 +524,80 @@ char *AlgMeas::Dirname (char *path)
 }
 void AlgMeas::TruncateWspectFiles(void)
 {
-  TruncateFile(woe.cg);
-  TruncateFile(woe.cg2);
-  TruncateFile(woe.pbp);
-  TruncateFile(woe.mid_point);
-  TruncateFile(woe.a0_p);
-  TruncateFile(woe.a1);
-  TruncateFile(woe.b1);
-  TruncateFile(woe.pion);
-  TruncateFile(woe.pion_prime);
-  TruncateFile(woe.rho);
-#if 0
-  TruncateFile(woe.a0);
-  TruncateFile(woe.a0_prime);
-  TruncateFile(woe.a1_x);
-  TruncateFile(woe.a1_y);
-  TruncateFile(woe.a1_z);
-  TruncateFile(woe.b1_x);
-  TruncateFile(woe.b1_y);
-  TruncateFile(woe.b1_z);
-  TruncateFile(woe.rho_x);
-  TruncateFile(woe.rho_y);
-  TruncateFile(woe.rho_z);
-  TruncateFile(woe.rho_x_prime);
-  TruncateFile(woe.rho_y_prime);
-  TruncateFile(woe.rho_z_prime);
-#else
-  TruncateFile(woe.meson_name00);
-  TruncateFile(woe.meson_name01);
-  TruncateFile(woe.meson_name02);
-  TruncateFile(woe.meson_name03);
-  TruncateFile(woe.meson_name04);
-  TruncateFile(woe.meson_name05);
-  TruncateFile(woe.meson_name06);
-  TruncateFile(woe.meson_name07);
-  TruncateFile(woe.meson_name08);
-  TruncateFile(woe.meson_name09);
-  TruncateFile(woe.meson_name10);
-  TruncateFile(woe.meson_name11);
-  TruncateFile(woe.meson_name12);
-  TruncateFile(woe.meson_name13);
-  TruncateFile(woe.meson_name14);
-  TruncateFile(woe.meson_name15);
-#endif
-  TruncateFile(woe.nucleon);
-  TruncateFile(woe.nucleon_prime);
-  TruncateFile(woe.delta_x);
-  TruncateFile(woe.delta_y);
-  TruncateFile(woe.delta_z);
-  TruncateFile(woe.delta_t);
-  /*
-   * Hack to work around a hack.... Grr...
-   */
-  char *meson_names[] = 
-    {
-      "a0.dat" , 
-      "rho_x.dat" , 
-      "rho_y.dat"    ,
-      "b1_z.dat"     ,
-      "rho_z.dat"    ,
-      "b1_y.dat",
-      "b1_x.dat",
-      "pion_prime.dat",
-      "a0_prime.dat",
-      "rho_x_prime.dat",
-      "rho_y_prime.dat",
-      "a1_z.dat" ,
-      "rho_z_prime.dat" , 
-      "a1_y.dat" , 
-      "a1_x.dat" , 
-      "pion.dat" 
-    };
-  for ( int i=0;i<16;i++ ) { 
-    TruncateFile(meson_names[i]);
-  }
+//   TruncateFile(woe.cg);
+//   TruncateFile(woe.cg2);
+//   TruncateFile(woe.pbp);
+//   TruncateFile(woe.mid_point);
+//   TruncateFile(woe.a0_p);
+//   TruncateFile(woe.a1);
+//   TruncateFile(woe.b1);
+//   TruncateFile(woe.pion);
+//   TruncateFile(woe.pion_prime);
+//   TruncateFile(woe.rho);
+// #if 0
+//   TruncateFile(woe.a0);
+//   TruncateFile(woe.a0_prime);
+//   TruncateFile(woe.a1_x);
+//   TruncateFile(woe.a1_y);
+//   TruncateFile(woe.a1_z);
+//   TruncateFile(woe.b1_x);
+//   TruncateFile(woe.b1_y);
+//   TruncateFile(woe.b1_z);
+//   TruncateFile(woe.rho_x);
+//   TruncateFile(woe.rho_y);
+//   TruncateFile(woe.rho_z);
+//   TruncateFile(woe.rho_x_prime);
+//   TruncateFile(woe.rho_y_prime);
+//   TruncateFile(woe.rho_z_prime);
+// #else
+//   TruncateFile(woe.meson_name00);
+//   TruncateFile(woe.meson_name01);
+//   TruncateFile(woe.meson_name02);
+//   TruncateFile(woe.meson_name03);
+//   TruncateFile(woe.meson_name04);
+//   TruncateFile(woe.meson_name05);
+//   TruncateFile(woe.meson_name06);
+//   TruncateFile(woe.meson_name07);
+//   TruncateFile(woe.meson_name08);
+//   TruncateFile(woe.meson_name09);
+//   TruncateFile(woe.meson_name10);
+//   TruncateFile(woe.meson_name11);
+//   TruncateFile(woe.meson_name12);
+//   TruncateFile(woe.meson_name13);
+//   TruncateFile(woe.meson_name14);
+//   TruncateFile(woe.meson_name15);
+// #endif
+//   TruncateFile(woe.nucleon);
+//   TruncateFile(woe.nucleon_prime);
+//   TruncateFile(woe.delta_x);
+//   TruncateFile(woe.delta_y);
+//   TruncateFile(woe.delta_z);
+//   TruncateFile(woe.delta_t);
+//   /*
+//    * Hack to work around a hack.... Grr...
+//    */
+//   char *meson_names[] = 
+//     {
+//       "a0.dat" , 
+//       "rho_x.dat" , 
+//       "rho_y.dat"    ,
+//       "b1_z.dat"     ,
+//       "rho_z.dat"    ,
+//       "b1_y.dat",
+//       "b1_x.dat",
+//       "pion_prime.dat",
+//       "a0_prime.dat",
+//       "rho_x_prime.dat",
+//       "rho_y_prime.dat",
+//       "a1_z.dat" ,
+//       "rho_z_prime.dat" , 
+//       "a1_y.dat" , 
+//       "a1_x.dat" , 
+//       "pion.dat" 
+//     };
+//   for ( int i=0;i<16;i++ ) { 
+//     TruncateFile(meson_names[i]);
+//   }
 }
 void AlgMeas::TruncateFile(char *foo)
 {

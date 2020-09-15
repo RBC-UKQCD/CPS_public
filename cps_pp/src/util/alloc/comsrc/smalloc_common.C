@@ -9,24 +9,20 @@
 
 CPS_START_NAMESPACE
 
-void* smalloc(const char cname[], const char fname[], const char vname[], size_t request){
-    return smalloc(request, vname, fname, cname);
+#if 0
+void* smalloc(size_t request, const char vname[], const char fname[], const char cname[]){
+    return smalloc(cname, fname, vname, request);
+}
+void sfree(void *p, const char vname[], const char fname[], const char cname[]){
+    sfree(cname, fname, vname, p);
 }
 
-//void* smalloc(size_t request){
-//    return smalloc(request, "", "smalloc", "");
-//}
-
-void sfree(const char cname[], const char fname[], const char vname[], void *p){
-    sfree(p, cname, fname, vname);
+void* fmalloc(size_t request, const char vname[], const char fname[], const char cname[]){
+    return fmalloc(cname, fname, vname, request);
 }
-
-void* fmalloc(const char *cname, const char *fname, const char *vname, size_t request){
-    return fmalloc(request, vname, fname, cname);
+void ffree(void *p, const char vname[], const char fname[], const char cname[]){
+    ffree(cname, fname, vname, p);
 }
-
-void ffree(const char *cname, const char *fname, const char *vname, void *p){
-    ffree(p, cname, fname, vname);
-}
+#endif
 
 CPS_END_NAMESPACE

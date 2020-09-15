@@ -7,20 +7,6 @@ CPS_START_NAMESPACE
   
   $Id: sproj_tr.C,v 1.1 2004/11/20 00:06:48 chulwoo Exp $
 */
-//--------------------------------------------------------------------
-//  CVS keywords
-//
-//  $Author: chulwoo $
-//  $Date: 2004/11/20 00:06:48 $
-//  $Header: /space/cvs/cps/cps++/src/util/lattice/f_wilson_types/qcdoc_cpp/sproj_tr.C,v 1.1 2004/11/20 00:06:48 chulwoo Exp $
-//  $Id: sproj_tr.C,v 1.1 2004/11/20 00:06:48 chulwoo Exp $
-//  $Name: v5_0_16_hantao_io_test_v7 $
-//  $Locker:  $
-//  $Revision: 1.1 $
-//  $Source: /space/cvs/cps/cps++/src/util/lattice/f_wilson_types/qcdoc_cpp/sproj_tr.C,v $
-//  $State: Exp $
-//
-//--------------------------------------------------------------------
 ///------------------------------------------------------------------
 //
 // sproj_tr.C

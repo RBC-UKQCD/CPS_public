@@ -13,39 +13,25 @@
 
 CPS_START_NAMESPACE
 
-void* smalloc(size_t request,
-	      const char vname[], const char fname[], const char cname[]){
+void* smalloc( const char cname[], const char fname[], const char vname[], size_t request){
 
-#ifdef HAVE_POSIX_MEMALIGN
-#define ALLOC_MEMALIGN_NUM 4096
   void *p;
-  if( posix_memalign((void**)&p, ALLOC_MEMALIGN_NUM, request) ) ERR.Pointer(cname, fname, vname);
-    VRB.Smalloc(cname, fname, vname, p, request);
-#else 
     if (request<=0)
 	ERR.General(cname,fname,"smalloc requested with size %d!\n",request);
-    void *p = malloc(request);
+//#ifdef HAVE_POSIX_MEMALIGN
+#if 0
+#define ALLOC_MEMALIGN_NUM 512
+  if( posix_memalign((void**)&p, ALLOC_MEMALIGN_NUM, request) ) ERR.Pointer(cname, fname, vname);
+#else 
+    p = malloc(request);
     if(!p) ERR.Pointer(cname, fname, vname);
 #endif
+    VRB.Smalloc(cname, fname, vname, p, request);
     return p;
 }
 
-void* smalloc(size_t request){
-    if (request<=0)
-	ERR.General("","","smalloc requested with size %d!\n",request);
-    void *p = malloc(request);
-    if(!p) ERR.Pointer("", "", "");
-    VRB.Smalloc("", "", "", p, request);
-    return p;
-}
-
-void sfree(void* p, const char vname[], const char fname[], const char cname[]){
+void sfree( const char cname[], const char fname[], const char vname[], void* p ){
     VRB.Sfree(cname, fname, vname, p);
-    free(p);
-}
-
-void sfree(void* p){
-    VRB.Sfree("", "", "", p);
     free(p);
 }
 

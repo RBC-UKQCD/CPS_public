@@ -16,7 +16,9 @@ enum INT_FORMAT {
   INT_AUTOMATIC, // used as arguments to function, 
                 //will be substituted by hostFormat or fileFormat depending on situation
   INT_32BIG,
-  INT_32LITTLE
+  INT_32LITTLE,
+  INT_64BIG,
+  INT_64LITTLE
 };
 
 
@@ -30,16 +32,19 @@ class IntConv : public DataConversion
   char * cname;
  protected:
   void byterevn(type32 w[], int n) const;
+  void byterevn64(type64 w[], int n) const;
 
   void copy32(type32 tgt[], type32 src[], int n) const;
-  enum INT_FORMAT  testHostFormat();
+  void copy64(type64 tgt[], type64 src[], int n) const;
 
  public:
   enum INT_FORMAT  hostFormat, fileFormat; // open to public so I can broadcast them
   enum INT_FORMAT  setFileFormat(const char * desc);
   enum INT_FORMAT  setFileFormat(const enum INT_FORMAT dataFormat);
+  enum INT_FORMAT  testHostFormat(int size = -1);
 
   IntConv();
+  IntConv(int size);
   virtual ~IntConv();
   char * file2host(char * hbuf, const char *fdat, const int fdat_len) const;
   char * host2file(char * fbuf, const char *hdat, const int hdat_len) const;

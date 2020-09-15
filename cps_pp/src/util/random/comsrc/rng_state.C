@@ -9,21 +9,6 @@ CPS_START_NAMESPACE
   $Id: rng_state.C,v 1.2 2005-08-02 18:07:43 chulwoo Exp $
 */
 //--------------------------------------------------------------------
-/*
-  $Author: chulwoo $
-  $Date: 2005-08-02 18:07:43 $
-  $Header: /home/cvs/cps/cps++/src/alg/alg_hmd/alg_hmc_rhmc.C,v 1.18
-2005/06/16
-07:18:55 chulwoo Exp $
-  $Id: rng_state.C,v 1.2 2005-08-02 18:07:43 chulwoo Exp $
-  $Name: not supported by cvs2svn $
-  $Locker:  $
-  $RCSfile: rng_state.C,v $
-  $Revision: 1.2 $
-  $Source: /home/chulwoo/CPS/repo/CVS/cps_only/cps_pp/src/util/random/comsrc/rng_state.C,v $
-  $State: Exp $
-*/
-
 LRGState::LRGState(){
 
   cname = "LRGState";

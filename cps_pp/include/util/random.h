@@ -2,12 +2,13 @@
 #include<vector>
 #ifdef USE_C11_RNG
 #include<random>
+#include <util/prng_engine.hpp>
 #endif
 CPS_START_NAMESPACE
 /*!\file
   \brief  Definition of RNG classes.
 
-  $Id: random.h,v 1.28 2008-04-21 14:19:17 chulwoo Exp $
+  $Id: random.h,v 1.28.142.1 2012-11-15 18:17:08 ckelly Exp $
  */
 
 
@@ -26,8 +27,12 @@ CPS_START_NAMESPACE
 #ifdef USE_C11_MT
 typedef   std::mt19937  CPS_RNG;
 typedef u_int32_t RNGSTATE ;
-#else
+#elif  (defined USE_C11_RANLUX )
 typedef   std::ranlux48  CPS_RNG;
+typedef u_int64_t RNGSTATE ;
+#else 
+// making sitmo C11_RNG default
+typedef   sitmo::prng_engine  CPS_RNG;
 typedef u_int64_t RNGSTATE ;
 #endif
 #endif
@@ -55,6 +60,11 @@ class RandomGenerator {
     RandomGenerator() {    }
     virtual ~RandomGenerator() {    }
 
+    //CK for testing add copy constructor and equivalence operator
+    RandomGenerator(const RandomGenerator &in);
+    RandomGenerator & operator=(const RandomGenerator &in);
+    bool operator==(const RandomGenerator &in) const;
+
     //! Gets a random number 
     IFloat Rand();
 
@@ -70,23 +80,16 @@ class RandomGenerator {
     //! Size of the RNG state.
     int StateSize() const;
 
+    int const* getState() const{ return ma; }
 #if 1
     //! Number of Integers in RNG, that should be stored to record status
     virtual int RNGints() const { return state_size + 2; } // ma & inext & inextp
 
     //! to store this object
-    void store(int *buf) {
-      memcpy(buf,ma,state_size * sizeof(int));
-      buf[state_size] = inext;
-      buf[state_size+1] = inextp;
-    }
+    void store(int *buf);
 
     //! to load from file
-    void load(int *buf) {
-      memcpy(ma,buf,state_size * sizeof(int));
-      inext = buf[state_size];
-      inextp = buf[state_size+1];
-    }
+    void load(int *buf);
 #endif
     
 };
@@ -122,7 +125,7 @@ class UniformRandomGenerator: public virtual RandomGenerator
   upper bound.
 */
     UniformRandomGenerator(IFloat high_limit = 0.5, IFloat low_limit = -0.5):
-//	RandomGenerator(), A(low_limit), B(high_limit) {} //what's wrong with this?
+//	RandomGenerator(), A(low_limit), B(high_limit) {} //what's wrong with this? CK: THEY'RE STATIC MEMBERS!
 	RandomGenerator() {}
 	~UniformRandomGenerator() {}
 
@@ -138,6 +141,9 @@ class UniformRandomGenerator: public virtual RandomGenerator
     static void SetInterval(IFloat high_limit, IFloat low_limit){
 	A = low_limit;
 	B = high_limit;
+    }
+    static void GetInterval(IFloat &hi, IFloat &lo){
+      lo = A; hi = B;
     }
 
     IFloat Rand();
@@ -176,6 +182,11 @@ class GaussianRandomGenerator : public virtual RandomGenerator
     GaussianRandomGenerator(IFloat s2 = 1.0):
 	RandomGenerator(), iset(0) {SetSigma(s2);}    
     ~GaussianRandomGenerator() {}
+
+    //CK: Added copy constructor and equivalene operator for testing purposes
+    GaussianRandomGenerator(const GaussianRandomGenerator &in);
+    GaussianRandomGenerator & operator=(const GaussianRandomGenerator &in);
+    bool operator==(const GaussianRandomGenerator &in) const;
 
 //! Sets the variance of the distribution.
 /*!
@@ -228,6 +239,11 @@ public UniformRandomGenerator, public GaussianRandomGenerator
     UGrandomGenerator():
 	UniformRandomGenerator(),
 	GaussianRandomGenerator() {};
+
+    //CK added copy constructor and equivalence operator
+    UGrandomGenerator(const UGrandomGenerator&in);
+    UGrandomGenerator & operator=(const UGrandomGenerator&in);
+    bool operator==(const UGrandomGenerator&in) const;
 
     //! Get a gaussian random number
     IFloat Grand(int noexit=0) { return GaussianRandomGenerator::Rand(noexit); }
@@ -287,16 +303,17 @@ class LatRanGen
     int rgen_pos_4d;// CJ: ID of the 4D generator being used
 
 #ifdef USE_C11_RNG
-    std::vector<CPS_RNG>  mtran;
-//   CPS_RNG  *mtran;
+   std::vector<CPS_RNG>  cpsran;
    std::uniform_real_distribution<Float> urand;
    std::normal_distribution<Float> grand;
    Float urand_lo=0,urand_hi=1.;
    Float grand_mean=0,grand_sigma=1.;
-#ifdef USE_C11_MT
+#if (defined USE_C11_MT)
    static const int state_size = 625;
-#else
+#elif (defined USE_C11_RANLUX)
    static const int state_size = 15;
+#else
+   static const int state_size = 11;
 #endif
 #else
     UGrandomGenerator *ugran;
@@ -310,6 +327,12 @@ class LatRanGen
   public:
     LatRanGen();
     ~LatRanGen();
+
+    //CK added for testing
+    LatRanGen(const LatRanGen &in);
+    LatRanGen &operator=(const LatRanGen &in);
+    bool operator==(const LatRanGen &in) const;
+
     void Initialize();  
 #if 0
 //doesn't work properly. Fix needed before enabling
@@ -323,6 +346,13 @@ class LatRanGen
     int RngNum(){return n_rgen_4d;}
 #endif
 
+    void Reinitialize(); //added by CK - turns off is_initialised flag, frees memory and runs initialize again
+#ifndef USE_C11_RNG
+    //below added by CK as I need access to the random number gens themselves.
+    UGrandomGenerator & UGrandGen(const int &idx){ return ugran[idx]; }
+    UGrandomGenerator & UGrandGen4D(const int &idx){ return ugran_4d[idx]; }
+#endif
+
     //! Get a uniform random number.
     IFloat Urand(FermionFieldDimension frm_dim=FOUR_D);
     IFloat Urand(Float high, Float low, FermionFieldDimension frm_dim=FOUR_D);
@@ -332,6 +362,7 @@ class LatRanGen
 
     //! Get a uniform random number which is the same on all nodes.
     IFloat Lrand(); 
+    IFloat Lrand(Float high, Float low);
 
     //! Sets the variance of the distribution.
     void SetSigma(IFloat sigma);
@@ -340,11 +371,11 @@ class LatRanGen
     void SetInterval(IFloat high, IFloat low);
 
     //! Specifies which hypercube RNG to use.
-    void AssignGenerator(int x, int y, int z, int t,int s = 0);
+    void AssignGenerator(int x, int y, int z, int t,int s=0, const int &field_idx = 0);
     //! Specifies which hypercube RNG to use.
-    void AssignGenerator(const int * coor);
+    void AssignGenerator(const int * coor, const int &field_idx = 0);
     //! Specifies which hypercube RNG to use.
-    void AssignGenerator(int i);
+    void AssignGenerator(int i, const int &field_idx = 0);
 
     //! Size of the RNG state (per hypercube).
     int StateSize() const;
@@ -380,6 +411,16 @@ class LatRanGen
     bool Read(const char* filename, int concur_io_num = 0);
     bool Write(const char* filename, int concur_io_num = 0);
 
+#if 0
+    int GetGeneratorIndex(const FermionFieldDimension &frm_dim = FIVE_D) const{
+#ifndef USE_C11_RNG
+      if(frm_dim == FIVE_D) return rgen_pos;
+      else 
+#endif
+      	return rgen_pos_4d;
+    }
+#endif
+    
  private:
     bool UseParIO;
     bool io_good;
@@ -435,14 +476,12 @@ class LRGState {
   ~LRGState(){
      delete[] rng_state;
   }
-
   void GetStates(){
     LRG.GetAllStates(rng_state);
   }
   void SetStates(){
     LRG.SetAllStates(rng_state);
   }
-
 #else
   unsigned int ** rng4d;
   unsigned int ** rng5d;

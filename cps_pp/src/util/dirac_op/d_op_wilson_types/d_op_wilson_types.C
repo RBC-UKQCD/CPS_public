@@ -118,7 +118,7 @@ int DiracOpWilsonTypes::RitzLatSize() {
   char *fname = "RitzLatSize()";
   VRB.Func(cname,fname);
 
-  int f_size = GJP.VolNodeSites() * lat.FsiteSize();
+  size_t f_size = GJP.VolNodeSites() * lat.FsiteSize();
 
   switch(dirac_arg->RitzMatOper)
   {
@@ -138,6 +138,7 @@ int DiracOpWilsonTypes::RitzLatSize() {
 		dirac_arg->RitzMatOper);
   }
 
+  if(GJP.Gparity()) f_size*=2;
   return f_size;
 }
 

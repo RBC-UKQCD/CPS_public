@@ -78,4 +78,49 @@ vml_LancArg (VML *vmls, char *name,LancArg *objp)
 	 vml_class_end(vmls,"LancArg",name);
 	return TRUE;
 }
+void rpc_deepcopy<LancArg>::doit(LancArg &into, LancArg const &from){
+	  rpc_deepcopy<Float>::doit(into.mass,from.mass);
+	  rpc_deepcopy<Float>::doit(into.stop_rsd,from.stop_rsd);
+	  rpc_deepcopy<Float>::doit(into.qr_rsd,from.qr_rsd);
+	  rpc_deepcopy<enum EigenType>::doit(into.EigenOper,from.EigenOper);
+	  rpc_deepcopy<bool_t>::doit(into.precon,from.precon);
+	  rpc_deepcopy<int>::doit(into.N_get,from.N_get);
+	  rpc_deepcopy<int>::doit(into.N_use,from.N_use);
+	  rpc_deepcopy<int>::doit(into.N_true_get,from.N_true_get);
+	  rpc_deepcopy<int>::doit(into.ch_ord,from.ch_ord);
+	  rpc_deepcopy<Float>::doit(into.ch_alpha,from.ch_alpha);
+	  rpc_deepcopy<Float>::doit(into.ch_beta,from.ch_beta);
+	  rpc_deepcopy<bool_t>::doit(into.ch_sh,from.ch_sh);
+	  rpc_deepcopy<Float>::doit(into.ch_mu,from.ch_mu);
+	  rpc_deepcopy<bool_t>::doit(into.lock,from.lock);
+	  rpc_deepcopy<int>::doit(into.maxits,from.maxits);
+	  rpc_deepcopy<char *>::doit(into.fname,from.fname,strlen(from.fname)+1);
+}
+void LancArg::deep_copy(LancArg const &rhs){
+	rpc_deepcopy<LancArg>::doit(*this,rhs);
+}
+void rpc_print<LancArg>::doit(LancArg const &what, const std::string &prefix){
+	std::cout << prefix << "{\n";
+	std::string spaces(prefix.size(),' ');
+	rpc_print<Float>::doit(what.mass,spaces+" mass = ");
+	rpc_print<Float>::doit(what.stop_rsd,spaces+" stop_rsd = ");
+	rpc_print<Float>::doit(what.qr_rsd,spaces+" qr_rsd = ");
+	rpc_print<enum EigenType>::doit(what.EigenOper,spaces+" EigenOper = ");
+	rpc_print<bool_t>::doit(what.precon,spaces+" precon = ");
+	rpc_print<int>::doit(what.N_get,spaces+" N_get = ");
+	rpc_print<int>::doit(what.N_use,spaces+" N_use = ");
+	rpc_print<int>::doit(what.N_true_get,spaces+" N_true_get = ");
+	rpc_print<int>::doit(what.ch_ord,spaces+" ch_ord = ");
+	rpc_print<Float>::doit(what.ch_alpha,spaces+" ch_alpha = ");
+	rpc_print<Float>::doit(what.ch_beta,spaces+" ch_beta = ");
+	rpc_print<bool_t>::doit(what.ch_sh,spaces+" ch_sh = ");
+	rpc_print<Float>::doit(what.ch_mu,spaces+" ch_mu = ");
+	rpc_print<bool_t>::doit(what.lock,spaces+" lock = ");
+	rpc_print<int>::doit(what.maxits,spaces+" maxits = ");
+	rpc_print<char *>::doit(what.fname,strlen(what.fname)+1,spaces+" fname = ");
+	std::cout << spaces << "}\n";
+}
+void LancArg::print(const std::string &prefix){
+	rpc_print<LancArg>::doit(*this,prefix);
+}
 CPS_END_NAMESPACE

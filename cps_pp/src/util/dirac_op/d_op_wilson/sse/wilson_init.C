@@ -1,7 +1,7 @@
 #if (defined USE_SSE)||(defined SSE_TO_C)
 #include <config.h>
 #ifdef SSE_TO_C
-#include "sse-defs.h"
+#include "../noarch/sse-defs.h"
 #else
 #define SSE_C_FLOAT Float
 #endif
@@ -185,6 +185,7 @@ void wilson_init(Wilson *wilson_p)  /* pointer to Wilson type structure    */
 /* spinors.)                                                                */
 /*--------------------------------------------------------------------------*/
   spinor_words = SPINOR_SIZE * wilson_p->vol[0];
+  if(GJP.Gparity()) spinor_words *=2; //use second half for f1
 
   wilson_p->af[0] = (IFloat *) smalloc(spinor_words*sizeof(Float));
   if(wilson_p->af[0] == 0)
@@ -218,8 +219,13 @@ void wilson_init(Wilson *wilson_p)  /* pointer to Wilson type structure    */
   const int   lt = wilson_p->ptr[3];
   const int   vol = wilson_p->vol[0];
 
+  omp_set_num_threads(GJP.Nthreads());
 #pragma omp parallel
+
   wilson_p->num_threads= omp_get_num_threads();
+
+  if(!UniqueID()) printf("SSE wilson dslash initialising on %d threads\n",wilson_p->num_threads);
+
 
 #if 0
   /*
@@ -250,6 +256,8 @@ void wilson_init(Wilson *wilson_p)  /* pointer to Wilson type structure    */
   block[2]=HALF_SPINOR_SIZE*lx*ly*lt/2;
   block[3]=HALF_SPINOR_SIZE*lx*ly*lz/2;
 
+  if(GJP.Gparity())
+    for(int i=0;i<4;i++) block[i]*=2; //comms buffers are double the usual size
 
   if(GJP.Xnodes()!=1){
     int dir=0;     wilson_init_comm(dir, block[dir], wilson_p);

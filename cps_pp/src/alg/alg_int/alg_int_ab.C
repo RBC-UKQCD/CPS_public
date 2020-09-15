@@ -18,6 +18,7 @@ CPS_END_NAMESPACE
 #include<util/smalloc.h>
 #include<util/verbose.h>
 #include<util/error.h>
+#include<util/time_cps.h>
 #include<alg/alg_int.h>
 CPS_START_NAMESPACE
 
@@ -42,13 +43,43 @@ AlgIntAB::~AlgIntAB() {
 
 // Maybe use tmp in future but can ignore for now
 void AlgIntAB::heatbath() {
-  traj++;
+//  traj++;
+  const char *fname="heatbath()";
+  std::string  veloc_label = "Phi_traj" +std::to_string(traj_num);
+//  veloc_label<<"Phi_traj"<<traj_num;
+//  char veloc_tmp[256];
+//  snprintf(veloc_tmp,256,"Phi_traj%d",traj_num);
+
+//  char *veloc_p = veloc_label.c_str();
   A->heatbath();
   B->heatbath();
+#ifdef HAVE_VELOC
+  if (level == TOP_LEVEL_INTEGRATOR){
+     int veloc_v = getVer(veloc_label.c_str());
+     VRB.Result(cname,fname,"veloc_v=%d\n",veloc_v);
+     Float dtime = -dclock();
+     if (veloc_v<1){
+	VELOC_Checkpoint_begin(veloc_label.c_str(),1);
+//	VELOC_Checkpoint_selective(VELOC_CKPT_SOME,phi_veloc_all.data(),phi_veloc_all.size());
+	VELOC_Checkpoint_mem();
+	VELOC_Checkpoint_end(1);
+     } else {
+        VELOC_Restart_begin (veloc_label.c_str(),1);
+//	VELOC_Recover_selective(VELOC_CKPT_SOME,phi_veloc_all.data(),phi_veloc_all.size());
+	VELOC_Recover_mem();
+	VELOC_Restart_end(1);
+        exit(-42);
+     }
+//     VELOC_Finalize(0);
+     dtime +=dclock();
+     print_time(fname,"VeloC()",dtime);
+  }
+#endif
 }
 
 Float AlgIntAB::energy() {
-  return A->energy() + B->energy();
+  Float out = A->energy() + B->energy();
+  return out;
 }
 
 void AlgIntAB::cost(CgStats *cg_stats) {
@@ -96,9 +127,7 @@ AlgIntAB& AlgIntAB::Create(AlgInt &A, AlgInt &B, IntABArg &ab_arg) {
 }
 
 void AlgIntAB::Destroy(AlgIntAB &ab) {
-
   delete &ab;
-
 }
 
 CPS_END_NAMESPACE

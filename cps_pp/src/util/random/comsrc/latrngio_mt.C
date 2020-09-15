@@ -8,6 +8,7 @@
 #include <util/intconv.h>
 #include <util/random.h>
 #include <iostream>
+#include <assert.h>
 #include <string>
 #include <fstream>
 #include <sstream>
@@ -34,6 +35,8 @@ void LatRngRead::read(RNGSTATE *mtran_dump,
 		      const QioArg & rd_arg) { 
   const char * fname = "read()";
   VRB.Func(cname,fname);
+
+  intconv.testHostFormat(sizeof(RNGSTATE));
 
   char loginfo[100];
   sprintf(loginfo,"Load %s",rd_arg.FileName);
@@ -68,8 +71,10 @@ void LatRngRead::read(RNGSTATE *mtran_dump,
   if(isRoot()) {
 #ifdef USE_C11_MT
     if(hd.datatype != "LATTICE_RNG_C11_MT19937"){ 
-#else
+#elif (defined USE_C11_RANLUX)
     if(hd.datatype != "LATTICE_RNG_C11_RANLUX48"){
+#else
+    if(hd.datatype != "LATTICE_RNG_C11_SITMO"){
 #endif
       VRB.Flow(cname,fname,"Invalid RNG type: %s\n",hd.datatype.c_str());
       error = 1;
@@ -125,12 +130,6 @@ void LatRngRead::read(RNGSTATE *mtran_dump,
   log();
 
 
-//#if TARGET == QCDOC  // when on QCDOC, only Parallel (direct IO) mode is used
-// #if 1
-//   setParallel();
-// #else
-//   setSerial();
-// #endif
   VRB.Result(cname,fname,"parIO()=%d\n",parIO());
 
   if(parIO()) {
@@ -266,7 +265,13 @@ void LatRngWrite::write(RNGSTATE *mtran_dump,
   io_good = false;
   int error = 0;
 
+
+  VRB.Result(cname,fname,"wt_arg.FileIntFormat= %s\n",intconv.name(wt_arg.FileIntFormat));
   // some cross-platform issued to be discussed
+  intconv.testHostFormat(sizeof(RNGSTATE));
+  if(sizeof(RNGSTATE) != intconv.size(wt_arg.FileIntFormat))
+  ERR.General(cname,fname,"sizeof(RNGSTATE)(%d) != intconv.size(wt_arg.FileIntFormat(%s))(%d)\n",
+	sizeof(RNGSTATE) , intconv.name(wt_arg.FileIntFormat), intconv.size(wt_arg.FileIntFormat) );
   intconv.setFileFormat(wt_arg.FileIntFormat);
   //  VRB.Flow(cname,fname, "Set File INT format : %s\n", intconv.name(intconv.fileFormat));
 

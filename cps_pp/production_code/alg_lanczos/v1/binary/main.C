@@ -225,7 +225,7 @@ int main(int argc,char *argv[])
     int neig=qpropw_arg.cg.neig;
 
     const int n_fields =  GJP.SnodeSites();  //   *nk ; 
-    const int f_size_per_site = lattice.FsiteSize() / GJP.SnodeSites()   / 2;
+    const size_t f_size_per_site = lattice.FsiteSize() / GJP.SnodeSites()   / 2;
     
     // root name of eigen value/vector to be read 
     char efname[1024];

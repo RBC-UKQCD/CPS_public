@@ -48,7 +48,7 @@ void mobius_mdagm(Vector *out,
 // Calculate the dot product <out, in> = <M in, M in>
 //------------------------------------------------------------------
   if(dot_prd != 0){
-    int f_size = 24 * mobius_lib_arg->vol_4d * mobius_lib_arg->ls / 2;
+    size_t f_size = 24 * mobius_lib_arg->vol_4d * mobius_lib_arg->ls / 2;
     *dot_prd = frm_tmp1->NormSqNode(f_size);
     DiracOp::CGflops+=2*f_size;
   }
@@ -89,7 +89,7 @@ void mobius_mdagm_shift(Vector *out,
 
   const int vol_4d_cb = mobius_lib_arg->vol_4d / 2;
   const int ls = mobius_lib_arg->ls;
-  const int f_size = vol_4d_cb * ls * 24;
+  const size_t f_size = (size_t) vol_4d_cb * ls * 24;
   
 
   //  1. tmp1 <- M in
@@ -112,11 +112,8 @@ void mobius_mdagm_shift(Vector *out,
 #if 1
   fTimesV1PlusV2( (IFloat*)out, -2*mu, (IFloat*)frm_tmp2, (IFloat*)out, f_size);
 #else
-<<<<<<< HEAD
-  cblas_daxpy(  f_size, (IFloat*)out, -2*mu, (IFloat*)frm_tmp2, (IFloat*)out);
-=======
-  cblas_daxpy( f_size, -2*mu, (IFloat*)frm_tmp2, (IFloat*)out);
->>>>>>> f4d8b3efd7d075dbc6c035719b5fa7db21eaba29
+//  cblas_daxpy(  f_size, (IFloat*)out, -2*mu, (IFloat*)frm_tmp2, (IFloat*)out);
+//  cblas_daxpy( f_size, -2*mu, (IFloat*)frm_tmp2, (IFloat*)out);
 #endif
   
 //  5. out += mu^2 in
@@ -125,11 +122,8 @@ void mobius_mdagm_shift(Vector *out,
 #if 1
   fTimesV1PlusV2( (IFloat*)out, mu*mu, (IFloat*)in, (IFloat*)out, f_size);
 #else
-<<<<<<< HEAD
-  cblas_daxpy(f_size,   (IFloat*)out, mu*mu, (IFloat*)in, (IFloat*)out);
-=======
-  cblas_daxpy( f_size, mu*mu, (IFloat*)in, (IFloat*)out );
->>>>>>> f4d8b3efd7d075dbc6c035719b5fa7db21eaba29
+//  cblas_daxpy(f_size,   (IFloat*)out, mu*mu, (IFloat*)in, (IFloat*)out);
+//  cblas_daxpy( f_size, mu*mu, (IFloat*)in, (IFloat*)out );
 #endif
 
   
@@ -137,7 +131,7 @@ void mobius_mdagm_shift(Vector *out,
   // Calculate the dot product <out, in> 
   //------------------------------------------------------------------
   if(dot_prd != 0){
-    int f_size = 24 * mobius_lib_arg->vol_4d * mobius_lib_arg->ls / 2;
+    size_t f_size = 24 * mobius_lib_arg->vol_4d * mobius_lib_arg->ls / 2;
     *dot_prd = frm_tmp1->NormSqNode(f_size);
     DiracOp::CGflops+=2*f_size;
   }

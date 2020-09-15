@@ -10,6 +10,23 @@ using namespace std;
 
 CPS_START_NAMESPACE
 
+
+#if 1
+const char *LatRngHeader::RNGString = 
+#ifdef USE_C11_RNG
+#ifdef USE_C11_MT
+"LATTICE_RNG_C11_MT19937";
+#elif (defined USE_C11_RANLUX)
+"LATTICE_RNG_C11_RANLUX48";
+#else
+"LATTICE_RNG_C11_SITMO";
+#endif
+#else
+"LATTICE_RNG_5D_4D";
+#endif
+#endif
+
+
 ///////////////////////////////////////////////////////////////////
 // GCFheaderPar class members
 string elmSpacePar(string str)
@@ -133,6 +150,7 @@ void LatticeHeader::init(const QioArg & qio_arg, FP_FORMAT FileFormat, Float Lin
 
   link_trace = LinkTrace;
   plaquette = Plaq;
+  VRB.Result("LatticeHeader","init()","link_trace=%g plaquette=%g\n",LinkTrace,Plaq);
 
   for(int i=0;i<4;i++) 
     boundary[i] = qio_arg.Bc(i);
@@ -211,8 +229,11 @@ void LatticeHeader::write(ostream & fout) {
   fout << "PLAQUETTE  = " << setprecision(10) << plaquette << endl;
 
   for(int i=0;i<4;i++){
-    fout << "BOUNDARY_"<<i+1<<" = " <<
-      (boundary[i]== BND_CND_APRD? "ANTIPERIODIC" :"PERIODIC") << endl;
+    fout << "BOUNDARY_"<<i+1<<" = ";
+    if(boundary[i] == BND_CND_PRD) fout << "PERIODIC";
+    else if(boundary[i] == BND_CND_APRD) fout << "ANTIPERIODIC";
+    else if(boundary[i] == BND_CND_GPARITY) fout << "GPARITY";
+    fout << endl;
   }
 
   fout << "CHECKSUM = ";
@@ -269,11 +290,12 @@ void LatticeHeader::read(istream & fin) {
   link_trace = hd.asFloat("LINK_TRACE");
   plaquette = hd.asFloat("PLAQUETTE");
 
-  boundary[0] = (hd.asString("BOUNDARY_1")=="ANTIPERIODIC" ? BND_CND_APRD : BND_CND_PRD);
-  boundary[1] = (hd.asString("BOUNDARY_2")=="ANTIPERIODIC" ? BND_CND_APRD : BND_CND_PRD);
-  boundary[2] = (hd.asString("BOUNDARY_3")=="ANTIPERIODIC" ? BND_CND_APRD : BND_CND_PRD);
-  boundary[3] = (hd.asString("BOUNDARY_4")=="ANTIPERIODIC" ? BND_CND_APRD : BND_CND_PRD);
-
+  string bcs[] = {hd.asString("BOUNDARY_1"), hd.asString("BOUNDARY_2"), hd.asString("BOUNDARY_3"), hd.asString("BOUNDARY_4") };
+  for(int d=0;d<4;d++){
+    if(bcs[d] == "PERIODIC") boundary[d] == BND_CND_PRD;
+    else if(bcs[d] == "ANTIPERIODIC") boundary[d] == BND_CND_APRD;
+    else if(bcs[d] == "GPARITY") boundary[d] == BND_CND_GPARITY;
+  }
   checksum = hd.asHex("CHECKSUM");
   //  sscanf(hd.asString("CHECKSUM").c_str(), "%x ", &checksum);
 
@@ -289,22 +311,27 @@ void LatticeHeader::read(istream & fin) {
   floating_point = fp.setFileFormat(hd.asString("FLOATING_POINT").c_str());
 }
 
-
 /////////////////////////////////////////////////////////////////////
 // LatRngHeader members 
 /////////////////////////////////////////////////////////////////////
 void LatRngHeader::init(const QioArg & qio_arg, INT_FORMAT FileFormat) {
   hdr_version = "1.0";
+
+  storage_format = "1.0";
+
+#if 1
 #ifdef USE_C11_RNG
 #ifdef USE_C11_MT
-  datatype = "LATTICE_RNG_C11_MT19937";
+	datatype = "LATTICE_RNG_C11_MT19937";
+#elif (defined USE_C11_RANLUX)
+	datatype = "LATTICE_RNG_C11_RANLUX48";
 #else
-  datatype = "LATTICE_RNG_C11_RANLUX48";
+	datatype = "LATTICE_RNG_C11_SITMO";
 #endif
 #else
-  datatype = "LATTICE_RNG_5D_4D";
+	datatype = "LATTICE_RNG_5D_4D";
 #endif
-  storage_format = "1.0";
+#endif
 
   for(int i=0;i<5;i++)
     dimension[i] = qio_arg.Nodes(i)*qio_arg.NodeSites(i);
@@ -459,6 +486,9 @@ void LatRngHeader::read(istream & fin) {
   archive_date = hd.asString("ARCHIVE_DATE");
 
   IntConv intconv;
+#ifdef USE_C11_RNG
+  intconv.testHostFormat(sizeof(RNGSTATE));
+#endif
   int_format = intconv.setFileFormat(hd.asString("INT_FORMAT").c_str());
 
 }

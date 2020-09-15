@@ -233,6 +233,9 @@ DiracOpMdwf::DiracOpMdwf(Lattice& latt,            // Lattice object.
     // is this the case?
     ERR.NotImplemented(cname, fname);
   }
+  if( GJP.Gparity() ){
+    ERR.General(cname,fname,"MDWF library has not been modified for G-parity BCs");
+  }
 
   latt_ptr = &latt;
 

@@ -748,6 +748,7 @@ void qio_writePropagator::write_ScS_12sink(char *outfile, const void *prop, cons
 void qio_writePropagator::write_12pairs(char *outfile, const QIO_PROP_SOURCE_TYPES sType, const void *prop, const void *source, 
 					int volFormat, FP_FORMAT floatFormat)
 {
+  if(GJP.Gparity()) return write_12pairs_gparity(outfile,sType,prop,source,volFormat,floatFormat);
 
   const char * fname = "write_12pairs(...)";
 
@@ -1283,6 +1284,7 @@ void qio_writePropagator::write_pair(char *outfile, const QIO_PROP_SOURCE_TYPES 
 {
   
   const char * fname = "write_pair(...)";
+  if(GJP.Gparity()) ERR.General(cname,fname,"Not currently implemented for G-parity propagators\n");
 
   VRB.Func(cname,fname);
 
@@ -1888,6 +1890,627 @@ void qio_writePropagator::setSourceHypercube( const int start[4], const int end[
 
 
   VRB.FuncEnd(cname,fname);
+}
+//CKelly for G-parity
+
+void qio_writePropagator::write_12pairs_gparity(char *outfile, const QIO_PROP_SOURCE_TYPES sType, const void *prop, const void *source, 
+						int volFormat, FP_FORMAT floatFormat){
+  const char * fname = "write_12pairs_gparity(...)";
+  if(!GJP.Gparity()) ERR.General(cname,fname,"Function not valid for non-gparity lattices\n");
+  
+  VRB.Func(cname,fname);
+
+  VRB.Result(cname,fname,"writing propagator format:\n    12 pairs of %s source and sink\n    to %s \n",
+	     ( sType==QIO_FULL_SOURCE ? "full" : ( sType==QIO_SCALAR_SOURCE ? "scalar" : "unknown") ),
+	     outfile);
+
+  int return_val(0);
+
+  const int sizepersite(QIO_PROP_SPIN_MAX*QIO_PROP_COLOR_MAX);
+
+  int source_size(0);
+
+  Float *wprop_f0 = (Float *)prop;
+  Float *wsource_f0 = (Float *)source;
+
+  if( sType != QIO_FULL_SOURCE ) ERR.General(cname,fname,"Not sure G-parity format for scalar source type\n");
+
+  Float *wprop_f1 = (Float *)prop + GJP.VolNodeSites()*sizepersite*sizepersite*2;
+  Float *wsource_f1 = (Float *)source + GJP.VolNodeSites()*2*sizepersite;
+
+  QIO_RecordInfo *record_prop;
+  record_prop = QIO_create_record_info(0, NULL, NULL, 0, "", "", 0,0,0,0);
+
+  QIO_RecordInfo *record_source;
+  record_source = QIO_create_record_info(0, NULL, NULL, 0, "", "", 0,0,0,0);
+
+  QIO_String *record_xml_prop;
+  record_xml_prop = QIO_string_create();
+
+  QIO_String *record_xml_source;
+  record_xml_source = QIO_string_create();
+
+  QIO_String *record_file;
+  record_file = QIO_string_create();
+
+  qio_setLayout();
+  
+  //detect output format
+
+  int SingleDouble(1);
+  // 1=double (standard), else single
+  
+  switch( floatFormat )
+    {
+    case FP_TIDSP32 :      SingleDouble=0; break;
+    case FP_IEEE32 :       SingleDouble=0; break;
+    case FP_IEEE32BIG :    SingleDouble=0; break;
+    case FP_IEEE32LITTLE : SingleDouble=0; break;
+
+    default: SingleDouble=1;
+    }
+
+  if (SingleDouble) VRB.Flow(cname,fname," output-precision: DOUBLE\n");
+  else VRB.Flow(cname,fname," output-precision: SINGLE\n");
+
+  char xml_info_file[7*(MAX_HEADER_LINE+10)];
+  char xml_info_prop[6*(MAX_HEADER_LINE+10)];
+  char xml_info_source[6*(MAX_HEADER_LINE+10)];
+
+
+
+  sprintf(xml_info_file, "DATATYPE = 4D_GPARITY_PROPAGATOR\nPROPAGATORTYPE = %s\nSOURCETYPE = %s\nENSEMBLE_ID = %s\nENSEMBLE_LABEL = %s\nSEQUENCE_NUMBER = %i",
+  	  header_propagator_type, header_source_type, header_ensemble_id, header_ensemble_label, header_traj);
+
+  sprintf(xml_info_prop, "DATATYPE = 4D_GPARITY_PROPAGATOR\nPROPAGATORTYPE = %s\nENSEMBLE_ID = %s\nENSEMBLE_LABEL = %s\nSEQUENCE_NUMBER = %i",
+  	  header_propagator_type, header_ensemble_id, header_ensemble_label, header_traj);
+
+  sprintf(xml_info_source, "DATATYPE = 4D_GPARITY_PROPAGATOR\nSOURCETYPE = %s\nENSEMBLE_ID = %s\nENSEMBLE_LABEL = %s\nSEQUENCE_NUMBER = %i",
+  	  header_source_type, header_ensemble_id, header_ensemble_label, header_traj);
+
+  //check for length...
+  if( (strlen(xml_info_file)*sizeof(char)) > QIO_INFO_STRING_MAX){
+    ERR.General(cname,fname," xml_info_file too large: %i\n %s\n", (strlen(xml_info_file)*sizeof(char)), xml_info_file);
+    exit(-12);
+  }
+  if( (strlen(xml_info_prop)*sizeof(char)) > QIO_INFO_STRING_MAX){
+    ERR.General(cname,fname," xml_info_prop too large: %i\n %s\n", (strlen(xml_info_prop)*sizeof(char)), xml_info_prop);
+    exit(-12);
+  }
+  if( (strlen(xml_info_source)*sizeof(char)) > QIO_INFO_STRING_MAX){
+    ERR.General(cname,fname," xml_info_source too large: %i\n %s\n", (strlen(xml_info_source)*sizeof(char)), xml_info_source);
+    exit(-12);
+  }
+
+
+
+  QIO_USQCDPropFileInfo *filerecordinfo;
+
+
+  switch(sType)
+    {
+    case 1:
+      filerecordinfo = QIO_create_usqcd_propfile_info(QIO_USQCDPROPFILETYPE_CD_PAIRS, xml_info_file);
+      break;
+
+    case 2:
+      filerecordinfo = QIO_create_usqcd_propfile_info(QIO_USQCDPROPFILETYPE_DD_PAIRS, xml_info_file);
+      break;
+
+    default:
+      ERR.General(cname,fname,"ERROR QIO: unknown source type %s\n",sType);
+      filerecordinfo = QIO_create_usqcd_propfile_info(0,xml_info_file);
+
+
+    }
+
+
+  QIO_encode_usqcd_propfile_info(record_file, filerecordinfo);
+
+  QIO_USQCDPropRecordInfo *userrecordinfo_prop = QIO_create_usqcd_proprecord_sc_info(0,0,xml_info_prop);
+
+  QIO_USQCDPropSourceInfo *userrecordinfo_source = QIO_create_usqcd_propsource_info(xml_info_source);
+
+  qio_openOutput(outfile, record_file, volFormat);
+
+
+  if(SingleDouble)
+    {
+      //output in double-precision
+
+      // create the record info
+      record_prop = QIO_create_record_info(QIO_FIELD, NULL, NULL, 0, "USQCD_D3_DiracFermion", "D", 3, 4, 2*sizepersite*sizeof(Float), 1);
+      // color=3 (not used), spin=4 (not used), size 2 (complex), count per site
+
+
+      if( sType == QIO_SCALAR_SOURCE)  //1  scalar source
+	{
+	  if(source_hypercube)
+	    record_source = QIO_create_record_info(QIO_HYPER, source_start, source_end, QIO_RW_DIMENSION, "USQCD_D3_Complex", "D", 0, 0, 2*sizeof(Float), 1);
+	  else
+	    record_source = QIO_create_record_info(QIO_FIELD, NULL, NULL, 0, "USQCD_D3_Complex", "D", 0, 0, 2*sizeof(Float), 1);
+	  // color, spin not used, size 2(complex)
+	  source_size = 1;
+	}
+      
+      if( sType == QIO_FULL_SOURCE ) // 2)  full source
+	{
+	  if(source_hypercube)
+	    record_source = QIO_create_record_info(QIO_HYPER, source_start, source_end, QIO_RW_DIMENSION, "USQCD_D3_DiracFermion", "D", 3, 4, 2*sizepersite*sizeof(Float), 1);
+	  else
+	    record_source = QIO_create_record_info(QIO_FIELD, NULL, NULL, 0, "USQCD_D3_DiracFermion", "D", 3, 4, 2*sizepersite*sizeof(Float), 1);
+	  // color=3 (not used), spin=4 (not used), size 2(complex), count per site
+	  source_size = sizepersite;
+	}
+
+      return_val = 0 ;
+
+
+
+      // now 12 pairs of source, sink, ordered by spin, color.
+
+      QIO_encode_usqcd_propsource_info(record_xml_source, userrecordinfo_source);
+
+#ifdef SPINCOLORINSERT
+      QIO_insert_usqcd_proprecord_spin( userrecordinfo_prop, 0);
+      
+      QIO_insert_usqcd_proprecord_color( userrecordinfo_prop, 0);
+#else
+      userrecordinfo_prop = QIO_create_usqcd_proprecord_sc_info(0,0,xml_info_prop);
+#endif     
+      QIO_encode_usqcd_proprecord_info(record_xml_prop, userrecordinfo_prop);
+      if( sType == QIO_SCALAR_SOURCE){
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getScSrc_SpinColor(0,0), 2*source_size*sizeof(Float), sizeof(Float), wsource_f0);
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getScSrc_SpinColor(0,0), 2*source_size*sizeof(Float), sizeof(Float), wsource_f1);
+      }else{
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getProp_SpinColor(0,0), 2*source_size*sizeof(Float), sizeof(Float), wsource_f0);
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getProp_SpinColor(0,0), 2*source_size*sizeof(Float), sizeof(Float), wsource_f1);
+      }
+      return_val += QIO_write( qio_Output, record_prop, record_xml_prop, qio_getProp_SpinColor(0,0), 2*sizepersite*sizeof(Float), sizeof(Float), wprop_f0);
+      return_val += QIO_write( qio_Output, record_prop, record_xml_prop, qio_getProp_SpinColor(0,0), 2*sizepersite*sizeof(Float), sizeof(Float), wprop_f1);
+
+#ifdef SPINCOLORINSERT
+      QIO_insert_usqcd_proprecord_color( userrecordinfo_prop, 1);
+#else
+      userrecordinfo_prop = QIO_create_usqcd_proprecord_sc_info(0,1,xml_info_prop);
+#endif
+      QIO_encode_usqcd_proprecord_info(record_xml_prop, userrecordinfo_prop);
+      if( sType == QIO_SCALAR_SOURCE){
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getScSrc_SpinColor(0,1), 2*source_size*sizeof(Float), sizeof(Float), wsource_f0);
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getScSrc_SpinColor(0,1), 2*source_size*sizeof(Float), sizeof(Float), wsource_f1);
+      }else{
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getProp_SpinColor(0,1), 2*source_size*sizeof(Float), sizeof(Float), wsource_f0);
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getProp_SpinColor(0,1), 2*source_size*sizeof(Float), sizeof(Float), wsource_f1);
+      }
+      return_val += QIO_write( qio_Output, record_prop, record_xml_prop, qio_getProp_SpinColor(0,1), 2*sizepersite*sizeof(Float), sizeof(Float), wprop_f0);
+      return_val += QIO_write( qio_Output, record_prop, record_xml_prop, qio_getProp_SpinColor(0,1), 2*sizepersite*sizeof(Float), sizeof(Float), wprop_f1);
+
+#ifdef SPINCOLORINSERT
+      QIO_insert_usqcd_proprecord_color( userrecordinfo_prop, 2);
+#else
+      userrecordinfo_prop = QIO_create_usqcd_proprecord_sc_info(0,2,xml_info_prop);
+#endif     
+      QIO_encode_usqcd_proprecord_info(record_xml_prop, userrecordinfo_prop);
+      if( sType == QIO_SCALAR_SOURCE){
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getScSrc_SpinColor(0,2), 2*source_size*sizeof(Float), sizeof(Float), wsource_f0);
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getScSrc_SpinColor(0,2), 2*source_size*sizeof(Float), sizeof(Float), wsource_f1);
+      }else{
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getProp_SpinColor(0,2), 2*source_size*sizeof(Float), sizeof(Float), wsource_f0);
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getProp_SpinColor(0,2), 2*source_size*sizeof(Float), sizeof(Float), wsource_f1);
+      }
+      return_val += QIO_write( qio_Output, record_prop, record_xml_prop, qio_getProp_SpinColor(0,2), 2*sizepersite*sizeof(Float), sizeof(Float), wprop_f0);
+      return_val += QIO_write( qio_Output, record_prop, record_xml_prop, qio_getProp_SpinColor(0,2), 2*sizepersite*sizeof(Float), sizeof(Float), wprop_f1);
+
+#ifdef SPINCOLORINSERT
+      QIO_insert_usqcd_proprecord_spin( userrecordinfo_prop, 1);
+      QIO_insert_usqcd_proprecord_color( userrecordinfo_prop, 0);
+#else
+      userrecordinfo_prop = QIO_create_usqcd_proprecord_sc_info(1,0,xml_info_prop);
+#endif     
+      QIO_encode_usqcd_proprecord_info(record_xml_prop, userrecordinfo_prop);
+      if( sType == QIO_SCALAR_SOURCE){
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getScSrc_SpinColor(1,0), 2*source_size*sizeof(Float), sizeof(Float), wsource_f0);
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getScSrc_SpinColor(1,0), 2*source_size*sizeof(Float), sizeof(Float), wsource_f1);
+      }else{
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getProp_SpinColor(1,0), 2*source_size*sizeof(Float), sizeof(Float), wsource_f0);
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getProp_SpinColor(1,0), 2*source_size*sizeof(Float), sizeof(Float), wsource_f1);
+      }
+      return_val += QIO_write( qio_Output, record_prop, record_xml_prop, qio_getProp_SpinColor(1,0), 2*sizepersite*sizeof(Float), sizeof(Float), wprop_f0);
+      return_val += QIO_write( qio_Output, record_prop, record_xml_prop, qio_getProp_SpinColor(1,0), 2*sizepersite*sizeof(Float), sizeof(Float), wprop_f1);
+
+#ifdef SPINCOLORINSERT
+      QIO_insert_usqcd_proprecord_color( userrecordinfo_prop, 1);
+#else
+      userrecordinfo_prop = QIO_create_usqcd_proprecord_sc_info(1,1,xml_info_prop);
+#endif     
+      QIO_encode_usqcd_proprecord_info(record_xml_prop, userrecordinfo_prop);
+      if( sType == QIO_SCALAR_SOURCE){
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getScSrc_SpinColor(1,1), 2*source_size*sizeof(Float), sizeof(Float), wsource_f0);
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getScSrc_SpinColor(1,1), 2*source_size*sizeof(Float), sizeof(Float), wsource_f1);
+      }else{
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getProp_SpinColor(1,1), 2*source_size*sizeof(Float), sizeof(Float), wsource_f0);
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getProp_SpinColor(1,1), 2*source_size*sizeof(Float), sizeof(Float), wsource_f1);
+      }
+      return_val += QIO_write( qio_Output, record_prop, record_xml_prop, qio_getProp_SpinColor(1,1), 2*sizepersite*sizeof(Float), sizeof(Float), wprop_f0);
+      return_val += QIO_write( qio_Output, record_prop, record_xml_prop, qio_getProp_SpinColor(1,1), 2*sizepersite*sizeof(Float), sizeof(Float), wprop_f1);
+
+#ifdef SPINCOLORINSERT
+      QIO_insert_usqcd_proprecord_color( userrecordinfo_prop, 2);
+#else
+      userrecordinfo_prop = QIO_create_usqcd_proprecord_sc_info(1,2,xml_info_prop);
+#endif     
+      QIO_encode_usqcd_proprecord_info(record_xml_prop, userrecordinfo_prop);
+      if( sType == QIO_SCALAR_SOURCE){
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getScSrc_SpinColor(1,2), 2*source_size*sizeof(Float), sizeof(Float), wsource_f0);
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getScSrc_SpinColor(1,2), 2*source_size*sizeof(Float), sizeof(Float), wsource_f1);
+      }else{
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getProp_SpinColor(1,2), 2*source_size*sizeof(Float), sizeof(Float), wsource_f0);
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getProp_SpinColor(1,2), 2*source_size*sizeof(Float), sizeof(Float), wsource_f1);
+      }
+      return_val += QIO_write( qio_Output, record_prop, record_xml_prop, qio_getProp_SpinColor(1,2), 2*sizepersite*sizeof(Float), sizeof(Float), wprop_f0);
+      return_val += QIO_write( qio_Output, record_prop, record_xml_prop, qio_getProp_SpinColor(1,2), 2*sizepersite*sizeof(Float), sizeof(Float), wprop_f1);
+
+#ifdef SPINCOLORINSERT
+      QIO_insert_usqcd_proprecord_spin( userrecordinfo_prop, 2);
+      QIO_insert_usqcd_proprecord_color( userrecordinfo_prop, 0);
+#else
+      userrecordinfo_prop = QIO_create_usqcd_proprecord_sc_info(2,0,xml_info_prop);
+#endif     
+      QIO_encode_usqcd_proprecord_info(record_xml_prop, userrecordinfo_prop);
+      if( sType == QIO_SCALAR_SOURCE){
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getScSrc_SpinColor(2,0), 2*source_size*sizeof(Float), sizeof(Float), wsource_f0);
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getScSrc_SpinColor(2,0), 2*source_size*sizeof(Float), sizeof(Float), wsource_f1);
+      }else{
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getProp_SpinColor(2,0), 2*source_size*sizeof(Float), sizeof(Float), wsource_f0);
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getProp_SpinColor(2,0), 2*source_size*sizeof(Float), sizeof(Float), wsource_f1);
+      }
+      return_val += QIO_write( qio_Output, record_prop, record_xml_prop, qio_getProp_SpinColor(2,0), 2*sizepersite*sizeof(Float), sizeof(Float), wprop_f0);
+      return_val += QIO_write( qio_Output, record_prop, record_xml_prop, qio_getProp_SpinColor(2,0), 2*sizepersite*sizeof(Float), sizeof(Float), wprop_f1);
+      
+#ifdef SPINCOLORINSERT
+      QIO_insert_usqcd_proprecord_color( userrecordinfo_prop, 1);
+#else
+      userrecordinfo_prop = QIO_create_usqcd_proprecord_sc_info(2,1,xml_info_prop);
+#endif     
+      QIO_encode_usqcd_proprecord_info(record_xml_prop, userrecordinfo_prop);
+      if( sType == QIO_SCALAR_SOURCE){
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getScSrc_SpinColor(2,1), 2*source_size*sizeof(Float), sizeof(Float), wsource_f0);
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getScSrc_SpinColor(2,1), 2*source_size*sizeof(Float), sizeof(Float), wsource_f1);
+      }else{
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getProp_SpinColor(2,1), 2*source_size*sizeof(Float), sizeof(Float), wsource_f0);
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getProp_SpinColor(2,1), 2*source_size*sizeof(Float), sizeof(Float), wsource_f1);
+      }
+      return_val += QIO_write( qio_Output, record_prop, record_xml_prop, qio_getProp_SpinColor(2,1), 2*sizepersite*sizeof(Float), sizeof(Float), wprop_f0);
+      return_val += QIO_write( qio_Output, record_prop, record_xml_prop, qio_getProp_SpinColor(2,1), 2*sizepersite*sizeof(Float), sizeof(Float), wprop_f1);
+
+#ifdef SPINCOLORINSERT
+      QIO_insert_usqcd_proprecord_color( userrecordinfo_prop, 2);
+#else
+      userrecordinfo_prop = QIO_create_usqcd_proprecord_sc_info(2,2,xml_info_prop);
+#endif     
+      QIO_encode_usqcd_proprecord_info(record_xml_prop, userrecordinfo_prop);
+      if( sType == QIO_SCALAR_SOURCE){
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getScSrc_SpinColor(2,2), 2*source_size*sizeof(Float), sizeof(Float), wsource_f0);
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getScSrc_SpinColor(2,2), 2*source_size*sizeof(Float), sizeof(Float), wsource_f1);
+      }else{
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getProp_SpinColor(2,2), 2*source_size*sizeof(Float), sizeof(Float), wsource_f0);
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getProp_SpinColor(2,2), 2*source_size*sizeof(Float), sizeof(Float), wsource_f1);
+      }
+      return_val += QIO_write( qio_Output, record_prop, record_xml_prop, qio_getProp_SpinColor(2,2), 2*sizepersite*sizeof(Float), sizeof(Float), wprop_f0);
+      return_val += QIO_write( qio_Output, record_prop, record_xml_prop, qio_getProp_SpinColor(2,2), 2*sizepersite*sizeof(Float), sizeof(Float), wprop_f1);
+
+#ifdef SPINCOLORINSERT
+      QIO_insert_usqcd_proprecord_spin( userrecordinfo_prop, 3);
+      QIO_insert_usqcd_proprecord_color( userrecordinfo_prop, 0);
+#else
+      userrecordinfo_prop = QIO_create_usqcd_proprecord_sc_info(3,0,xml_info_prop);
+#endif     
+      QIO_encode_usqcd_proprecord_info(record_xml_prop, userrecordinfo_prop);
+      if( sType == QIO_SCALAR_SOURCE){
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getScSrc_SpinColor(3,0), 2*source_size*sizeof(Float), sizeof(Float), wsource_f0);
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getScSrc_SpinColor(3,0), 2*source_size*sizeof(Float), sizeof(Float), wsource_f1);
+      }else{
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getProp_SpinColor(3,0), 2*source_size*sizeof(Float), sizeof(Float), wsource_f0);
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getProp_SpinColor(3,0), 2*source_size*sizeof(Float), sizeof(Float), wsource_f1);
+      }
+      return_val += QIO_write( qio_Output, record_prop, record_xml_prop, qio_getProp_SpinColor(3,0), 2*sizepersite*sizeof(Float), sizeof(Float), wprop_f0);
+      return_val += QIO_write( qio_Output, record_prop, record_xml_prop, qio_getProp_SpinColor(3,0), 2*sizepersite*sizeof(Float), sizeof(Float), wprop_f1);
+
+#ifdef SPINCOLORINSERT
+      QIO_insert_usqcd_proprecord_color( userrecordinfo_prop, 1);
+#else
+      userrecordinfo_prop = QIO_create_usqcd_proprecord_sc_info(3,1,xml_info_prop);
+#endif     
+      QIO_encode_usqcd_proprecord_info(record_xml_prop, userrecordinfo_prop);
+      if( sType == QIO_SCALAR_SOURCE){
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getScSrc_SpinColor(3,1), 2*source_size*sizeof(Float), sizeof(Float), wsource_f0);
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getScSrc_SpinColor(3,1), 2*source_size*sizeof(Float), sizeof(Float), wsource_f1);
+      }else{
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getProp_SpinColor(3,1), 2*source_size*sizeof(Float), sizeof(Float), wsource_f0);
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getProp_SpinColor(3,1), 2*source_size*sizeof(Float), sizeof(Float), wsource_f1);
+      }
+      return_val += QIO_write( qio_Output, record_prop, record_xml_prop, qio_getProp_SpinColor(3,1), 2*sizepersite*sizeof(Float), sizeof(Float), wprop_f0);
+      return_val += QIO_write( qio_Output, record_prop, record_xml_prop, qio_getProp_SpinColor(3,1), 2*sizepersite*sizeof(Float), sizeof(Float), wprop_f1);
+
+#ifdef SPINCOLORINSERT
+      QIO_insert_usqcd_proprecord_color( userrecordinfo_prop, 2);
+#else
+      userrecordinfo_prop = QIO_create_usqcd_proprecord_sc_info(3,2,xml_info_prop);
+#endif     
+      QIO_encode_usqcd_proprecord_info(record_xml_prop, userrecordinfo_prop);
+      if( sType == QIO_SCALAR_SOURCE){
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getScSrc_SpinColor(3,2), 2*source_size*sizeof(Float), sizeof(Float), wsource_f0);
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getScSrc_SpinColor(3,2), 2*source_size*sizeof(Float), sizeof(Float), wsource_f1);
+      }else{
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getProp_SpinColor(3,2), 2*source_size*sizeof(Float), sizeof(Float), wsource_f0);
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getProp_SpinColor(3,2), 2*source_size*sizeof(Float), sizeof(Float), wsource_f1);
+      }
+      return_val += QIO_write( qio_Output, record_prop, record_xml_prop, qio_getProp_SpinColor(3,2), 2*sizepersite*sizeof(Float), sizeof(Float), wprop_f0);
+      return_val += QIO_write( qio_Output, record_prop, record_xml_prop, qio_getProp_SpinColor(3,2), 2*sizepersite*sizeof(Float), sizeof(Float), wprop_f1);
+    }
+  else
+    {
+      //output in single-precision
+
+      // create the record info
+      record_prop = QIO_create_record_info(QIO_FIELD, NULL, NULL, 0, "USQCD_F3_DiracFermion", "F", 3, 4, 2*sizepersite*sizeof(float), 1);
+      // color=3 (not used), spin=4 (not used), size 2 (complex), count per site
+
+
+      if( sType == QIO_SCALAR_SOURCE)  // scalar source
+	{
+	  if(source_hypercube)
+	    record_source = QIO_create_record_info(QIO_HYPER, source_start, source_end, QIO_RW_DIMENSION, "USQCD_F3_Complex", "F", 0, 0, 2*sizeof(float), 1);
+	  else
+	    record_source = QIO_create_record_info(QIO_FIELD, NULL, NULL, 0, "USQCD_F3_Complex", "F", 0, 0, 2*sizeof(float), 1);
+	  // color, spin not used, size 2(complex)
+	  source_size = 1;
+	}
+
+      if( sType == QIO_FULL_SOURCE) // full source
+	{
+	  if(source_hypercube)
+	    record_source = QIO_create_record_info(QIO_HYPER, source_start, source_end, QIO_RW_DIMENSION, "USQCD_F3_DiracFermion", "F", 3, 4, 2*sizepersite*sizeof(float), 1);
+	  else
+	    record_source = QIO_create_record_info(QIO_FIELD, NULL, NULL, 0, "USQCD_F3_DiracFermion", "F", 3, 4, 2*sizepersite*sizeof(float), 1);
+	  // color=3 (not used), spin=4 (not used), size 2(complex), count per site
+	  source_size = sizepersite;
+	}
+
+      return_val = 0 ;
+
+
+      // now 12 pairs of source, sink, ordered by spin, color.
+
+
+      QIO_encode_usqcd_propsource_info(record_xml_source, userrecordinfo_source);
+
+#ifdef SPINCOLORINSERT
+      QIO_insert_usqcd_proprecord_spin( userrecordinfo_prop, 0);
+      QIO_insert_usqcd_proprecord_color( userrecordinfo_prop, 0);
+#else
+      userrecordinfo_prop = QIO_create_usqcd_proprecord_sc_info(0,0,xml_info_prop);
+#endif     
+      QIO_encode_usqcd_proprecord_info(record_xml_prop, userrecordinfo_prop);
+      if( sType == QIO_SCALAR_SOURCE){
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getScSrcSingle_SpinColor(0,0), 2*source_size*sizeof(float), sizeof(float), wsource_f0);
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getScSrcSingle_SpinColor(0,0), 2*source_size*sizeof(float), sizeof(float), wsource_f1);
+      }else{
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getPropSingle_SpinColor(0,0), 2*source_size*sizeof(float), sizeof(float), wsource_f0);
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getPropSingle_SpinColor(0,0), 2*source_size*sizeof(float), sizeof(float), wsource_f1);
+      }
+      return_val += QIO_write( qio_Output, record_prop, record_xml_prop, qio_getPropSingle_SpinColor(0,0), 2*sizepersite*sizeof(float), sizeof(float), wprop_f0);
+      return_val += QIO_write( qio_Output, record_prop, record_xml_prop, qio_getPropSingle_SpinColor(0,0), 2*sizepersite*sizeof(float), sizeof(float), wprop_f1);
+
+#ifdef SPINCOLORINSERT
+      QIO_insert_usqcd_proprecord_color( userrecordinfo_prop, 1);
+#else
+      userrecordinfo_prop = QIO_create_usqcd_proprecord_sc_info(0,1,xml_info_prop);
+#endif     
+      QIO_encode_usqcd_proprecord_info(record_xml_prop, userrecordinfo_prop);
+      if( sType == QIO_SCALAR_SOURCE){
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getScSrcSingle_SpinColor(0,1), 2*source_size*sizeof(float), sizeof(float), wsource_f0);
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getScSrcSingle_SpinColor(0,1), 2*source_size*sizeof(float), sizeof(float), wsource_f1);
+      }else{
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getPropSingle_SpinColor(0,1), 2*source_size*sizeof(float), sizeof(float), wsource_f0);
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getPropSingle_SpinColor(0,1), 2*source_size*sizeof(float), sizeof(float), wsource_f1);
+      }
+      return_val += QIO_write( qio_Output, record_prop, record_xml_prop, qio_getPropSingle_SpinColor(0,1), 2*sizepersite*sizeof(float), sizeof(float), wprop_f0);
+      return_val += QIO_write( qio_Output, record_prop, record_xml_prop, qio_getPropSingle_SpinColor(0,1), 2*sizepersite*sizeof(float), sizeof(float), wprop_f1);
+
+#ifdef SPINCOLORINSERT
+      QIO_insert_usqcd_proprecord_color( userrecordinfo_prop, 2);
+#else
+      userrecordinfo_prop = QIO_create_usqcd_proprecord_sc_info(0,2,xml_info_prop);
+#endif     
+      QIO_encode_usqcd_proprecord_info(record_xml_prop, userrecordinfo_prop);
+      if( sType == QIO_SCALAR_SOURCE){
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getScSrcSingle_SpinColor(0,2), 2*source_size*sizeof(float), sizeof(float), wsource_f0);
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getScSrcSingle_SpinColor(0,2), 2*source_size*sizeof(float), sizeof(float), wsource_f1);
+      }else{
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getPropSingle_SpinColor(0,2), 2*source_size*sizeof(float), sizeof(float), wsource_f0);
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getPropSingle_SpinColor(0,2), 2*source_size*sizeof(float), sizeof(float), wsource_f1);
+      }
+      return_val += QIO_write( qio_Output, record_prop, record_xml_prop, qio_getPropSingle_SpinColor(0,2), 2*sizepersite*sizeof(float), sizeof(float), wprop_f0);
+      return_val += QIO_write( qio_Output, record_prop, record_xml_prop, qio_getPropSingle_SpinColor(0,2), 2*sizepersite*sizeof(float), sizeof(float), wprop_f1);
+
+#ifdef SPINCOLORINSERT
+      QIO_insert_usqcd_proprecord_spin( userrecordinfo_prop, 1);
+      QIO_insert_usqcd_proprecord_color( userrecordinfo_prop, 0);
+#else
+      userrecordinfo_prop = QIO_create_usqcd_proprecord_sc_info(1,0,xml_info_prop);
+#endif     
+      QIO_encode_usqcd_proprecord_info(record_xml_prop, userrecordinfo_prop);
+      if( sType == QIO_SCALAR_SOURCE){
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getScSrcSingle_SpinColor(1,0), 2*source_size*sizeof(float), sizeof(float), wsource_f0);
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getScSrcSingle_SpinColor(1,0), 2*source_size*sizeof(float), sizeof(float), wsource_f1);
+      }else{
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getPropSingle_SpinColor(1,0), 2*source_size*sizeof(float), sizeof(float), wsource_f0);
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getPropSingle_SpinColor(1,0), 2*source_size*sizeof(float), sizeof(float), wsource_f1);
+      }
+      return_val += QIO_write( qio_Output, record_prop, record_xml_prop, qio_getPropSingle_SpinColor(1,0), 2*sizepersite*sizeof(float), sizeof(float), wprop_f0);
+      return_val += QIO_write( qio_Output, record_prop, record_xml_prop, qio_getPropSingle_SpinColor(1,0), 2*sizepersite*sizeof(float), sizeof(float), wprop_f1);
+
+#ifdef SPINCOLORINSERT
+      QIO_insert_usqcd_proprecord_color( userrecordinfo_prop, 1);
+#else
+      userrecordinfo_prop = QIO_create_usqcd_proprecord_sc_info(1,1,xml_info_prop);
+#endif     
+      QIO_encode_usqcd_proprecord_info(record_xml_prop, userrecordinfo_prop);
+      if( sType == QIO_SCALAR_SOURCE){
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getScSrcSingle_SpinColor(1,1), 2*source_size*sizeof(float), sizeof(float), wsource_f0);
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getScSrcSingle_SpinColor(1,1), 2*source_size*sizeof(float), sizeof(float), wsource_f1);
+      }else{
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getPropSingle_SpinColor(1,1), 2*source_size*sizeof(float), sizeof(float), wsource_f0);
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getPropSingle_SpinColor(1,1), 2*source_size*sizeof(float), sizeof(float), wsource_f1);
+      }
+      return_val += QIO_write( qio_Output, record_prop, record_xml_prop, qio_getPropSingle_SpinColor(1,1), 2*sizepersite*sizeof(float), sizeof(float), wprop_f0);
+      return_val += QIO_write( qio_Output, record_prop, record_xml_prop, qio_getPropSingle_SpinColor(1,1), 2*sizepersite*sizeof(float), sizeof(float), wprop_f1);
+
+#ifdef SPINCOLORINSERT
+      QIO_insert_usqcd_proprecord_color( userrecordinfo_prop, 2);
+#else
+      userrecordinfo_prop = QIO_create_usqcd_proprecord_sc_info(1,2,xml_info_prop);
+#endif     
+      QIO_encode_usqcd_proprecord_info(record_xml_prop, userrecordinfo_prop);
+      if( sType == QIO_SCALAR_SOURCE){
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getScSrcSingle_SpinColor(1,2), 2*source_size*sizeof(float), sizeof(float), wsource_f0);
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getScSrcSingle_SpinColor(1,2), 2*source_size*sizeof(float), sizeof(float), wsource_f1);
+      }else{
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getPropSingle_SpinColor(1,2), 2*source_size*sizeof(float), sizeof(float), wsource_f0);
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getPropSingle_SpinColor(1,2), 2*source_size*sizeof(float), sizeof(float), wsource_f1);
+      }
+      return_val += QIO_write( qio_Output, record_prop, record_xml_prop, qio_getPropSingle_SpinColor(1,2), 2*sizepersite*sizeof(float), sizeof(float), wprop_f0);
+      return_val += QIO_write( qio_Output, record_prop, record_xml_prop, qio_getPropSingle_SpinColor(1,2), 2*sizepersite*sizeof(float), sizeof(float), wprop_f1);
+
+#ifdef SPINCOLORINSERT
+      QIO_insert_usqcd_proprecord_spin( userrecordinfo_prop, 2);
+      QIO_insert_usqcd_proprecord_color( userrecordinfo_prop, 0);
+#else
+      userrecordinfo_prop = QIO_create_usqcd_proprecord_sc_info(2,0,xml_info_prop);
+#endif     
+      QIO_encode_usqcd_proprecord_info(record_xml_prop, userrecordinfo_prop);
+      if( sType == QIO_SCALAR_SOURCE){
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getScSrcSingle_SpinColor(2,0), 2*source_size*sizeof(float), sizeof(float), wsource_f0);
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getScSrcSingle_SpinColor(2,0), 2*source_size*sizeof(float), sizeof(float), wsource_f1);
+      }else{
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getPropSingle_SpinColor(2,0), 2*source_size*sizeof(float), sizeof(float), wsource_f0);
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getPropSingle_SpinColor(2,0), 2*source_size*sizeof(float), sizeof(float), wsource_f1);
+      }
+      return_val += QIO_write( qio_Output, record_prop, record_xml_prop, qio_getPropSingle_SpinColor(2,0), 2*sizepersite*sizeof(float), sizeof(float), wprop_f0);
+      return_val += QIO_write( qio_Output, record_prop, record_xml_prop, qio_getPropSingle_SpinColor(2,0), 2*sizepersite*sizeof(float), sizeof(float), wprop_f1);
+      
+#ifdef SPINCOLORINSERT
+      QIO_insert_usqcd_proprecord_color( userrecordinfo_prop, 1);
+#else
+      userrecordinfo_prop = QIO_create_usqcd_proprecord_sc_info(2,1,xml_info_prop);
+#endif     
+      QIO_encode_usqcd_proprecord_info(record_xml_prop, userrecordinfo_prop);
+      if( sType == QIO_SCALAR_SOURCE){
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getScSrcSingle_SpinColor(2,1), 2*source_size*sizeof(float), sizeof(float), wsource_f0);
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getScSrcSingle_SpinColor(2,1), 2*source_size*sizeof(float), sizeof(float), wsource_f1);
+      }else{
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getPropSingle_SpinColor(2,1), 2*source_size*sizeof(float), sizeof(float), wsource_f0);
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getPropSingle_SpinColor(2,1), 2*source_size*sizeof(float), sizeof(float), wsource_f1);
+      }
+      return_val += QIO_write( qio_Output, record_prop, record_xml_prop, qio_getPropSingle_SpinColor(2,1), 2*sizepersite*sizeof(float), sizeof(float), wprop_f0);
+      return_val += QIO_write( qio_Output, record_prop, record_xml_prop, qio_getPropSingle_SpinColor(2,1), 2*sizepersite*sizeof(float), sizeof(float), wprop_f1);
+
+#ifdef SPINCOLORINSERT
+      QIO_insert_usqcd_proprecord_color( userrecordinfo_prop, 2);
+#else
+      userrecordinfo_prop = QIO_create_usqcd_proprecord_sc_info(2,2,xml_info_prop);
+#endif     
+      QIO_encode_usqcd_proprecord_info(record_xml_prop, userrecordinfo_prop);
+      if( sType == QIO_SCALAR_SOURCE){
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getScSrcSingle_SpinColor(2,2), 2*source_size*sizeof(float), sizeof(float), wsource_f0);
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getScSrcSingle_SpinColor(2,2), 2*source_size*sizeof(float), sizeof(float), wsource_f1);
+      }else{
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getPropSingle_SpinColor(2,2), 2*source_size*sizeof(float), sizeof(float), wsource_f0);
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getPropSingle_SpinColor(2,2), 2*source_size*sizeof(float), sizeof(float), wsource_f1);
+      }
+      return_val += QIO_write( qio_Output, record_prop, record_xml_prop, qio_getPropSingle_SpinColor(2,2), 2*sizepersite*sizeof(float), sizeof(float), wprop_f0);
+      return_val += QIO_write( qio_Output, record_prop, record_xml_prop, qio_getPropSingle_SpinColor(2,2), 2*sizepersite*sizeof(float), sizeof(float), wprop_f1);
+
+#ifdef SPINCOLORINSERT
+      QIO_insert_usqcd_proprecord_spin( userrecordinfo_prop, 3);
+      QIO_insert_usqcd_proprecord_color( userrecordinfo_prop, 0);
+#else
+      userrecordinfo_prop = QIO_create_usqcd_proprecord_sc_info(3,0,xml_info_prop);
+#endif     
+      QIO_encode_usqcd_proprecord_info(record_xml_prop, userrecordinfo_prop);
+      if( sType == QIO_SCALAR_SOURCE){
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getScSrcSingle_SpinColor(3,0), 2*source_size*sizeof(float), sizeof(float), wsource_f0);
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getScSrcSingle_SpinColor(3,0), 2*source_size*sizeof(float), sizeof(float), wsource_f1);
+      }else{
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getPropSingle_SpinColor(3,0), 2*source_size*sizeof(float), sizeof(float), wsource_f0);
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getPropSingle_SpinColor(3,0), 2*source_size*sizeof(float), sizeof(float), wsource_f1);
+      }
+      return_val += QIO_write( qio_Output, record_prop, record_xml_prop, qio_getPropSingle_SpinColor(3,0), 2*sizepersite*sizeof(float), sizeof(float), wprop_f0);
+      return_val += QIO_write( qio_Output, record_prop, record_xml_prop, qio_getPropSingle_SpinColor(3,0), 2*sizepersite*sizeof(float), sizeof(float), wprop_f1);
+
+#ifdef SPINCOLORINSERT
+      QIO_insert_usqcd_proprecord_color( userrecordinfo_prop, 1);
+#else
+      userrecordinfo_prop = QIO_create_usqcd_proprecord_sc_info(3,1,xml_info_prop);
+#endif     
+      QIO_encode_usqcd_proprecord_info(record_xml_prop, userrecordinfo_prop);
+      if( sType == QIO_SCALAR_SOURCE){
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getScSrcSingle_SpinColor(3,1), 2*source_size*sizeof(float), sizeof(float), wsource_f0);
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getScSrcSingle_SpinColor(3,1), 2*source_size*sizeof(float), sizeof(float), wsource_f1);
+      }else{
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getPropSingle_SpinColor(3,1), 2*source_size*sizeof(float), sizeof(float), wsource_f0);
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getPropSingle_SpinColor(3,1), 2*source_size*sizeof(float), sizeof(float), wsource_f1);
+      }
+      return_val += QIO_write( qio_Output, record_prop, record_xml_prop, qio_getPropSingle_SpinColor(3,1), 2*sizepersite*sizeof(float), sizeof(float), wprop_f0);
+      return_val += QIO_write( qio_Output, record_prop, record_xml_prop, qio_getPropSingle_SpinColor(3,1), 2*sizepersite*sizeof(float), sizeof(float), wprop_f1);
+
+#ifdef SPINCOLORINSERT
+      QIO_insert_usqcd_proprecord_color( userrecordinfo_prop, 2);
+#else
+      userrecordinfo_prop = QIO_create_usqcd_proprecord_sc_info(3,2,xml_info_prop);
+#endif     
+      QIO_encode_usqcd_proprecord_info(record_xml_prop, userrecordinfo_prop);
+      if( sType == QIO_SCALAR_SOURCE){
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getScSrcSingle_SpinColor(3,2), 2*source_size*sizeof(float), sizeof(float), wsource_f0);
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getScSrcSingle_SpinColor(3,2), 2*source_size*sizeof(float), sizeof(float), wsource_f1);
+      }else{
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getPropSingle_SpinColor(3,2), 2*source_size*sizeof(float), sizeof(float), wsource_f0);
+	return_val += QIO_write( qio_Output, record_source, record_xml_source, qio_getPropSingle_SpinColor(3,2), 2*source_size*sizeof(float), sizeof(float), wsource_f1);
+      }
+      return_val += QIO_write( qio_Output, record_prop, record_xml_prop, qio_getPropSingle_SpinColor(3,2), 2*sizepersite*sizeof(float), sizeof(float), wprop_f0);
+      return_val += QIO_write( qio_Output, record_prop, record_xml_prop, qio_getPropSingle_SpinColor(3,2), 2*sizepersite*sizeof(float), sizeof(float), wprop_f1);
+
+    }
+
+
+  if ( (return_val == 0) ) 
+    VRB.Result(cname,fname,"QIO_write successfull...\n");
+  else
+    ERR.General(cname,fname,"ERROR QIO: QIO_write(s) returned %i\n",return_val);
+
+
+  // clean-up
+
+  QIO_destroy_record_info(record_prop);
+  QIO_destroy_record_info(record_source);
+
+  
+  QIO_string_destroy(record_xml_prop);
+  QIO_string_destroy(record_xml_source);
+
+  QIO_destroy_usqcd_propfile_info(filerecordinfo);
+  QIO_destroy_usqcd_proprecord_info(userrecordinfo_prop);
+  QIO_destroy_usqcd_propsource_info(userrecordinfo_source);
+
+  QIO_string_destroy(record_file);
+
+  qio_closeOutput();
+
+
+
+  VRB.FuncEnd(cname,fname);
+
 }
 
 

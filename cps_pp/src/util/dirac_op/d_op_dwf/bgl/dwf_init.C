@@ -52,7 +52,7 @@ void dwf_init(Dwf *dwf_p)
 //------------------------------------------------------------------
 // Allocate memory for two temporary fermion checkerboard fields  
 //------------------------------------------------------------------
-  int f_size = 24 * GJP.VolNodeSites() * GJP.SnodeSites() / 2; 
+  size_t f_size = 24 * GJP.VolNodeSites() * GJP.SnodeSites() / 2; 
 
   dwf_p->frm_tmp1 = (IFloat *) smalloc(f_size*sizeof(IFloat));
   if(dwf_p->frm_tmp1 == 0)

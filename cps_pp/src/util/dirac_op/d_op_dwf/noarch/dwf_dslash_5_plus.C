@@ -117,13 +117,15 @@ void dwf_dslash_5_plus(Vector *out,
   int x;
   int s;
 
-// Initializations
-//------------------------------------------------------------------
+  // Initializations
+  //------------------------------------------------------------------
   int local_ls = GJP.SnodeSites(); 
   int s_nodes = GJP.Snodes();
   int s_node_coor = GJP.SnodeCoor();
   int vol_4d_cb = dwf_lib_arg->vol_4d / 2;
-  int ls_stride = 24 * vol_4d_cb;
+  int ls_stride = 24 * vol_4d_cb; //same as SPINOR_SIZE * vol_4d_cb
+  if(GJP.Gparity()) ls_stride*=2;
+
   IFloat *f_in;
   IFloat *f_out;
   IFloat *f_temp;
@@ -131,10 +133,10 @@ void dwf_dslash_5_plus(Vector *out,
   IFloat two_over_a5 = 2.0 * GJP.DwfA5Inv();
   IFloat neg_mass_two_over_a5 = -2.0 * mass * GJP.DwfA5Inv();
 
-// [1 + gamma_5] term (if dag=1 [1 - gamma_5] term)
-//
-// out[s] = [1 + gamma_5] in[s-1]
-//------------------------------------------------------------------
+  // [1 + gamma_5] term (if dag=1 [1 - gamma_5] term)
+  //
+  // out[s] = [1 + gamma_5] in[s-1]
+  //------------------------------------------------------------------
   f_in  = (IFloat *) in;
   f_out = (IFloat *) out;
   if(dag == 1){
@@ -151,18 +153,27 @@ void dwf_dslash_5_plus(Vector *out,
       f_in  =  f_in + 24;
       f_out = f_out + 24;
     }
+    if(GJP.Gparity()){
+      for(x=0; x<vol_4d_cb; x++){
+
+	fTimesV1PlusV2(f_out, two_over_a5, f_in, f_out, 12);
+	
+	f_in  =  f_in + 24;
+	f_out = f_out + 24;
+      }
+    }
+
   }
 
-
-// [1 + gamma_5] for lower boundary term (if dag=1 [1 - gamma_5] term)
-// If there's only one node along fifth direction, no communication
-// is necessary; Otherwise data from adjacent node in minus direction
-// will be needed.
-// If the lower boundary is the s=0 term
-// out[0] = - m_f * [1 + gamma_5] in[ls-1]
-// else, out[s] = [1 + gamma_5] in[s-1]
-//
-//------------------------------------------------------------------
+  // [1 + gamma_5] for lower boundary term (if dag=1 [1 - gamma_5] term)
+  // If there's only one node along fifth direction, no communication
+  // is necessary; Otherwise data from adjacent node in minus direction
+  // will be needed.
+  // If the lower boundary is the s=0 term
+  // out[0] = - m_f * [1 + gamma_5] in[ls-1]
+  // else, out[s] = [1 + gamma_5] in[s-1]
+  //
+  //------------------------------------------------------------------
 
   f_in  = (IFloat *) in;  
   f_in = f_in + (local_ls-1)*ls_stride; 
@@ -193,11 +204,39 @@ void dwf_dslash_5_plus(Vector *out,
     f_out = f_out + 24;
   }
 
+  if(GJP.Gparity()){
+    f_in  = (IFloat *) in + (local_ls-1)*ls_stride + ls_stride/2;
+    f_out = (IFloat *) out + ls_stride/2;
 
-// [1 - gamma_5] term (if dag=1 [1 + gamma_5] term)
-// 
-// out[s] = [1 - gamma_5] in[s+1]
-//------------------------------------------------------------------
+    if(dag == 1){
+      f_in  =  f_in + 12;
+      f_out = f_out + 12;
+    }
+
+    for(x=0; x<vol_4d_cb; x++){
+    
+      f_temp = f_in;
+      
+      if (s_nodes != 1 ) {
+	f_temp = comm_buf;
+	getMinusData(f_temp, f_in, 12, 4);
+      }
+      
+      if(s_node_coor == 0) { 
+	fTimesV1PlusV2(f_out, neg_mass_two_over_a5, f_temp, f_out, 12);
+      }
+      else {
+	fTimesV1PlusV2(f_out, two_over_a5, f_temp, f_out, 12);
+      }
+      
+      f_in  =  f_in + 24;
+      f_out = f_out + 24;
+    }
+  }
+  // [1 - gamma_5] term (if dag=1 [1 + gamma_5] term)
+  // 
+  // out[s] = [1 - gamma_5] in[s+1]
+  //------------------------------------------------------------------
   f_in  = (IFloat *) in;
   f_out = (IFloat *) out;
   if(dag == 0){
@@ -214,18 +253,27 @@ void dwf_dslash_5_plus(Vector *out,
       f_in  =  f_in + 24;
       f_out = f_out + 24;
     }
+    if(GJP.Gparity()){
+      for(x=0; x<vol_4d_cb; x++){
+	
+	fTimesV1PlusV2(f_out, two_over_a5, f_in, f_out, 12);
+	
+	f_in  =  f_in + 24;
+	f_out = f_out + 24;
+      }
+    }
+
   }
 
-
-// [1 - gamma_5] for upper boundary term (if dag=1 [1 + gamma_5] term)
-// If there's only one node along fifth direction, no communication
-// is necessary; Otherwise data from adjacent node in minus direction
-// will be needed.
-// If the upper boundary is the s=ls term
-// out[ls-1] = - m_f * [1 - gamma_5] in[0]
-// else out[s] = [1 - gamma_5] in[s+1]
-//
-//------------------------------------------------------------------
+  // [1 - gamma_5] for upper boundary term (if dag=1 [1 + gamma_5] term)
+  // If there's only one node along fifth direction, no communication
+  // is necessary; Otherwise data from adjacent node in minus direction
+  // will be needed.
+  // If the upper boundary is the s=ls term
+  // out[ls-1] = - m_f * [1 - gamma_5] in[0]
+  // else out[s] = [1 - gamma_5] in[s+1]
+  //
+  //------------------------------------------------------------------
 
   f_in  = (IFloat *) in;
   f_out = (IFloat *) out;
@@ -257,11 +305,39 @@ void dwf_dslash_5_plus(Vector *out,
   }
   DiracOp::CGflops+=2*2*vol_4d_cb*local_ls*12;
 
+  if(GJP.Gparity()){
+    f_in  = (IFloat *) in + ls_stride/2;
+    f_out = (IFloat *) out + ls_stride/2;
 
+    if(dag == 0){
+      f_in  =  f_in + 12;
+      f_out = f_out + 12;
+    }
+
+    f_out = f_out + (local_ls-1)*ls_stride;
+    for(x=0; x<vol_4d_cb; x++){
+
+      f_temp = f_in;
+
+      if (s_nodes != 1 ) {
+	f_temp = comm_buf;
+	getPlusData(f_temp, f_in, 12, 4);
+      }
+
+      if(s_node_coor == s_nodes - 1) { 
+	fTimesV1PlusV2(f_out, neg_mass_two_over_a5, f_temp, f_out, 12);
+      }
+      else {
+	fTimesV1PlusV2(f_out, two_over_a5, f_temp, f_out, 12);
+      }
+    
+      f_in  =  f_in + 24;
+      f_out = f_out + 24;
+    }
+  }
+
+  DiracOp::CGflops+=2*2*vol_4d_cb*local_ls*12;
 }
-
-
-
 CPS_END_NAMESPACE
 #endif
 #endif

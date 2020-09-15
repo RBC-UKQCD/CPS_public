@@ -80,6 +80,7 @@ inline unsigned int SeedST(){return SERIAL_SEED;} //!< Gets a RNG seed.
 //! A barrier function.
 inline unsigned int sync(){return 1;}
 #endif
+inline unsigned int Barrier(){return 1;}
 
 inline void broadcast( void *, size_t size){}
 #endif

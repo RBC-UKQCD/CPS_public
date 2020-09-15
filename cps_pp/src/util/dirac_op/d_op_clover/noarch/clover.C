@@ -73,7 +73,7 @@ void clover_init(Clover *clover_p)
   // allocate temporary buffers to be used by DiracOpClover::MatPcDagMatPc
   // and etc.
   //-------------------------------------------------------------------------
-  int f_size = SPINOR_SIZE * GJP.VolNodeSites() * sizeof(IFloat);  
+  size_t f_size = SPINOR_SIZE * GJP.VolNodeSites() * sizeof(IFloat);  
   clover_p->frm_buf0 = (IFloat *)smalloc(f_size);
   clover_p->frm_buf1 = clover_p->frm_buf0 + f_size / (2 * sizeof(IFloat));
 

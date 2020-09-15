@@ -41,8 +41,7 @@ DFLAGS += @DFLAGS@
 .PHONY: cps clean
 
 
-LIBLIST = $(BUILDDIR)/cps.a 
-#LIBLIST =  $(BUILDDIR)/cps.xla $(BUILDDIR)/cps.a 
+LIBLIST = $(BUILDDIR)/libcps.a 
 	 
 
 #

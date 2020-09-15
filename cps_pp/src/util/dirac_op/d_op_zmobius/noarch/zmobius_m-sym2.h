@@ -12,7 +12,7 @@ void  zmobius_m_sym2 (Vector *out,
   //------------------------------------------------------------------
   // Initializations
   //------------------------------------------------------------------
-  const int f_size = 24 * mobius_lib_arg->vol_4d * mobius_lib_arg->ls / 2;
+  const size_t f_size = 24 * mobius_lib_arg->vol_4d * mobius_lib_arg->ls / 2;
   const int ls=mobius_lib_arg->ls;
   const int vol_4d_cb = mobius_lib_arg->vol_4d / 2;
   const int ls_stride = 24 * vol_4d_cb;
@@ -43,20 +43,20 @@ void  zmobius_m_sym2 (Vector *out,
   //------------------------------------------------------------------
   // Apply M_5^-1 (hopping in 5th dir + diagonal)
   //------------------------------------------------------------------
-  zmobius_m5inv(frm_tmp2, mass, 0, mobius_lib_arg,mobius_lib_arg->zmobius_kappa_ratio);
+  zmobius_m5inv(frm_tmp2, mass, 0, mobius_lib_arg,mobius_lib_arg->zmobius_kappa_ratio.data());
   DEBUG_MOBIUS_DSLASH("mobius_m5inv %e\n", time_elapse());
 
 
   // Apply Dslash O <- E
   //------------------------------------------------------------------
   time_elapse();
-  zmobius_dslash_4(out, gauge_field, frm_tmp2, 0, 0, mobius_lib_arg, mass);
+  zmobius_dslash_4(out, gauge_field, frm_tmp2, 1, 0, mobius_lib_arg, mass);
   DEBUG_MOBIUS_DSLASH("mobius_dslash_4 %e\n", time_elapse());
 
   //------------------------------------------------------------------
   // Apply kappa_b(s)
   //------------------------------------------------------------------
-  const Complex *kappa_b = mobius_lib_arg->zmobius_kappa_b;
+  const Complex *kappa_b = mobius_lib_arg->zmobius_kappa_b.data();
   for(int s=0;s<local_ls;++s){
     int glb_s = s + local_ls*s_node_coor;
     Complex* cp = (Complex*)( (Float*)out + s * ls_stride);
@@ -67,14 +67,14 @@ void  zmobius_m_sym2 (Vector *out,
   //------------------------------------------------------------------
   // Apply M_5^-1 (hopping in 5th dir + diagonal)
   //------------------------------------------------------------------
-  zmobius_m5inv(out, mass, 0, mobius_lib_arg,mobius_lib_arg->zmobius_kappa_ratio);
+  zmobius_m5inv(out, mass, 0, mobius_lib_arg,mobius_lib_arg->zmobius_kappa_ratio.data());
   DEBUG_MOBIUS_DSLASH("mobius_m5inv %e\n", time_elapse());
   
 
   //------------------------------------------------------------------
   // Apply Dslash E <- O
   //------------------------------------------------------------------
-  zmobius_dslash_4(frm_tmp2, gauge_field, out, 1, 0, mobius_lib_arg, mass);
+  zmobius_dslash_4(frm_tmp2, gauge_field, out, 0, 0, mobius_lib_arg, mass);
   DEBUG_MOBIUS_DSLASH("mobius_dslash_4 %e\n", time_elapse());
   
   //------------------------------------------------------------------

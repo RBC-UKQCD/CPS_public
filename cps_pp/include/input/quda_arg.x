@@ -22,5 +22,10 @@ class QudaArg {
   Float reliable_delta; /*!< delta parameter for reliableupdates. */
   int max_restart; /*< Maximum number of restarts. */
   int device; /*!< Which CUDA device to use. */
+  int maxiter_precondition;
+  int Ls_cheap ; // the cheap Ls, which should be 4.
+  bool perform_mspcg_madwf_ml_training ;    // whether or not to perform the training. Please set it to false.
+  bool use_mspcg_madwf_ml_training ; // whether or not use the training: Please set it to true.  
+  Float mu; 
   memfun QudaArg();
 };

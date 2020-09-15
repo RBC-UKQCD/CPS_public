@@ -2,6 +2,7 @@
 #include <config.h>
 #include <util/qio_writeGenericFields.h>
 #include <util/time_cps.h>
+#include <util/verbose.h>
 
 
 #define PROFILE
@@ -20,10 +21,10 @@ void qio_genfield_get_glb(char *buf_, size_t site_index, int count, void *arg_)
 {
   moveMem(buf_, arg_, sizeof(qio_genfield_glb_type)) ;
 
-  qio_genfield_glb_type* a;
+  qio_genfield_glb_type* a= &qio_genfield_glb;
 
-#if 0
-  printf("qio_genfield_get_glb: writing %d %d %d %d\n",
+#if 1
+  VRB.Result("","qio_genfield_get_glb", "writing %d %d %d %d\n",
 	 a-> precision,
 	 a-> n_fields,
 	 a-> f_size_per_site,
@@ -40,11 +41,11 @@ void qio_getGenField(char *buf_, size_t site_index, int count, void *arg)
   
 
   const int n_field = qio_genfield_glb. n_fields;
-  const int f_size = qio_genfield_glb. f_size_per_site;
+  const size_t f_size = qio_genfield_glb. f_size_per_site;
   const int n_sites = qio_genfield_glb. n_sites;
 
 #if 0
-  printf("qio_geGenField: %d %d %d %d %d %x\n", n_field, f_size, n_sites,count, site_index, buf_);
+  VRB.Result("","qio_geGenField", "%d %d %d %d %d %x\n", n_field, f_size, n_sites,count, site_index, buf_);
 #endif
 
   /*
@@ -77,9 +78,7 @@ void qio_getGenField(char *buf_, size_t site_index, int count, void *arg)
 		sizeof(Float)* f_size);
     }
   }else{
-
     const float *field = (float*) arg;
-
     float *buf = (float*) buf_;
     for(int field_i=0; field_i<n_field;++field_i){
       moveMem(  buf  + f_size* ( field_i   ),  
@@ -132,7 +131,7 @@ void qio_writeGenericFields::qio_openOutput(char *filename, QIO_String *record_f
 
 void qio_writeGenericFields::write_genericfields(
 						 char *outfile,
-						 int n_fields, int f_size_per_site, void *field,
+						 int n_fields, size_t f_size_per_site, void *field,
 						 int volFormat, FP_FORMAT floatFormat)
  {
 #ifdef PROFILE
@@ -164,8 +163,8 @@ void qio_writeGenericFields::write_genericfields(
     }
 
   qio_genfield_glb.precision=SingleDouble;
-  if (SingleDouble)  VRB.Flow(cname,fname," output-precision: DOUBLE\n");
-  else VRB.Flow(cname,fname," output-precision: SINGLE\n");
+  if (SingleDouble)  VRB.Result(cname,fname," output-precision: DOUBLE\n");
+  else VRB.Result(cname,fname," output-precision: SINGLE\n");
 
   char xml_info_field[7*(MAX_HEADER_LINE+10)];
 

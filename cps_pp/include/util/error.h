@@ -4,6 +4,7 @@
 #include<cstring>
 #include<string>
 #include<config.h>
+#include<string>
 /*!\file
   \brief  Declaration and definition of Error class.
 
@@ -76,6 +77,7 @@ class Error
 
     void General(const char*, const char*, const char*, ...);
     //!< Error message for miscellaneous failure.    
+    void General(std::string &cname, std::string &fname, const char*, ...);
 
     void HdwCheck(const char *,const char *);
         

@@ -51,7 +51,7 @@ static int bgl_cg_count = 0;
 //------------------------------------------------------------------
 const unsigned CBUF_MODE4 = 0xcb18c1ff;
 
-static int f_size_cb;     // Node checkerboard size of the fermion field
+static size_t f_size_cb;     // Node checkerboard size of the fermion field
 
 static inline void print_vec( Vector *vec, char *name){
   Float temp_f = vec->NormSqNode(f_size_cb);

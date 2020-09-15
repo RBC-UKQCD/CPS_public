@@ -14,7 +14,15 @@ class LatRngIO : public QioControl {
  private:
   char * cname;
  public:
-  LatRngIO () : QioControl(), cname("LatRngIO") { }
+  LatRngIO () : QioControl(), cname("LatRngIO") { 
+    //CK: add default IO style for different architectures rather than hardcoding it in
+#if TARGET != BGQ
+    setParallel();
+#else
+    setSerial();
+#endif
+
+  }
   virtual ~LatRngIO() { }
 
  protected:

@@ -1,0 +1,11 @@
+class QudaArg QudaPram = {
+CudaPrecision gauge_prec = CUDA_DOUBLE_PRECISION
+CudaPrecision spinor_prec = CUDA_DOUBLE_PRECISION
+CudaReconstructType reconstruct = CUDA_RECONSTRUCT_NO
+CudaPrecision gauge_prec_sloppy = CUDA_HALF_PRECISION
+CudaPrecision spinor_prec_sloppy = CUDA_HALF_PRECISION
+CudaReconstructType reconstruct_sloppy = CUDA_RECONSTRUCT_NO
+double reliable_delta = 0.1
+int max_restart = 100
+int device = 0
+}

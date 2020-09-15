@@ -261,7 +261,7 @@ void PT::mat(int n, PTmatrix **mout, PTmatrix **min, const int *dir){
   int if_print = 0;
   if ( (call_num%10000==1) && (!QMP_get_node_number()) ) if_print=1;
 
-#undef USE_TEST2
+#define USE_TEST2
 #ifdef USE_TEST2
 //assume nt > n!
     static char *cname="mat()";
@@ -372,13 +372,13 @@ void PT::mat(int n, PTmatrix **mout, PTmatrix **min, const int *dir){
   dtime += dclock();
   nonlocal +=dtime;
 
-  if (call_num%100==0){
+  if (call_num%1000==0){
     static char *cname="mat()";
     if (!QMP_get_node_number() ) {
-    print_flops("mat():local*100",0,localt);
-    print_flops("mat():nonlocal*100",0,nonlocal);
-    print_flops("mat():qmp*100",0,qmp);
-    print_flops("mat():setup*100",0,setup);
+    print_flops("mat():local*1000",0,localt);
+    print_flops("mat():nonlocal*1000",0,nonlocal);
+    print_flops("mat():qmp*1000",0,qmp);
+    print_flops("mat():setup*1000",0,setup);
     }
     localt=nonlocal=qmp=setup=0.;
   }

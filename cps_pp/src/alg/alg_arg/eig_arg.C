@@ -39,7 +39,8 @@ vml_EigArg (VML *vmls, char *name,EigArg *objp)
 	 if (!vml_array (vmls, "Mass", (char **)&objp->Mass.Mass_val, (u_int *) &objp->Mass.Mass_len, ~0,
 		sizeof (Float), (vmlproc_t) vml_Float))
 		 return FALSE;
-	 if (!vml_int (vmls, "n_masses", &objp->n_masses))
+	 if (!vml_array (vmls, "Epsilon", (char **)&objp->Epsilon.Epsilon_val, (u_int *) &objp->Epsilon.Epsilon_len, ~0,
+		sizeof (Float), (vmlproc_t) vml_Float))
 		 return FALSE;
 	 if (!vml_int (vmls, "N_eig", &objp->N_eig))
 		 return FALSE;
@@ -74,6 +75,8 @@ vml_EigArg (VML *vmls, char *name,EigArg *objp)
 	 if (!vml_int (vmls, "hsum_dir", &objp->hsum_dir))
 		 return FALSE;
 	 if (!vml_Float (vmls, "mass", &objp->mass))
+		 return FALSE;
+	 if (!vml_Float (vmls, "epsilon", &objp->epsilon))
 		 return FALSE;
 	 if (!vml_string (vmls, "fname", &objp->fname, ~0))
 		 return FALSE;

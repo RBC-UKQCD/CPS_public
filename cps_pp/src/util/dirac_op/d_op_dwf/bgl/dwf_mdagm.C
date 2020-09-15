@@ -44,7 +44,7 @@ void dwf_mdagm(Vector *out,
 // Calculate the dot product <out, in> = <M in, M in>
 //------------------------------------------------------------------
   if(dot_prd != 0){
-    int f_size = 24 * dwf_lib_arg->vol_4d * dwf_lib_arg->ls / 2;
+    size_t f_size = 24 * dwf_lib_arg->vol_4d * dwf_lib_arg->ls / 2;
     *dot_prd = frm_tmp1->NormSqNode(f_size);
     DiracOp::CGflops+=2*f_size;
   }

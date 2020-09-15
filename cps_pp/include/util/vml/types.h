@@ -23,7 +23,7 @@ typedef int enum_t;
 #endif
 
 #ifndef HAVE_INT8_T
-typedef char int8_t;
+//typedef char int8_t;
 #endif
 
 #ifndef HAVE_INT16_T
@@ -35,7 +35,7 @@ typedef int int32_t;
 #endif
 
 #ifndef HAVE_INT64_T
-typedef long long int64_t;
+//typedef long long int64_t;
 #endif
 
 #ifndef HAVE_UINT8_T
@@ -50,17 +50,17 @@ typedef unsigned short uint16_t;
 typedef unsigned int uint32_t;
 #endif
 #ifndef HAVE_UINT64_T
-typedef unsigned long long uint64_t;
+//typedef unsigned long long uint64_t;
 #endif
 #define MAX_NETOBJ_SZ 1024
 #ifndef HAVE_UINT_T
 typedef unsigned int u_int;
 #endif
 #ifndef HAVE_U_QUAD_T
-typedef unsigned long long u_quad_t;
+//typedef unsigned long long u_quad_t;
 #endif
 #ifndef HAVE_QUAD_T
-typedef long long int quad_t;
+//typedef long long int quad_t;
 #endif
 #ifndef HAVE_NETOBJ
 struct netobj {

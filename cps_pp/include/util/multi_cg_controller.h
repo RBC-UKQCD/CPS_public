@@ -6,6 +6,9 @@
 #include <util/lattice/fbfm.h>
 #endif
 
+// Promoting the class to work without BFM. BFM implementation in bfm_mixed_solver.
+// Has to be manually reconciled after merging Gparity branch is done!!
+#ifndef USE_BFM
 
 CPS_START_NAMESPACE
 //Controls the version of the multi-shift algorithm used. The user can define different versions to use in different environments, for example if you
@@ -46,70 +49,8 @@ public:
     void setReliableUpdateFreq(const int &f){ reliable_update_freq = f; }
     void setMaximumDefectCorrectionCycles(const int &c){ max_defect_correction_cycles = c; }
 
-#ifdef USE_BFM
-    int MInv(Fermion_t *sol_multi, Fermion_t src, 
-	     Float *shift, int Nshift, 
-	     Float *mresidual, Float *alpha, int single,
-	     bfm_evo<double> &bd,
-	     bfm_evo<float> &bf){
-	
-	const Mode& mode = getMode();
-	int iter;
-
-	if(mode == SINGLE_PREC){ //Note, this uses the residuals specified in the cg_arg without modification
-#pragma omp parallel
-	    {
-		Fermion_t src_f = bf.threadedAllocFermion();
-		Fermion_t sol_f[Nshift];
-		for(int i=0;i<Nshift;i++) sol_f[i] = bf.threadedAllocFermion();
-
-		mixed_cg::threaded_convFermion(src_f,src,bf,bd);
-		mixed_cg::switch_comm(bf,bd);
-		iter = bf.CGNE_prec_MdagM_multi_shift(sol_f, src_f, shift, alpha, Nshift, mresidual, single);
-		mixed_cg::switch_comm(bd,bf);
-		for(int i=0;i<Nshift;i++){
-		    mixed_cg::threaded_convFermion(sol_multi[i],sol_f[i],bd,bf);
-		    bf.threadedFreeFermion(sol_f[i]);
-		}
-		bf.threadedFreeFermion(src_f);
-	    }       
-	}else if(mode == DOUBLE_PREC){
-#pragma omp parallel
-	    {
-		iter = bd.CGNE_prec_MdagM_multi_shift(sol_multi, src, shift, alpha, Nshift, mresidual, single);
-	    }
-	}else if(mode == SINGLE_PREC_PLUS_OUTER_DEFECT_CORRECTION_LOOP){
-	    double fresidual[Nshift]; //residuals for initial single prec solve
-	    for(int s=0;s<Nshift;s++) fresidual[s] = (mresidual[s] >= minimum_single_prec_residual ? mresidual[s] : minimum_single_prec_residual);
-#pragma omp parallel
-	    {
-		iter = mixed_cg::threaded_cg_mixed_defect_correction_multi_shift_MdagM(sol_multi,src, shift,alpha, bd,bf, Nshift, mresidual, fresidual, single, max_defect_correction_cycles);
-	    }
-	}else if(mode == SINGLE_PREC_AS_DOUBLE_PREC_GUESS){
-	    double fresidual[Nshift]; //residuals for initial single prec solve
-	    for(int s=0;s<Nshift;s++) fresidual[s] = (mresidual[s] >= minimum_single_prec_residual ? mresidual[s] : minimum_single_prec_residual);
-#pragma omp parallel
-	    {
-		iter = mixed_cg::threaded_cg_mixed_single_prec_as_guess_multi_shift_MdagM(sol_multi,src, shift,alpha, Nshift, mresidual, fresidual, single, bd, bf);
-	    }
-	}else if(mode == SINGLE_PREC_RESTARTED_AS_DOUBLE_PREC_GUESS){
-	    double fresidual[Nshift]; //residuals for initial single prec solve
-	    for(int s=0;s<Nshift;s++) fresidual[s] = (mresidual[s] >= minimum_single_prec_residual ? mresidual[s] : minimum_single_prec_residual);
-#pragma omp parallel
-	    {
-		iter = mixed_cg::threaded_cg_mixed_restarted_multi_shift_MdagM(sol_multi,src, shift,alpha, Nshift, mresidual, fresidual, single, bd, bf, max_defect_correction_cycles);
-	    }
-	}else if(mode == SINGLE_PREC_RELIABLE_UPDATE_PLUS_OUTER_DEFECT_CORRECTION_LOOP){
-	    #pragma omp parallel
-	    {
-		iter = mixed_cg::threaded_cg_mixed_multi_shift_MdagM_sp_relup_dp_defect_correction(sol_multi,src, shift,alpha, Nshift, mresidual, single, bf, bd, reliable_update_freq, -1, max_defect_correction_cycles);
-	    }
-	}else ERR.General("_MultiShiftCGargs","MInv(..)","Unknown multi-shift mode\n");
-	return iter;
-    }
-#endif
 };
 
 extern MultiShiftCGcontroller MultiShiftController; //global instance (created in fbfm.C)
 CPS_END_NAMESPACE
-
+#endif

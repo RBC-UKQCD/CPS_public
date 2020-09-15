@@ -26,9 +26,6 @@ CPS_START_NAMESPACE
   \return A pointer to the allocated memory
   \post Program exits with the appropriate Error code if allocation fails.  
 */
-void* smalloc(size_t request,
-	      const char vname[], const char fname[]="smalloc", const char cname[]="");
-void* smalloc(size_t request);
 
 //! Allocate memory
 /*!
@@ -43,6 +40,10 @@ void* smalloc(size_t request);
 */
 
 void* smalloc(const char cname[], const char fname[], const char vname[], size_t request);
+inline void* smalloc(size_t request, const char vname[], const char fname[]="smalloc", const char cname[]=""){
+return smalloc(cname,fname,vname,request);
+}
+inline void* smalloc(size_t request){ return smalloc("","","",request);}
 
 //! Free allocate memory
 /*!
@@ -54,9 +55,6 @@ void* smalloc(const char cname[], const char fname[], const char vname[], size_t
   \param cname The name of the calling class
   \post  Exits with the appropriate Error code if allocation fails.  
 */
-void sfree(void* p,
-	   const char vname[], const char fname[]="sfree", const char cname[]="");
-void sfree(void* p);
 
 //! Free memory
 /*!
@@ -68,6 +66,10 @@ void sfree(void* p);
   \param p Pointer to the memory to be freed.
 */
 void sfree(const char cname[], const char fname[], const char vname[], void *p);
+inline void sfree(void* p, const char vname[], const char fname[],const char cname[]){
+   sfree(cname,fname,vname,p);
+}
+inline void sfree(void* p){ sfree ("","","",p);}
 
 //! Doesn't appear to do anything.
 void sclear();
@@ -86,9 +88,14 @@ void sclear();
   \return A pointer to the allocated memory
   \post  Exits with the appropriate Error code if allocation fails.  
 */
-void* fmalloc(size_t request,
-	      const char vname[], const char fname[]="fmalloc", const char cname[]="");
-void* fmalloc(size_t request);
+void* fmalloc(const char cname[], const char fname[], const char vname[], size_t request);
+inline void* fmalloc(size_t request,
+	      const char vname[], const char fname[]="fmalloc", const char cname[]=""){
+      return fmalloc(cname,fname,vname,request);
+}
+inline void* fmalloc(size_t request){
+      return fmalloc("","","",request);
+}
 
 //! Free allocate memory
 /*!
@@ -99,10 +106,13 @@ void* fmalloc(size_t request);
   \param fname The name of the calling function or method
   \param cname The name of the calling class
 */
-void ffree(void* p,
-	   const char vname[], const char fname[]="ffree", const char cname[]="");
 void ffree(const char cname[], const char fname[], const char vname[], void *p);
-void ffree(void* p);
+inline void ffree(void* p, const char vname[], const char fname[]="ffree", const char cname[]=""){
+     ffree(cname,fname,vname,p);
+}
+inline void ffree(void* p){
+     ffree("","","",p);
+}
 
 //! Allocate memory
 /*!
@@ -115,7 +125,6 @@ void ffree(void* p);
   \return A pointer to the allocated memory
   \post  Exits with the appropriate Error code if allocation fails.
 */
-void* fmalloc(const char cname[], const char fname[], const char vname[], size_t request);
 
 //! Free memory
 /*!

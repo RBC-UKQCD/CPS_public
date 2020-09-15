@@ -1,0 +1,241 @@
+class GparityContractArg contract_arg = {
+Array meas[13] = {
+ContractionType type = CONTRACTION_TYPE_ALL_BILINEARS
+struct ContractionTypeAllBilinears contraction_type_all_bilinears = {
+string prop_1 = "prop_m0.01_F"
+string prop_2 = "prop_m0.01_F"
+Array momenta[1] = {
+struct MomArg momenta[0] = {
+Vector p[3] = {
+double p[0] = 0
+double p[1] = 0
+double p[2] = 0
+}
+}
+}
+string file = "../results/bilinears_0.01_0.01_FF"
+}
+ContractionType type = CONTRACTION_TYPE_ALL_BILINEARS
+struct ContractionTypeAllBilinears contraction_type_all_bilinears = {
+string prop_1 = "prop_m0.01_B"
+string prop_2 = "prop_m0.01_B"
+Array momenta[1] = {
+struct MomArg momenta[0] = {
+Vector p[3] = {
+double p[0] = 0
+double p[1] = 0
+double p[2] = 0
+}
+}
+}
+string file = "../results/bilinears_0.01_0.01_BB"
+}
+ContractionType type = CONTRACTION_TYPE_ALL_WALLSINK_BILINEARS_SPECIFIC_MOMENTUM
+struct ContractionTypeAllWallSinkBilinearsSpecificMomentum contraction_type_all_wallsink_bilinears_specific_momentum = {
+string prop_1 = "prop_m0.01_F"
+string prop_2 = "prop_m0.01_F"
+Array momenta[1] = {
+struct MomPairArg momenta[0] = {
+Vector p1[3] = {
+double p1[0] = 0
+double p1[1] = 0
+double p1[2] = 0
+}
+Vector p2[3] = {
+double p2[0] = 0
+double p2[1] = 0
+double p2[2] = 0
+}
+}
+}
+int cosine_sink = 0
+string file = "../results/wallsink_bilinears_0.01_0.01_FF"
+}
+ContractionType type = CONTRACTION_TYPE_ALL_WALLSINK_BILINEARS_SPECIFIC_MOMENTUM
+struct ContractionTypeAllWallSinkBilinearsSpecificMomentum contraction_type_all_wallsink_bilinears_specific_momentum = {
+string prop_1 = "prop_m0.01_B"
+string prop_2 = "prop_m0.01_B"
+Array momenta[1] = {
+struct MomPairArg momenta[0] = {
+Vector p1[3] = {
+double p1[0] = 0
+double p1[1] = 0
+double p1[2] = 0
+}
+Vector p2[3] = {
+double p2[0] = 0
+double p2[1] = 0
+double p2[2] = 0
+}
+}
+}
+int cosine_sink = 0
+string file = "../results/wallsink_bilinears_0.01_0.01_BB"
+}
+ContractionType type = CONTRACTION_TYPE_ALL_BILINEARS
+struct ContractionTypeAllBilinears contraction_type_all_bilinears = {
+string prop_1 = "prop_m0.045_F"
+string prop_2 = "prop_m0.045_F"
+Array momenta[1] = {
+struct MomArg momenta[0] = {
+Vector p[3] = {
+double p[0] = 0
+double p[1] = 0
+double p[2] = 0
+}
+}
+}
+string file = "../results/bilinears_0.045_0.045_FF"
+}
+ContractionType type = CONTRACTION_TYPE_ALL_BILINEARS
+struct ContractionTypeAllBilinears contraction_type_all_bilinears = {
+string prop_1 = "prop_m0.045_B"
+string prop_2 = "prop_m0.045_B"
+Array momenta[1] = {
+struct MomArg momenta[0] = {
+Vector p[3] = {
+double p[0] = 0
+double p[1] = 0
+double p[2] = 0
+}
+}
+}
+string file = "../results/bilinears_0.045_0.045_BB"
+}
+ContractionType type = CONTRACTION_TYPE_ALL_WALLSINK_BILINEARS_SPECIFIC_MOMENTUM
+struct ContractionTypeAllWallSinkBilinearsSpecificMomentum contraction_type_all_wallsink_bilinears_specific_momentum = {
+string prop_1 = "prop_m0.045_F"
+string prop_2 = "prop_m0.045_F"
+Array momenta[1] = {
+struct MomPairArg momenta[0] = {
+Vector p1[3] = {
+double p1[0] = 0
+double p1[1] = 0
+double p1[2] = 0
+}
+Vector p2[3] = {
+double p2[0] = 0
+double p2[1] = 0
+double p2[2] = 0
+}
+}
+}
+int cosine_sink = 0
+string file = "../results/wallsink_bilinears_0.045_0.045_FF"
+}
+ContractionType type = CONTRACTION_TYPE_ALL_WALLSINK_BILINEARS_SPECIFIC_MOMENTUM
+struct ContractionTypeAllWallSinkBilinearsSpecificMomentum contraction_type_all_wallsink_bilinears_specific_momentum = {
+string prop_1 = "prop_m0.045_B"
+string prop_2 = "prop_m0.045_B"
+Array momenta[1] = {
+struct MomPairArg momenta[0] = {
+Vector p1[3] = {
+double p1[0] = 0
+double p1[1] = 0
+double p1[2] = 0
+}
+Vector p2[3] = {
+double p2[0] = 0
+double p2[1] = 0
+double p2[2] = 0
+}
+}
+}
+int cosine_sink = 0
+string file = "../results/wallsink_bilinears_0.045_0.045_BB"
+}
+ContractionType type = CONTRACTION_TYPE_ALL_BILINEARS
+struct ContractionTypeAllBilinears contraction_type_all_bilinears = {
+string prop_1 = "prop_m0.045_F"
+string prop_2 = "prop_m0.01_F"
+Array momenta[1] = {
+struct MomArg momenta[0] = {
+Vector p[3] = {
+double p[0] = 0
+double p[1] = 0
+double p[2] = 0
+}
+}
+}
+string file = "../results/bilinears_0.045_0.01_FF"
+}
+ContractionType type = CONTRACTION_TYPE_ALL_BILINEARS
+struct ContractionTypeAllBilinears contraction_type_all_bilinears = {
+string prop_1 = "prop_m0.045_B"
+string prop_2 = "prop_m0.01_B"
+Array momenta[1] = {
+struct MomArg momenta[0] = {
+Vector p[3] = {
+double p[0] = 0
+double p[1] = 0
+double p[2] = 0
+}
+}
+}
+string file = "../results/bilinears_0.045_0.01_BB"
+}
+ContractionType type = CONTRACTION_TYPE_ALL_WALLSINK_BILINEARS_SPECIFIC_MOMENTUM
+struct ContractionTypeAllWallSinkBilinearsSpecificMomentum contraction_type_all_wallsink_bilinears_specific_momentum = {
+string prop_1 = "prop_m0.045_F"
+string prop_2 = "prop_m0.01_F"
+Array momenta[1] = {
+struct MomPairArg momenta[0] = {
+Vector p1[3] = {
+double p1[0] = 0
+double p1[1] = 0
+double p1[2] = 0
+}
+Vector p2[3] = {
+double p2[0] = 0
+double p2[1] = 0
+double p2[2] = 0
+}
+}
+}
+int cosine_sink = 0
+string file = "../results/coswallsink_bilinears_0.045_0.01_FF"
+}
+ContractionType type = CONTRACTION_TYPE_ALL_WALLSINK_BILINEARS_SPECIFIC_MOMENTUM
+struct ContractionTypeAllWallSinkBilinearsSpecificMomentum contraction_type_all_wallsink_bilinears_specific_momentum = {
+string prop_1 = "prop_m0.045_B"
+string prop_2 = "prop_m0.01_B"
+Array momenta[1] = {
+struct MomPairArg momenta[0] = {
+Vector p1[3] = {
+double p1[0] = 0
+double p1[1] = 0
+double p1[2] = 0
+}
+Vector p2[3] = {
+double p2[0] = 0
+double p2[1] = 0
+double p2[2] = 0
+}
+}
+}
+int cosine_sink = 0
+string file = "../results/coswallsink_bilinears_0.045_0.01_BB"
+}
+ContractionType type = CONTRACTION_TYPE_TOPOLOGICAL_CHARGE
+struct ContractionTypeTopologicalCharge contraction_type_topological_charge = {
+int n_ape_smearing_cycles = 20
+int ape_smear_su3_project = 1
+double ape_su3_proj_tolerance = 1e-12
+int ape_orthog = -1
+double ape_coef = 0.45
+string file = "../results/topq"
+}
+}
+string config_fmt = "../configurations/ckpoint_lat.%d"
+int conf_start = 300
+int conf_incr = 5
+int conf_lessthan = 910
+struct FixGaugeArg fix_gauge = {
+FixGaugeType fix_gauge_kind = FIX_GAUGE_COULOMB_T
+int hyperplane_start = 0
+int hyperplane_step = 1
+int hyperplane_num = 32
+double stop_cond = 1e-08
+int max_iter_num = 10000
+}
+}

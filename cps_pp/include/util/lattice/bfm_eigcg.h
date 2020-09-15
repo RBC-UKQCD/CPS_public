@@ -25,14 +25,16 @@
 #include <pprefetch.h>
 #endif
 
+#ifdef USE_QMP
 #include<qmp.h>
+#endif
 
 void eigen_solver(double *A, double *EV, double *E, int n);
 template<class Float> void matrix_dgemm (const int M,const int N, const int K, Float **A, const double *B, double *C);
 void min_eig_index(int *INDEX, int nev,double *EIG, int n);
 void invert_H_zpotri(std::complex<double> *data, int N);
-void invert_H_matrix(complex<double> *data, int N); //if n is large enough, must be parallerized!!!
-template<class Float> void eigcg_vec_mult(Float* V, const int m, double *QZ, const int n, const int f_size_cb, const int nthread, const int me);
+void invert_H_matrix(std::complex<double> *data, int N); //if n is large enough, must be parallerized!!!
+template<class Float> void eigcg_vec_mult(Float* V, const int m, double *QZ, const int n, const size_t f_size_cb, const int nthread, const int me);
 
 static double time_diff(const struct timeval &end_time, const struct timeval &start_time)
 {
@@ -41,6 +43,8 @@ static double time_diff(const struct timeval &end_time, const struct timeval &st
     return sec_diff + 1.0e-6 * usec_diff;
 }
 
+//CK: The region below is now included in BFM directly
+#if 0
 template <class Float>
 Fermion_t bfm_evo<Float>::threadedAllocCompactFermion   (int mem_type)
 {
@@ -97,6 +101,9 @@ void bfm_evo<Float>::threaded_free(void* handle)
     }
     this->thread_barrier();
 }
+#endif
+
+
 
 template<class Float>
 int bfm_evo<Float>::EIG_CGNE_M(Fermion_t solution[2], Fermion_t source[2])
@@ -129,6 +136,10 @@ int bfm_evo<Float>::EIG_CGNE_M(Fermion_t solution[2], Fermion_t source[2])
 template<class Float>
 int bfm_evo<Float>::Eig_CGNE_prec(Fermion_t psi, Fermion_t src)
 {
+    printf("int bfm_evo<Float>::Eig_CGNE_prec temporarily disabled\n");
+    exit(-1);
+#if 0
+
     double f;
     double cp,c,a,d,b;
     int me = this->thread_barrier();
@@ -164,10 +175,9 @@ int bfm_evo<Float>::Eig_CGNE_prec(Fermion_t psi, Fermion_t src)
                 for(int i=0;i<eigcg->def_len;i++)
                     for(int j=0;j<eigcg->def_len;j++)
                         invH[i*eigcg->def_len+j]=eigcg->H[i*eigcg->get_max_def_len()+j];
-                invert_H_matrix(invH, eigcg->def_len);
-                // invert_H_zpotri(invH, eigcg->def_len);
+                // invert_H_matrix(invH, eigcg->def_len);
+                invert_H_zpotri(invH, eigcg->def_len);
             }
-            this->thread_barrier();
             //------
         } else {
             invH = eigcg->H;
@@ -186,24 +196,13 @@ int bfm_evo<Float>::Eig_CGNE_prec(Fermion_t psi, Fermion_t src)
             complex<double> dt = this->inner((Fermion_t)(eigcg->getU(n)), src);
             if(me==0)Ub[n] = dt;
         }
-        // if(me==0) {
-        //     for(int i=0;i<eigcg->def_len;i++) {
-        //         invHUb[i]=0.0;
-        //         for(int j=0;j<eigcg->def_len;j++)
-        //             invHUb[i] += invH[i*eigcg->def_len+j]*Ub[j]; //notice the index ofr invH.
-        //     }
-        // }
-        int nvec_start, nvec_count;
-        this->thread_work_nobarrier(eigcg->def_len, me, nvec_count, nvec_start);
-
-        this->thread_barrier();
-        for(int i = nvec_start; i < nvec_start + nvec_count; ++i) {
-        // for(int i=0;i<eigcg->def_len;i++) {
-            invHUb[i]=0.0;
-            for(int j=0;j<eigcg->def_len;j++)
-                invHUb[i] += invH[i*eigcg->def_len+j]*Ub[j]; //notice the index ofr invH.
+        if(me==0) {
+            for(int i=0;i<eigcg->def_len;i++) {
+                invHUb[i]=0.0;
+                for(int j=0;j<eigcg->def_len;j++)
+                    invHUb[i] += invH[i*eigcg->def_len+j]*Ub[j]; //notice the index ofr invH.
+            }
         }
-        this->thread_barrier();
 
         struct timeval dtime2;
         gettimeofday(&dtime2, NULL);
@@ -529,6 +528,7 @@ int bfm_evo<Float>::Eig_CGNE_prec(Fermion_t psi, Fermion_t src)
                         invHUb[i] += invH[i*eigcg->def_len+j]*Ub[j]; //notice the index ofr invH.
                 }
             }
+
             //set tmp=0.0;
             this->set_zero(tmp);
             for(int i=0;i<eigcg->def_len;i++) {
@@ -586,7 +586,6 @@ int bfm_evo<Float>::Eig_CGNE_prec(Fermion_t psi, Fermion_t src)
             t += diff.tv_sec*1.0E6 + diff.tv_usec;
             t -= t_lancos;
             if ( this->isBoss()&& !me ) {
-                //printf("bfmbase::Eig_CGNE_prec: %d mprec flops/site\n",mprecFlopsPerSite());
                 printf("bfmbase::Eig_CGNE_prec: CG part: %le s for %le flops\n",t/1e6, flops);
                 printf("bfmbase::Eig_CGNE_prec: CG part: %le Mflops per node\n",flops/t);
                 if(do_eigcg) {
@@ -665,8 +664,8 @@ int bfm_evo<Float>::Eig_CGNE_prec(Fermion_t psi, Fermion_t src)
         delete [] low;
         if(me==0) {
             if(eigcg->def_len == eigcg->get_max_def_len())
-                //invert_H_zpotri(eigcg->H,eigcg->get_max_def_len());
-                invert_H_matrix(eigcg->H,eigcg->get_max_def_len());
+                invert_H_zpotri(eigcg->H,eigcg->get_max_def_len());
+                // invert_H_matrix(eigcg->H,eigcg->get_max_def_len());
         }
 
         gettimeofday(&addV_end,NULL);
@@ -706,11 +705,13 @@ int bfm_evo<Float>::Eig_CGNE_prec(Fermion_t psi, Fermion_t src)
     else {
         return this->iter;
     }
+#endif
 }
 
 #ifndef BLOCK_SIZE
 #define BLOCK_SIZE ((int) 4)
 #endif
+//CK: Come on guys, using inscrutable single-letter variable names DOES NOT MAKE THE CODE RUN FASTER! What on Earth does this do??
 template<class Float> void basic_dgemm (const int KB, const int M, const int N, const int K, Float **A, const double *B, double *C, const int NB)
 {
     int i, j, k;
@@ -750,7 +751,8 @@ template<class Float> void basic_dgemm (const int KB, const int M, const int N, 
                             register double cij = *(C + i*NB + j);
                             cij += pA[0][i]*(*(Bp++));
                             cij += pA[1][i]*(*(Bp++));
-                            cij += pA[3][i]*(*(Bp++));
+                            //cij += pA[3][i]*(*(Bp++)); CK: Should this not be index 2? This line causes SEGV for me
+                            cij += pA[2][i]*(*(Bp++)); 
                             *(C + i*NB + j) = cij;
                         }
                 }
@@ -965,7 +967,7 @@ template<class Float> void matrix_dgemm (const int M,const int N, const int K, F
 }
 
 template<class Float>
-void eigcg_vec_mult(Float* V, const int m, double *QZ, const int n, const int f_size_cb, const int nthread, const int me)
+void eigcg_vec_mult(Float* V, const int m, double *QZ, const int n, const size_t f_size_cb, const int nthread, const int me)
 //QZ is saved in column major format. 
 //perform V = V*QZ;
 {
@@ -1006,7 +1008,7 @@ void eigcg_vec_mult(Float* V, const int m, double *QZ, const int n, const int f_
 }
 
 template<class Float>
-void eigcg_vec_mult2(Float* V, const int m, double *QZ, const int n, const int f_size_cb,
+void eigcg_vec_mult2(Float* V, const int m, double *QZ, const int n, const size_t f_size_cb,
                      const int nthread, const int me,
                      bfm_evo<Float> &bfmobj)
 //QZ is saved in column major format. 
@@ -1055,7 +1057,7 @@ void myaxpy(Float *r, Float *x, Float *y, double a, int len)
 }
 
 template<class Float>
-void eigcg_vec_mult3(Float* V, const int m, double *QZ, const int n, const int f_size_cb,
+void eigcg_vec_mult3(Float* V, const int m, double *QZ, const int n, const size_t f_size_cb,
                      const int nthread, const int me,
                      bfm_evo<Float> &bfmobj)
 //QZ is saved in column major format. 
@@ -1088,5 +1090,7 @@ void eigcg_vec_mult3(Float* V, const int m, double *QZ, const int n, const int f
         bfmobj.threadedFreeFermion(ret[i]);
     }
 }
+
+#undef BLOCK_SIZE
 
 #endif

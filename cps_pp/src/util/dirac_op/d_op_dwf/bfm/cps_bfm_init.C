@@ -10,7 +10,6 @@
 #include "majority_vote.h"
 #endif
 #ifdef USE_CHROMA
-#include <chroma.h>
 #endif
 #include <qdp.h>
 #include <util/gjp.h>
@@ -19,14 +18,20 @@
 #include <util/time_cps.h>
 #include <util/dirac_op/d_op_dwf.h>
 
+//added by CK for checksumming
+#include <util/fpconv.h>
+#include <util/checksum.h>
+#include <util/qioarg.h>
 //static int  Printf(char *format,...){}
-#define Printf if ( QMP_is_primary_node() ) printf
+//CK: replaced with non-QMP version in case QMP is not in use
+#define Printf if(!UniqueID()) printf
+
+//if ( QMP_is_primary_node() ) printf
 
 //#define USE_OMP
 
 
 #ifdef USE_CHROMA
-using namespace Chroma;
 #endif
 
 USING_NAMESPACE_CPS
@@ -39,7 +44,7 @@ CPS_START_NAMESPACE
 int cps_qdp_init(int *argc, char ***argv){
   VRB.Result("","cps_qdp_init()","started\n");
   if (qdp_initted) return 1;
-//  if (Chroma::isInitialized()) {
+//  if ( qdp_already_initted ) {
   if ( qdp_already_initted || QDP::QDP_isInitialized()) {
 
     VRB.Debug("","cps_qdp_init()","Already started!");
@@ -47,7 +52,6 @@ int cps_qdp_init(int *argc, char ***argv){
     return 1;
   }
 #ifdef USE_CHROMA
-  Chroma::initialize( argc, argv);
   VRB.Result("","cps_qdp_init()","Chroma::initialize( argc, argv)");
 #endif
   QDP::QDP_initialize( argc, argv);
@@ -55,8 +59,8 @@ int cps_qdp_init(int *argc, char ***argv){
   int size[Nd];
   multi1d<int> nrow(Nd);  
   for(int i = 0;i<Nd;i++) nrow[i] = GJP.Sites(i);
-//  multi1d<LatticeFermion> test(Nd);  
-//  nrow=size;
+  //  multi1d<LatticeFermion> test(Nd);  
+  //  nrow=size;
   Layout::setLattSize(nrow);
   Layout::create();
   for(int i=0;i<Nd;i++){
@@ -71,7 +75,10 @@ int cps_qdp_finalize(){
   if (!qdp_initted) {
     ERR.General("","cps_qdp_finalize()","qdp_initted=0!");
   }
-   qdp_already_initted = 1;
+  // Keep Chroma in scope, as it seems to finalize QMP too!
+  qdp_already_initted = 1;
+  //  if (! qdp_already_initted) Chroma::finalize();
+  //  else   VRB.Result("","cps_qdp_finalize()","cps_qdp had already started, not finalized here.");
   qdp_initted = 0;
   return 1;
 }
@@ -80,25 +87,25 @@ CPS_END_NAMESPACE
 static int chroma_idx(int x[4],int node_latt[4], int reim,int i_el, int i_size)
 {
   int ccb   = ((x[0]+x[1]+x[2]+x[3])&0x1); /*Work out local checkerboard of site*/
-                         /*FIXME Here need to worry about base_parity
-                          *as chroma indexes with global and not local parity
-                          */
+  /*FIXME Here need to worry about base_parity
+   *as chroma indexes with global and not local parity
+   */
   int chroma_cbsite[4];
   chroma_cbsite[0] = x[0];
   chroma_cbsite[1] = x[1];
   chroma_cbsite[2] = x[2];
   chroma_cbsite[3] = x[3];
   for(int i =0;i<4;i++)
-  if ( (x[i]<0) || (x[i]>=node_latt[i]) ){
-     printf("x[%d]=%d!!\n",i,x[i]);
-     exit(-3);
-  }
+    if ( (x[i]<0) || (x[i]>=node_latt[i]) ){
+      printf("x[%d]=%d!!\n",i,x[i]);
+      exit(-3);
+    }
 
 
 
   int csite= x[0] + node_latt[0]*(x[1]
-                  +       node_latt[1]*(x[2]
-                  +             node_latt[2]*x[3]));
+				  +       node_latt[1]*(x[2]
+							+             node_latt[2]*x[3]));
   csite = csite/2;
   int cbvol = (node_latt[0]*node_latt[1]*node_latt[2]*node_latt[3])/2;
   int idx = (ccb*cbvol+csite)*i_size*2 + i_el*2 + reim;
@@ -107,48 +114,61 @@ static int chroma_idx(int x[4],int node_latt[4], int reim,int i_el, int i_size)
 }
 
 void importGauge(
-CPS_NAMESPACE::Lattice &Lat,
-multi1d<LatticeColorMatrix> &U,
-CPS_NAMESPACE::Float *gauge,
-int dag){
+		 CPS_NAMESPACE::Lattice &Lat,
+		 multi1d<LatticeColorMatrix> &U,
+		 CPS_NAMESPACE::Float *gauge,
+		 int dag){
 #if 1
   int Ncoco = 9;
   QDPdouble *U_p;
   int x[5],node_latt[5];
-  char *fname="importGauge";
+  const char *fname="importGauge";
   static int called=0;
   static double time=0.;
 
-//  time -=dclock();
+  Printf("importGauge\n");
+
+  //  time -=dclock();
   for(int i=0;i<5;i++) node_latt[i]=GJP.NodeSites(i);
 
-  for (int mu=0;mu<Nd;mu++){
-    U_p = (QDPdouble *)&(U[mu].elem(0).elem());
-//    VRB.Result("",fname,"U_p[%d]=%p, U_p[%d][0]=%e\n",mu,U_p,mu,*U_p);
-    for ( x[3]=0;x[3]<node_latt[3];x[3]++ ) {
-    for ( x[2]=0;x[2]<node_latt[2];x[2]++ ) {
-    for ( x[1]=0;x[1]<node_latt[1];x[1]++ ) {
-    for ( x[0]=0;x[0]<node_latt[0];x[0]++ ) {
+  //CK: for G-parity, bfm expects first the U fields then the U*: [U_x],[U_y],[U_z],[U_t] then [U*]....
+  int nflav = 1; 
+  if(GJP.Gparity()){
+    nflav = 2;
+    Printf("importGauge: G-parity enabled\n");
+  }
+
+  for(int flav=0; flav< nflav; flav++){
+    for (int mu=0;mu<Nd;mu++){
+      U_p = (QDPdouble *)&(U[mu+Nd*flav].elem(0).elem());
+      //    VRB.Result("",fname,"U_p[%d]=%p, U_p[%d][0]=%e\n",mu,U_p,mu,*U_p);
+      for ( x[3]=0;x[3]<node_latt[3];x[3]++ ) {
+	for ( x[2]=0;x[2]<node_latt[2];x[2]++ ) {
+	  for ( x[1]=0;x[1]<node_latt[1];x[1]++ ) {
+	    for ( x[0]=0;x[0]<node_latt[0];x[0]++ ) {
       
-        for ( int row=0;row<3;row++ ) 
-        for ( int col=0;col<3;col++ ) {
-        for ( int reim=0;reim<2;reim++ ) {
+	      for ( int row=0;row<3;row++ ) 
+		for ( int col=0;col<3;col++ ) {
+		  for ( int reim=0;reim<2;reim++ ) {
 
-          int coco = col+3*row;
-          int coco2 = coco;
-          if (dag) coco2 = row+3*col;
+		    int coco = col+3*row;
+		    int coco2 = coco;
+		    if (dag) coco2 = row+3*col;
   
-          int cidx = chroma_idx(x,node_latt,reim,coco,Ncoco);
-          int bidx = reim + 2 *(coco2 + Ncoco *(Lat.GsiteOffset(x,mu)));
-          *(U_p+cidx) = *(gauge+bidx);
+		    int cidx = chroma_idx(x,node_latt,reim,coco,Ncoco);
+		    //Assume even-odd preconditioned. U* fields offset by one half-volume from the U fields
+		    int bidx = reim + 2 *(coco2 + Ncoco *(Lat.GsiteOffset(x,mu))) + flav * Nd*2*Ncoco*GJP.VolNodeSites()/2; 
+		    //if(mu==3 && row==0 && col==0) printf("Gauge %d %d %d %d, reim %d, flav %d = %f\n",x[0],x[1],x[2],x[3],reim,flav,gauge[bidx]); 
+		    *(U_p+cidx) = *(gauge+bidx);
   
-        }} // reim,coco
+		  }} // reim,coco
   
-    }}}} // x
-    VRB.Result("",fname,"U_p[%d]=%p, U_p[%d][0]=%e\n",mu,U_p,mu,*U_p);
+	    }}}} // x
+      VRB.Result("",fname,"U_p[%d]=%p, U_p[%d][0]=%e\n",mu,U_p,mu,*U_p);
 
-  }//mu
-//  time +=dclock();
+    }//mu
+  }//flav
+  //  time +=dclock();
 #endif
 }
 
@@ -157,375 +177,437 @@ int dag){
 // export : CPS <- QDP
 //  impexFermion(0,Lat,src,src_cps,0,1);
 void impexFermion(
-int if_export,
-CPS_NAMESPACE::Lattice &Lat,
-multi1d<LatticeFermion> const &qdp,
-CPS_NAMESPACE::Float *cps_p,
-int even, int odd, int Ls=0, double fac_t=1.){
+		  int if_export,
+		  CPS_NAMESPACE::Lattice &Lat,
+		  multi1d<LatticeFermion> const &qdp,
+		  CPS_NAMESPACE::Float *cps_p,
+		  int even, int odd, int Ls=0, double fac_t=1.){
 
-//  double M5 = GJP.DwfHeight();
-//  double fac = (5-M5)*(5-M5);
+  //  double M5 = GJP.DwfHeight();
+  //  double fac = (5-M5)*(5-M5);
   int i, node_latt[5];
-  char *fname="impexFermion";
+  const char *fname="impexFermion";
   unsigned long vol=1;
 
   for(i=0;i<5;i++) node_latt[i]=GJP.NodeSites(i);
   for(i=0;i<4;i++) vol *= node_latt[i];
 
   if(Ls==0){
-	Ls = node_latt[4];
-//       if( !if_export) fac=fac_t;
+    Ls = node_latt[4];
+    //       if( !if_export) fac=fac_t;
   }
   double  fac = fac_t;
 
-  if (qdp.size() != Ls ) {
-    printf("qdp.size()(%d) != node_latt[4](%d)\n",qdp.size(),node_latt[4]);
+  int qdp_size_expected = Ls;
+  if(GJP.Gparity()){
+    qdp_size_expected*=2;
+    Printf("impexFermion: G-parity enabled\n");
+  }
+  if (qdp.size() != qdp_size_expected ) {
+    printf("qdp.size()(%d) != node_latt[4](%d)*(2 if G-parity, else 1)\n",qdp.size(),qdp_size_expected);
     exit(-4);
   }
 
   static int called=0;
 
+  //CK: For G-parity, for each s-slice 2 4d fields are expected: s=0 |f0 f1| s=1 |f0 f1| ....
+  int nflav=1; if(GJP.Gparity()) nflav=2;
+
 #if 1
 #ifndef USE_OMP
   int x[5];
   for(x[4]=0;x[4]<Ls;x[4]++){
-    QDPdouble *qdp_p = (QDPdouble *) &(qdp[x[4]].elem(0).elem(0).elem(0).real());
-//    printf("%d: cps_p=%p qdp_p=%p\n",x[4],cps_p,qdp_p);
-    for ( x[3]=0;x[3]<node_latt[3];x[3]++ ) {
-    for ( x[2]=0;x[2]<node_latt[2];x[2]++ ) {
-    for ( x[1]=0;x[1]<node_latt[1];x[1]++ ) {
-    for ( x[0]=0;x[0]<node_latt[0];x[0]++ ) {
+    for(int flav=0;flav<nflav;flav++){
+      int qdpidx = flav + nflav*x[4];
+      QDPdouble *qdp_p = (QDPdouble *) &(qdp[qdpidx].elem(0).elem(0).elem(0).real());
+      //    printf("%d: cps_p=%p qdp_p=%p\n",x[4],cps_p,qdp_p);
+      for ( x[3]=0;x[3]<node_latt[3];x[3]++ ) {
+	for ( x[2]=0;x[2]<node_latt[2];x[2]++ ) {
+	  for ( x[1]=0;x[1]<node_latt[1];x[1]++ ) {
+	    for ( x[0]=0;x[0]<node_latt[0];x[0]++ ) {
 #else
-//   omp_set_num_threads(1);
-     QDPdouble *q_p[Ls]; 
-     for(i=0;i<Ls;i++)
-	q_p[i] = (QDPdouble *) &(qdp[i].elem(0).elem(0).elem(0).real());
+	      QDPdouble *q_p[qdp_size_expected]; 
+	      for(i=0;i<qdp_size_expected;i++)
+		q_p[i] = (QDPdouble *) &(qdp[i].elem(0).elem(0).elem(0).real());
 #pragma omp parallel for default(shared)
-    for (i=0;i<vol*Ls;i++){
- 	   unsigned long rest=i;
-	   int x[5];
-	   for(int j =0; j<4;j++){
-		x[j]= rest%node_latt[j]; rest = rest/node_latt[j];
-	   }
-	x[4]=rest;
-//        QDPdouble *qdp_p = (QDPdouble *) &(qdp[x[4]].elem(0).elem(0).elem(0).real());
-	QDPdouble *qdp_p = q_p[x[4]];        
-	const int tnum = omp_get_thread_num();
-//	if ((called%10000)==0)
-//	Printf("impex %d: %d %d %d %d %d:%d\n",i,x[0],x[1],x[2],x[3],x[4],tnum);
+	      for (i=0;i<vol*nflav*Ls;i++){
+		unsigned long rest=i;
+		int x[5];
+		for(int j =0; j<4;j++){
+		  x[j]= rest%node_latt[j]; rest = rest/node_latt[j];
+		}
+		int flav = rest%nflav; rest = rest/nflav;
+
+		x[4]=rest;
+	   
+		int qdpidx = flav + nflav*x[4];
+		QDPdouble *qdp_p = q_p[qdpidx];        
+		const int tnum = omp_get_thread_num();
+		//	if ((called%10000)==0)
+	   
 #endif
       
-      for ( int coco=0;coco<12;coco++ ) {
-      for ( int reim=0;reim<2;reim++ ) {
+		for ( int coco=0;coco<12;coco++ ) {
+		  for ( int reim=0;reim<2;reim++ ) {
   
-        int cidx = chroma_idx(x,node_latt,reim,coco,12);
-        int bidx = Lat.FsiteOffsetChkb(x);
-        bidx = reim + 2 *(coco + 12 *bidx);
-	if (0)
-	if( !if_export)
-		{if (bidx==0) Printf("%d %d %d %d %d: cps[0](in)=%g\n",
-		x[0],x[1],x[2],x[3],x[4], *(cps_p+bidx));}
-	else
-		{if (cidx==0) Printf("%d %d %d %d %d: qdp[0](in)=%g\n",
-		x[0],x[1],x[2],x[3],x[4], *(qdp_p+cidx));}
-       if( !if_export){ 
-	 if(1)
-         if ((odd) && ( (x[0]+x[1]+x[2]+x[3]+x[4])%2==1) ){
-            *(qdp_p+cidx) = *(cps_p+bidx)*fac;
-         } else if ((even) && ( (x[0]+x[1]+x[2]+x[3]+x[4])%2==0) ){
-            *(qdp_p+cidx) = *(cps_p+bidx)*fac;
-         } else {
-//            *(qdp_p+cidx) = 0.;
-         }
-       } else {
-	 if(1)
-         if ((odd) && ( (x[0]+x[1]+x[2]+x[3]+x[4])%2==1) ){
-            *(cps_p+bidx) = *(qdp_p+cidx)*fac;
-         } else if ((even) && ( (x[0]+x[1]+x[2]+x[3]+x[4])%2==0) ){
-            *(cps_p+bidx) = *(qdp_p+cidx)*fac;
-         } else {
-//            *(cps_p+bidx) = 0.;
-         }
-      } 
-	if (0)
-	if( if_export)
-		{if (bidx==0) Printf("%d %d %d %d %d: cps[0]=%g\n",
-		x[0],x[1],x[2],x[3],x[4], *(cps_p+bidx));}
-	else
-		{if (cidx==0) Printf("%d %d %d %d %d: qdp[0]=%g\n",
-		x[0],x[1],x[2],x[3],x[4], *(qdp_p+cidx));}
+		    int cidx = chroma_idx(x,node_latt,reim,coco,12);
+		    int bidx = Lat.FsiteOffsetChkb(x);
+		    bidx = reim + 2 *(coco + 12 *bidx) + flav*24*vol/2; //CK: f1 offset by one checkerboarded half-volume 
 
-      }} // reim,coco
+		    int parity = (x[0]+x[1]+x[2]+x[3]+x[4])%2;
+		    //if(reim==0 && coco==0 && ( (odd&&parity==1)||(even&&parity==0) ) ) Printf("impex %d: %d %d %d %d %d flav %d: bidx is %d\n",i,x[0],x[1],x[2],x[3],x[4],flav,bidx);
+
+		    int xr = x[0];
+		    int fr = flav;
+		    if(!GJP.Gparity() && xr>=node_latt[0]/2){ xr-=node_latt[0]/2; fr=1; }
+		    if (0)
+		      if( !if_export)
+			{if (coco==0 && reim==0 && ( (odd&&parity==1)||(even&&parity==0) ) ) Printf("%d %d %d %d %d flav %d: cps[0](in)=%g\n",
+												    xr,x[1],x[2],x[3],x[4],fr, *(cps_p+bidx));}
+		      else
+			{if (cidx==0) Printf("%d %d %d %d %d flav %d: qdp[0](in)=%g\n",
+					     x[0],x[1],x[2],x[3],x[4],flav, *(qdp_p+cidx));}
+	       
+		    if( !if_export){ 
+		      if(1)
+			if (odd && parity==1){
+			  *(qdp_p+cidx) = *(cps_p+bidx)*fac;
+			} else if (even && parity==0){
+			  *(qdp_p+cidx) = *(cps_p+bidx)*fac;
+			} else {
+			  //*(qdp_p+cidx) = 0.;
+			}
+		    } else {
+		      if(1)
+			if (odd && parity==1){
+			  *(cps_p+bidx) = *(qdp_p+cidx)*fac;
+			} else if (even && parity==0){
+			  *(cps_p+bidx) = *(qdp_p+cidx)*fac;
+			} else {
+			  //*(cps_p+bidx) = 0.;
+			}
+		    }
+ 
+		    if (0)
+		      if( if_export)
+			{if (bidx==0) Printf("%d %d %d %d %d flav %d: cps[0]=%g\n",
+					     x[0],x[1],x[2],x[3],x[4],flav, *(cps_p+bidx));}
+		      else
+			{if (coco==0 && reim==0 && ( (odd&&parity==1)||(even&&parity==0) )  ) Printf("%d %d %d %d %d flav %d: qdp[0]=%g\n",
+												     x[0],x[1],x[2],x[3],x[4],flav, *(qdp_p+cidx));}
+
+		  }} // reim,coco
   
 #ifndef USE_OMP
-    }}}} // x
+	      }}}}} // x
 #endif
-  } // x[4]
+    } // x[4]
 #endif
-  called++;
-}
-
-template <class Float>
-int dwf_CG_precMdagM_oo_multi( multi2d<LatticeFermion> &sol,
-                              multi1d<LatticeFermion> &src,
-                              multi1d<LatticeColorMatrix> &U,
-//							  std::string output_stem,
-                              double    shifts[],
-                              double    alpha[],
-                              int       nshift,
-                              double mresidual[],
-                              int single,
-                              int Ls,
-                              Real mass,
-                              Real M5,
-                              Real residual, int max_iter);
-
-
-
-static int cps_qdp_dwf_invert(
-Lattice &Lat, 
-CPS_NAMESPACE::Float mass, 
-CPS_NAMESPACE::Float *sol_cps, 
-CPS_NAMESPACE::Float *src_cps,
-double residual,
-int max_iter
-){
-  char *fname = "cps_qdp_dwf_invert()";
-
-  if (GJP.Snodes() != 1)
-    ERR.General("",fname,"Snodes()(%d)!=1",GJP.Snodes());
-
-  cps_qdp_init(GJP.argc_p(), GJP.argv_p());
-  if (!qdp_initted)
-    ERR.General("",fname,"QDP not initialized!(%d)",0);
-
-  int iter=0;   
-
-  int Ls = GJP.SnodeSites();
-  double M5 = GJP.DwfHeight();
-//  int Nd = 4;
-
-  Printf("src[0]=%g\n",*src_cps);
-  int lx = QDP::Layout::subgridLattSize()[0];
-  int ly = QDP::Layout::subgridLattSize()[1];
-  int lz = QDP::Layout::subgridLattSize()[2];
-  int lt = QDP::Layout::subgridLattSize()[3];
-  multi1d<LatticeFermion> src_qdp(Ls);
-
-  /********************************************************
-   * Setup DWF operator
-   ********************************************************
-   */
-//  omp_set_num_threads(64);
-  bfmarg dwfa;
-#ifdef UNIFORM_SEED_TESTING
-  majorityVote  dwf;
-#else
-//  bfm_qdp<double>  dwf;
-  bfm_qdp<float>  dwf;
-#endif
-
-  dwfa.node_latt[0]  = lx;
-  dwfa.node_latt[1]  = ly;
-  dwfa.node_latt[2]  = lz;
-  dwfa.node_latt[3]  = lt;
-  dwfa.verbose=1;
-  dwfa.reproduce=0;
-  bfmarg::Threads(64);
-  bfmarg::Reproduce(0);
-  bfmarg::ReproduceChecksum(0);
-  bfmarg::ReproduceMasterCheck(0);
-  bfmarg::Verbose(1);
-
-  static int CGcount = 0;
-  CGcount++;
-  int test_freq = GJP.CGreprodFreq();
-  if (test_freq && (CGcount % test_freq == 0)) {
-  dwfa.reproduce=1;
-  bfmarg::Reproduce(1);
+    called++;
   }
 
-  multi1d<int> procs = QDP::Layout::logicalSize();
-  Printf("%d dim machine\n\t", procs.size());
-  for(int mu=0;mu<4;mu++){
-    Printf("%d ", procs[mu]);
-    if ( procs[mu]>1 ) {
-      dwfa.local_comm[mu] = 0;
-    } else { 
-      dwfa.local_comm[mu] = 1;
+  template <class Float>
+    int dwf_CG_precMdagM_oo_multi( multi2d<LatticeFermion> &sol,
+				   multi1d<LatticeFermion> &src,
+				   multi1d<LatticeColorMatrix> &U,
+				   //							  std::string output_stem,
+				   double    shifts[],
+				   double    alpha[],
+				   int       nshift,
+				   double mresidual[],
+				   int single,
+				   int Ls,
+				   Real mass,
+				   Real M5,
+				   Real residual, int max_iter);
+
+
+
+  static int cps_qdp_dwf_invert(
+				Lattice &Lat, 
+				CPS_NAMESPACE::Float mass, 
+				CPS_NAMESPACE::Float *sol_cps, 
+				CPS_NAMESPACE::Float *src_cps,
+				double residual,
+				int max_iter
+				){
+    const char *fname = "cps_qdp_dwf_invert()";
+
+    if (GJP.Snodes() != 1)
+      ERR.General("",fname,"Snodes()(%d)!=1",GJP.Snodes());
+
+    cps_qdp_init(GJP.argc_p(), GJP.argv_p());
+    if (!qdp_initted)
+      ERR.General("",fname,"QDP not initialized!(%d)",0);
+
+    int iter=0;   
+
+    int Ls = GJP.SnodeSites();
+    double M5 = GJP.DwfHeight();
+    //  int Nd = 4;
+
+    Printf("src[0]=%g\n",*src_cps);
+    int lx = QDP::Layout::subgridLattSize()[0];
+    int ly = QDP::Layout::subgridLattSize()[1];
+    int lz = QDP::Layout::subgridLattSize()[2];
+    int lt = QDP::Layout::subgridLattSize()[3];
+
+    int nferm = Ls;
+    if(GJP.Gparity()){
+      nferm*=2;
+      Printf("cps_qdp_dwf_invert: Inverting a G-parity fermion\n");
     }
-  }
-  Printf("\nLocal comm = ");
-  for(int mu=0;mu<4;mu++){
-    Printf("%d ", dwfa.local_comm[mu]);
-  }
-  Printf("\n");
+    multi1d<LatticeFermion> src_qdp(nferm);
+
+    /********************************************************
+     * Setup DWF operator
+     ********************************************************
+     */
+    bfmarg::Threads(GJP.Nthreads());
+
+    bfmarg dwfa;
+#ifdef UNIFORM_SEED_TESTING
+    majorityVote  dwf;
+#else
+    //  bfm_qdp<double>  dwf;
+    bfm_qdp<float>  dwf;
+#endif
+
+    dwfa.node_latt[0]  = lx;
+    dwfa.node_latt[1]  = ly;
+    dwfa.node_latt[2]  = lz;
+    dwfa.node_latt[3]  = lt;
+
+    multi1d<int> ncoor = QDP::Layout::nodeCoord();
+    multi1d<int> procs = QDP::Layout::logicalSize();
+
+#ifdef BFM_GPARITY
+    if(GJP.Gparity()){
+      dwfa.gparity = 1;
+      Printf("G-parity directions: ");
+      for(int d=0;d<3;d++)
+	if(GJP.Bc(d) == BND_CND_GPARITY){ dwfa.gparity_dir[d] = 1; Printf("%d ",d); }
+	else dwfa.gparity_dir[d] = 0;
+      for(int d=0;d<4;d++){
+	dwfa.nodes[d] = procs[d];
+	dwfa.ncoor[d] = ncoor[d];
+      }
+      Printf("\n");
+    }
+#endif
+
+    dwfa.verbose=1;
+    dwfa.reproduce=0;
+    bfmarg::Reproduce(0);
+    bfmarg::ReproduceChecksum(0);
+    bfmarg::ReproduceMasterCheck(0);
+    bfmarg::Verbose(1);
+
+    static int CGcount = 0;
+    CGcount++;
+    int test_freq = GJP.CGreprodFreq();
+    if (test_freq && (CGcount % test_freq == 0)) {
+      dwfa.reproduce=1;
+      bfmarg::Reproduce(1);
+    }
+
+    Printf("%d dim machine\n\t", procs.size());
+    for(int mu=0;mu<4;mu++){
+      Printf("%d ", procs[mu]);
+      if ( procs[mu]>1 ) {
+	dwfa.local_comm[mu] = 0;
+      } else { 
+	dwfa.local_comm[mu] = 1;
+      }
+    }
+    Printf("\nLocal comm = ");
+    for(int mu=0;mu<4;mu++){
+      Printf("%d ", dwfa.local_comm[mu]);
+    }
+    Printf("\n");
   
-  multi1d<int> ncoor = QDP::Layout::nodeCoord();
-
-//  Real M5(1.8);
-//  Real mq(0.1);
-
-  CPS_NAMESPACE::Float *gauge = (CPS_NAMESPACE::Float*) Lat.GaugeField();
-  dwfa.precon_5d = 1;
-  dwfa.Ls   = Ls;
-  dwfa.solver = DWF;
-  dwfa.M5   = toDouble(M5);
-  dwfa.mass = toDouble(mass);
-  dwfa.Csw  = 0.0;
-  dwfa.max_iter = max_iter;
-  dwfa.residual = residual;
-//OK
-for(int i = 0;i<1;i++){
-  Printf("Initialising bfm operator\n");
-  dwf.init(dwfa);
-  Printf("Initialising bfm operator done\n");
-
-//OK
-{
-  multi1d<LatticeColorMatrix> U(Nd);
-  importGauge(Lat,U,gauge,1);
-  dwf.importGauge(U);
-}
-
-  Printf("Setup gauge field\n");
-  /********************************************************
-   * Gaussian source and result vectors
-   ********************************************************
-   */
-//  multi1d<LatticeFermion> source(Ls);
-//  for(int s=0;s<Ls;s++) gaussian(source[s]);
-
-  Fermion_t src_bfm = dwf.allocFermion();
-//  dwf.master_fill(src_bfm,0.0);
-  Printf("src_bfm=%p \n",src_bfm);
-  Fermion_t psi[1];
-  psi[0] = dwf.allocFermion();
-//  dwf.master_fill(psi[0],0.0);
- Printf("psi[0]=%p \n",psi[0]);
-
-  double M5 = GJP.DwfHeight();
-  double fac = (5-M5)*(5-M5);
-
-for(int i = 0;i<1;i++){
 
 
-  /********************************************************
-   * Import gauge field to BAGEL
-   ********************************************************
-   */
+    //  Real M5(1.8);
+    //  Real mq(0.1);
 
-  impexFermion(0,Lat,src_qdp,sol_cps,0,1,0,1./fac);
-  dwf.importFermion(src_qdp,psi[0],1);
-  impexFermion(0,Lat,src_qdp,src_cps,0,1);
-  dwf.importFermion(src_qdp,src_bfm,1);
-  CPS_NAMESPACE::Float *tmp_p = (CPS_NAMESPACE::Float *)src_bfm;
-  Printf("src_bfm[0]=%g\n",*tmp_p);
+    CPS_NAMESPACE::Float *gauge = (CPS_NAMESPACE::Float*) Lat.GaugeField();
+    dwfa.precon_5d = 1;
+    dwfa.Ls   = Ls;
+    dwfa.solver = DWF;
+    dwfa.M5   = toDouble(M5);
+    dwfa.mass = toDouble(mass);
+    dwfa.Csw  = 0.0;
+    dwfa.max_iter = max_iter;
+    dwfa.residual = residual;
+    //OK
+    for(int i = 0;i<1;i++){
+      Printf("Initialising bfm operator\n");
+      dwf.init(dwfa);
+      Printf("Initialising bfm operator done\n");
 
-  Printf("Calling half cb inverter\n"); fflush(stdout);
-  dwf.inv_type=CG_PREC_MDAGM;
-  dwf.qdp_chi_h[0]=psi[0];
-  dwf.qdp_chi_h[1]=psi[0];
-  dwf.qdp_psi_h[0]=src_bfm;
-  dwf.qdp_psi_h[1]=src_bfm;
-double bfm_time = -dclock();
-  bfm_spawn_cg(dwf);
-  bfm_time  += dclock();
-  print_flops(fname,"bfm",0,bfm_time);
+      //OK
+      {
+	int nlatt = Nd;
+	if(GJP.Gparity()) nlatt*=2;
 
-  iter = dwf.iter;
-  tmp_p = (CPS_NAMESPACE::Float *)psi[0];
-  Printf("psi[0]=%g\n",*(tmp_p));
-  dwf.exportFermion(src_qdp,psi[0],1);
-}
-  impexFermion(1,Lat,src_qdp,sol_cps,0,1,0,fac);
-  Printf("sol[0]=%g\n",*sol_cps);
+	multi1d<LatticeColorMatrix> U(nlatt);
+	importGauge(Lat,U,gauge,1);
+	dwf.importGauge(U);
+      }
+
+      Printf("Setup gauge field\n");
+      /********************************************************
+       * Gaussian source and result vectors
+       ********************************************************
+       */
+      //  multi1d<LatticeFermion> source(Ls);
+      //  for(int s=0;s<Ls;s++) gaussian(source[s]);
+
+      Fermion_t src_bfm = dwf.allocFermion();
+      //  dwf.master_fill(src_bfm,0.0);
+      Printf("src_bfm=%p \n",src_bfm);
+      Fermion_t psi[1];
+      psi[0] = dwf.allocFermion();
+      //  dwf.master_fill(psi[0],0.0);
+      Printf("psi[0]=%p \n",psi[0]);
+
+      double M5 = GJP.DwfHeight();
+      double fac = (5-M5)*(5-M5);
+
+      for(int i = 0;i<1;i++){
 
 
-  Printf("src_bfm=%p freed\n",src_bfm);
-  dwf.freeFermion(src_bfm);
-  Printf("psi[0]=%p freed\n",psi[0]);
-  dwf.freeFermion(psi[0]);
-  Printf("Done\n"); 
-//OK
-  dwf.end();
-}
-//NOT OK
-  cps_qdp_finalize();
-  return iter;
-}
+	/********************************************************
+	 * Import gauge field to BAGEL
+	 ********************************************************
+	 */
 
-CPS_START_NAMESPACE
-int DiracOpDwf::InvCg(Vector *out,
-                   Vector *in,
-                   Float *true_res){
+	impexFermion(0,Lat,src_qdp,sol_cps,0,1,0,1./fac);
+	dwf.importFermion(src_qdp,psi[0],1);
 
-   char *fname="InvCg(V*,V*,F*)";
-   double cg_time = -dclock();
-   Float *sol_cps = (Float*) out;
-   Float *src_cps = (Float*) in;
-  unsigned int f_size_cb =  GJP.VolNodeSites() * lat.FsiteSize() / (lat.FchkbEvl()+1);
-  Float src_norm_sq = in->NormSqNode(f_size_cb);
-  DiracOpGlbSum(&src_norm_sq);
-  VRB.Flow(cname,fname,"src_norm_sq=%e\n",src_norm_sq);
 
-// Calculate stopping condition
-//------------------------------------------------------------------
-  Float stp_cnd = src_norm_sq * dirac_arg->stop_rsd * dirac_arg->stop_rsd;
-   Float residual = dirac_arg->stop_rsd;
-  VRB.Result(cname,fname,
-           "stp_cnd =%e\n", IFloat(residual));
-//  residual = 0.7*residual;
+	Printf("Impex Source\n");
+
+	impexFermion(0,Lat,src_qdp,src_cps,0,1);
+
+	dwf.importFermion(src_qdp,src_bfm,1);
+	CPS_NAMESPACE::Float *tmp_p = (CPS_NAMESPACE::Float *)src_bfm;
+	Printf("src_bfm[0]=%g\n",*tmp_p);
+
+	Printf("Calling half cb inverter\n"); fflush(stdout);
+	dwf.inv_type=CG_PREC_MDAGM;
+	dwf.qdp_chi_h[0]=psi[0];
+	dwf.qdp_chi_h[1]=psi[0];
+	dwf.qdp_psi_h[0]=src_bfm;
+	dwf.qdp_psi_h[1]=src_bfm;
+	double bfm_time = -dclock();
+	bfm_spawn_cg(dwf);
+	bfm_time  += dclock();
+	print_flops(fname,"bfm",0,bfm_time);
+
+	iter = dwf.iter;
+	tmp_p = (CPS_NAMESPACE::Float *)psi[0];
+	Printf("psi[0]=%g\n",*(tmp_p));
+	dwf.exportFermion(src_qdp,psi[0],1);
+      }
+      impexFermion(1,Lat,src_qdp,sol_cps,0,1,0,fac);
+      Printf("sol[0]=%g\n",*sol_cps);
+
+
+      Printf("src_bfm=%p freed\n",src_bfm);
+      dwf.freeFermion(src_bfm);
+      Printf("psi[0]=%p freed\n",psi[0]);
+      dwf.freeFermion(psi[0]);
+      Printf("Done\n"); 
+      //OK
+      dwf.end();
+    }
+    //NOT OK
+    cps_qdp_finalize();
+
+    Printf("Returning iteration number\n");
+
+    return iter;
+  }
+
+  CPS_START_NAMESPACE
+    int DiracOpDwf::InvCg(Vector *out,
+			  Vector *in,
+			  Float *true_res){
+
+    const char *fname="InvCg(V*,V*,F*) [bfm version]";
+    double cg_time = -dclock();
+    Float *sol_cps = (Float*) out;
+    Float *src_cps = (Float*) in;
+    size_t f_size_cb =  GJP.VolNodeSites() * lat.FsiteSize() / (lat.FchkbEvl()+1);
+    if(GJP.Gparity()) f_size_cb*=2;
+
+    Float src_norm_sq = in->NormSqNode(f_size_cb);
+    DiracOpGlbSum(&src_norm_sq);
+    VRB.Result(cname,fname,"src_norm_sq=%e\n",src_norm_sq);
+
+    // Calculate stopping condition
+    //------------------------------------------------------------------
+    Float stp_cnd = src_norm_sq * dirac_arg->stop_rsd * dirac_arg->stop_rsd;
+    Float residual = dirac_arg->stop_rsd;
+    VRB.Result(cname,fname,
+	       "stp_cnd =%e\n", IFloat(residual));
+    //  residual = 0.7*residual;
     Vector *mmp = (Vector *) smalloc(cname,fname,"mmp",f_size_cb * sizeof(Float));
     Vector *res = (Vector *) smalloc(cname,fname,"res",f_size_cb * sizeof(Float));
-for(int i =0;i<10;i++) {
-   Float *sol;
-   Float *src;
-	if(i==0){ sol=sol_cps;src=src_cps;}
-	else { 
-	   sol=(Float *)mmp;src=(Float *)res; 
-	   mmp->VecZero(f_size_cb);
-	}
-   int iter = cps_qdp_dwf_invert(lat,dirac_arg->mass,sol,src,residual,dirac_arg->max_num_iter);
+    for(int i =0;i<10;i++) {
+      Float *sol;
+      Float *src;
+      if(i==0){ sol=sol_cps;src=src_cps;}
+      else { 
+	sol=(Float *)mmp;src=(Float *)res; 
+	mmp->VecZero(f_size_cb);
+      }
+      int iter = cps_qdp_dwf_invert(lat,dirac_arg->mass,sol,src,residual,dirac_arg->max_num_iter);
 
-	if(i!=0){
-    out->FTimesPlusVec(1.,mmp, f_size_cb);
-	}
-  //------------------------------------------------------------------
-  // Done. Finish up and return
-  //------------------------------------------------------------------
-    // Calculate and set true residual: 
-    // true_res = |src - MatPcDagMatPc * sol| / |src|
-//    Vector *sol = (Vector *) out;
-//    Vector *src = (Vector *) in;
-    MatPcDagMatPc(mmp, out);
+      if(iter==-1){
+	ERR.General(cname,fname,"bfm CG did not converge");
+      }
+
+      if(i!=0){
+	out->FTimesPlusVec(1.,mmp, f_size_cb);
+      }
+      //------------------------------------------------------------------
+      // Done. Finish up and return
+      //------------------------------------------------------------------
+      // Calculate and set true residual: 
+      // true_res = |src - MatPcDagMatPc * sol| / |src|
+      //    Vector *sol = (Vector *) out;
+      //    Vector *src = (Vector *) in;
+      MatPcDagMatPc(mmp, out);
 #if 0
-    res->CopyVec(in, f_size_cb);
-//    res->VecMinusEquVec(mmp, f_size_cb);
-    res->FTimesPlusVec(-1.,mmp, f_size_cb);
-    Float res_norm_sq_cur = res->NormSqNode(f_size_cb);
+      res->CopyVec(in, f_size_cb);
+      //    res->VecMinusEquVec(mmp, f_size_cb);
+      res->FTimesPlusVec(-1.,mmp, f_size_cb);
+      Float res_norm_sq_cur = res->NormSqNode(f_size_cb);
 #else
-    Float res_norm_sq_cur = 0;
-    Float *in_f = (Float *)in;
-    Float *res_f = (Float *)res;
-    Float *mmp_f = (Float *)mmp;
+      Float res_norm_sq_cur = 0;
+      Float *in_f = (Float *)in;
+      Float *res_f = (Float *)res;
+      Float *mmp_f = (Float *)mmp;
 #pragma omp parallel for default(shared) reduction(+: res_norm_sq_cur)
-    for(int i_tmp=0;i_tmp<f_size_cb;i_tmp++){
+      for(int i_tmp=0;i_tmp<f_size_cb;i_tmp++){
 	Float temp = *(res_f+i_tmp) = *(in_f+i_tmp) - *(mmp_f+i_tmp);
 	res_norm_sq_cur += temp*temp;
-    }
+      }
 #endif
-    DiracOpGlbSum(&res_norm_sq_cur);
-    Float tmp = res_norm_sq_cur / src_norm_sq;
-    tmp = sqrt(tmp);
-    if(true_res != 0){
-      *true_res = tmp;
+      DiracOpGlbSum(&res_norm_sq_cur);
+      Float tmp = res_norm_sq_cur / src_norm_sq;
+      tmp = sqrt(tmp);
+      if(true_res != 0){
+	*true_res = tmp;
+      }
+      VRB.Result(cname,fname,
+		 "True |res| / |src| = %e, iter = %d\n", IFloat(tmp), iter);
+      if(tmp<dirac_arg->stop_rsd) break;
+      residual = 0.5*dirac_arg->stop_rsd/tmp;
     }
-    VRB.Result(cname,fname,
-  	     "True |res| / |src| = %e, iter = %d\n", IFloat(tmp), iter);
-	if(tmp<dirac_arg->stop_rsd) break;
-   residual = 0.5*dirac_arg->stop_rsd/tmp;
-}
 
     Printf("mmp =%p\n",mmp);
     sfree(cname,fname,"mmp",mmp);
@@ -533,10 +615,10 @@ for(int i =0;i<10;i++) {
     Printf("res =%p\n",res);
     sfree(cname,fname,"res",res);
     Printf("res freed\n");
-	cg_time +=dclock();
-	print_flops(cname,fname,0,cg_time);
-}
+    cg_time +=dclock();
+    print_flops(cname,fname,0,cg_time);
+  }
 
-CPS_END_NAMESPACE
+  CPS_END_NAMESPACE
 
 #endif

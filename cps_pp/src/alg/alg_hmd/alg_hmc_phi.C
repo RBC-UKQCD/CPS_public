@@ -362,9 +362,6 @@ AlgHmcPhi::~AlgHmcPhi() {
 //------------------------------------------------------------------
 Float AlgHmcPhi::run(void)
 {
-#if TARGET==cpsMPI
-    using MPISCU::fprintf;
-#endif
   int step;                            // Trajectory step
   Float h_init;                        // Initial Hamiltonian
   Float h_final;                       // Final Hamiltonian

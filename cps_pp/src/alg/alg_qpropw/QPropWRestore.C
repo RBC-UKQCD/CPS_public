@@ -114,8 +114,8 @@ QPropW::RestoreQProp (char *name, int mid)
     //----------------------------------------------------------------
     int ls = GJP.SnodeSites ();
     int ls_glb = GJP.SnodeSites () * GJP.Snodes ();
-    int f_size = GJP.VolNodeSites () * Lat.FsiteSize () / GJP.SnodeSites ();
-    int f_size_5d = f_size * ls;
+    size_t f_size = GJP.VolNodeSites () * Lat.FsiteSize () / GJP.SnodeSites ();
+    size_t f_size_5d = f_size * ls;
 
     FermionVectorTp sol;
     FermionVectorTp src;
@@ -422,7 +422,7 @@ QPropW::RestoreQPropLs (char *name, int ls)
   }
 
   if (qp_arg.save_ls_prop == 2) {
-    int f_size = sizeof (WilsonMatrix) * GJP.VolNodeSites () / sizeof (Float);
+    size_t f_size = sizeof (WilsonMatrix) * GJP.VolNodeSites () / sizeof (Float);
 
     int s_local = ls % GJP.SnodeSites ();
     int s_node = ls / GJP.SnodeSites ();
@@ -694,7 +694,7 @@ QPropW::SaveQProp (char *name, int mid)
 
     for (int ii (0); ii < GJP.VolNodeSites (); ++ii)
       *(save_prop + ii) = renFac * prop[ii];
-     
+
   } else
     save_prop = &prop[0];
 

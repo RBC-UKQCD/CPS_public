@@ -51,7 +51,7 @@ void mobius_unprec(Vector *out,
 
 //  Vector  *frm_tmp2 = (Vector *) mobius_lib_arg->frm_tmp2;
 
-  
+  VRB.Debug("","mobius_unprec","mass=%e\n",mass);
   const unsigned long  f_size = (24/(2*6)) * mobius_lib_arg->vol_4d * mobius_lib_arg->ls;
   Vector  *frm_tmp2 = (Vector*)smalloc("","mobius_unpre()","frm_tmp2",2*f_size*(2*6)*sizeof(Float));
   memset(out,0,f_size*(2*6)*sizeof(Float));
@@ -84,6 +84,7 @@ void mobius_unprec(Vector *out,
 //  unsigned long  size = GJP.VolNodeSites() * local_ls * 2 * Colors() * SpinComponents();
   unsigned long  size = GJP.VolNodeSites() * local_ls * 2 * 3 * 4;
   for(int ieo=0;ieo<2;++ieo){
+//#pragma omp parallel for
     for(int s=0; s<local_ls;++s){
       int glb_s = s + local_ls*s_node_coor;
 //      const Complex kappa_b =

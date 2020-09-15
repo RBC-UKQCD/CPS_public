@@ -34,7 +34,7 @@ private:
   char* cname;
 
   //! Node checkerboard size of the fermion field
-  int f_size;
+  size_t f_size;
 
 protected:
   

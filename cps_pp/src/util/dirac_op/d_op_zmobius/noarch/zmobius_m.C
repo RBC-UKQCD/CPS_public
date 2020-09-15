@@ -43,12 +43,18 @@ void  zmobius_m(Vector *out,
 		Float mass, 
 		Zmobus *mobius_lib_arg)
 {
+  Float dtime;
   switch( mobius_lib_arg-> pc_type ){
   case   ZMOB_PC_ORIG:
+//dtime = -dclock(true);
     zmobius_m_orig(out, gauge_field, in, mass, mobius_lib_arg);
+//dtime += dclock(true);
+//    print_flops("","zmobius_m-orig()",0,dtime);
     break;
   case   ZMOB_PC_SYM1:
+//dtime = -dclock(true);
     zmobius_m_sym1(out, gauge_field, in, mass, mobius_lib_arg);
+//dtime += dclock(true);
     break;
   case   ZMOB_PC_SYM2:
     zmobius_m_sym2(out, gauge_field, in, mass, mobius_lib_arg);

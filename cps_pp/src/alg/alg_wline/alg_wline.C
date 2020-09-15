@@ -82,9 +82,6 @@ AlgWline::~AlgWline() {
 //------------------------------------------------------------------
 void AlgWline::run()
 {
-#if TARGET==cpsMPI
-    using MPISCU::fprintf;
-#endif
 
   const char *fname = "run";
   VRB.Func(cname,fname);

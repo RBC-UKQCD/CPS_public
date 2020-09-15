@@ -12,6 +12,7 @@ CPS_START_NAMESPACE
 #define INCLUDED_DWF_H
 
 CPS_END_NAMESPACE
+#include <vector> //std::vector
 #include <util/wilson.h>
 #include <util/vector.h>
 #include <util/rcomplex.h>
@@ -52,9 +53,17 @@ typedef struct{
   IFloat dwf_kappa;    // 1/[2*(5-dwf_height)]
   IFloat mobius_kappa_b;    // 1/[2*(b*(4-dwf_height)+1)]
   IFloat mobius_kappa_c;    // 1/[2*(c*(4-dwf_height)-1)]
+#if 0
   Rcomplex *zmobius_kappa_b;    // 1/[2*(b*(4-dwf_height)+1)]
   Rcomplex *zmobius_kappa_c;    // 1/[2*(c*(4-dwf_height)-1)]
   Rcomplex *zmobius_kappa_ratio;//    kappa_b / kappa_c
+#else
+  std::vector < Rcomplex > zmobius_b;    // b[i]
+  std::vector < Rcomplex > zmobius_c;    // c[i]
+  std::vector < Rcomplex > zmobius_kappa_b;    // 1/[2*(b*(4-dwf_height)+1)]
+  std::vector < Rcomplex > zmobius_kappa_c;    // 1/[2*(c*(4-dwf_height)-1)]
+  std::vector < Rcomplex > zmobius_kappa_ratio;//    kappa_b / kappa_c
+#endif
   // pre/post-conditioning for zmobius
   ZMobiusPCType pc_type;
 

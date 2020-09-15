@@ -50,7 +50,7 @@ static int bgl_cg_count = 0;
 //------------------------------------------------------------------
 const unsigned CBUF_MODE4 = 0xcb18c1ff;
 
-static int f_size_cb;     // Node checkerboard size of the fermion field
+static size_t f_size_cb;     // Node checkerboard size of the fermion field
 
 static inline void print_vec( Vector *vec, char *name){
 #if 0
@@ -88,15 +88,17 @@ int DiracOp::InvCgShift(Vector *out,
 		   Float *shift ){
   int itr;                       // Current number of CG iterations
   int max_itr;                       // Max number of CG iterations
-  Float stp_cnd;                   // Stop if residual^2 <= stp_cnd
-  Float res_norm_sq_prv;          // The previous step |residual|^2
-  Float res_norm_sq_cur;           // The current step |residual|^2 
+  Float stp_cnd=0.;;                   // Stop if residual^2 <= stp_cnd
+  Float res_norm_sq_prv=0.;;          // The previous step |residual|^2
+  Float res_norm_sq_cur=0.;;           // The current step |residual|^2 
   Float a;
   Float b;
   Float d;
   int i, ic, icb;
   char *fname = "InvCg(V*,V*,F,F*)";
   IFloat *temp;
+
+if(GJP.Gparity()) ERR.General(cname,fname,"G-parity not yet enabled in comsrc inv_cg routines");
 
 // Flash the LED and then turn it off
 //------------------------------------------------------------------
@@ -318,7 +320,7 @@ int DiracOp::InvCgShift(Vector *out,
 #endif
   
     DiracOpGlbSum(&d);
-  VRB.Flow(cname,fname, "d = %e\n", IFloat(d));
+  VRB.Flow(cname,fname, "d = %e", IFloat(d));
 
     // If d = 0 we are done
     if(d == 0.0) {
@@ -329,7 +331,7 @@ int DiracOp::InvCgShift(Vector *out,
     }
 
     a = res_norm_sq_prv / d;
-    VRB.Flow(cname,fname, "a = %e\n", IFloat(a));
+    VRB.Flow(cname,fname, "a = %e", IFloat(a));
 
     // Set circular buffer
 //    setCbufCntrlReg(4, CBUF_MODE4);
@@ -348,11 +350,11 @@ int DiracOp::InvCgShift(Vector *out,
 
     // if( |res|^2 <= stp_cnd ) we are done
     VRB.Flow(cname,fname,
-	     "|res[%d]|^2 = %e\n", itr, IFloat(res_norm_sq_cur));
+	     "|res[%d]|^2 = %e", itr, IFloat(res_norm_sq_cur));
     if(res_norm_sq_cur <= stp_cnd) break;
 
     b = res_norm_sq_cur / res_norm_sq_prv;
-    VRB.Flow(cname,fname, "b = %e\n", IFloat(b));
+    VRB.Flow(cname,fname, "b = %e", IFloat(b));
 
     // dir = b * dir + res;
     dir->FTimesV1PlusV2(b, dir, res, f_size_cb);
@@ -383,13 +385,13 @@ int DiracOp::InvCgShift(Vector *out,
     unsigned long long flops_per_site = CGflops;
     flops_per_site /= (GJP.VolNodeSites()*(itr+1));
     print_flops(cname,fname,CGflops,&start,&end);
-    VRB.Result(cname,fname,"flops_per_site=%llu\n",flops_per_site);
+    VRB.Result(cname,fname,"flops_per_site=%llu",flops_per_site);
 #endif
 
   // It has not reached stp_cnd: Issue a warning
   if(itr == dirac_arg->max_num_iter - 1){
     VRB.Warn(cname,fname,
-	      "CG reached max iterations = %d. |res|^2 = %e\n",
+	      "CG reached max iterations = %d. |res|^2 = %e",
 	     itr+1, IFloat(res_norm_sq_cur) );
   }
 

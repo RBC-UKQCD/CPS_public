@@ -132,7 +132,7 @@ int main(int argc,char *argv[]){
     printf("\n");
   }
 
-  int f_size = GJP.VolNodeSites() * lat.FsiteSize();
+  size_t f_size = GJP.VolNodeSites() * lat.FsiteSize();
   printf("Lattice site size = %d, Fermion size = %d\n",GJP.VolNodeSites(),lat.FsiteSize());
   
 //  Vector *X_out = (Vector*)smalloc(f_size*sizeof(IFloat),"x_out",fname,cname);

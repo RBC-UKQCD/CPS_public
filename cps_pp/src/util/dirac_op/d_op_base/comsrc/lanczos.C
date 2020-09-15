@@ -44,21 +44,21 @@ void eigsrt (Float * d, Float * e, Float * tte, Float ** v1, int n,
 void eigsrt_low (Float * d, Float ** v1, int n, Vector ** v2, int n2);
 void eigsrt_low (Float * d, int n);
 void eigsrt (Float * d, int n);
-void testMat (Vector * Apsi, Vector * psi, int f_size);
+void testMat (Vector * Apsi, Vector * psi, size_t f_size);
 void QRtrf (Float * d, Float * e, int nk, int n, Float ** z, Float dsh,
 	    int kmin, int kmax);
 
-void lanczos_GramSchm (Float * psi, Float ** vec, int Nvec, int f_size,
+void lanczos_GramSchm (Float * psi, Float ** vec, int Nvec, size_t f_size,
 		       Float * alpha);
-void lanczos_GramSchm_real (Float * psi, Float ** vec, int Nvec, int f_size,
+void lanczos_GramSchm_real (Float * psi, Float ** vec, int Nvec, size_t f_size,
 			    Float * alpha);
-void lanczos_GramSchm_test (Float * psi, Float ** vec, int Nvec, int f_size,
+void lanczos_GramSchm_test (Float * psi, Float ** vec, int Nvec, size_t f_size,
 			    Float * alpha);
-void lanczos_GramSchm_test (Float * psi, float **vec, int Nvec, int f_size,
+void lanczos_GramSchm_test (Float * psi, float **vec, int Nvec, size_t f_size,
 			    Float * alpha);
-void double_to_float (Float * vec, int f_size);
-void movefloattoFloat (Float * out, float *in, int f_size);
-void moveFloattofloat (float *out, Float * in, int f_size);
+void double_to_float (Float * vec, size_t f_size);
+void movefloattoFloat (Float * out, float *in, size_t f_size);
+void moveFloattofloat (float *out, Float * in, size_t f_size);
 
 #ifdef USE_LAPACK
 void tqri_LAPACK (double *shifts, double *ttbeta, int NN, int m, double *Q)
@@ -219,7 +219,7 @@ int DiracOp::ImpResLanczos (Vector ** V,	//Lanczos vectors, eigenvectors of Ritz
 
   // Set the node checkerboard size of the fermion field
   //------------------------------------------------------------------
-  int f_size = RitzLatSize ();
+  size_t f_size = RitzLatSize ();
 
   // implicitly restarted lanczos
   int m = nk + np;
@@ -752,7 +752,7 @@ alpha: diagonal elements of the Lanczos tridiagonal matrix
 beta: off-diagonal matrix elements of said tridiagonal matrix  
  */
 
-void DiracOp::lanczos (int k0, int m, int f_size,
+void DiracOp::lanczos (int k0, int m, size_t f_size,
 		       Vector * Apsi, Vector * r,
 		       Vector ** V, Float * alpha, Float * beta,
 		       MatrixPolynomialArg * cheby_arg,
@@ -880,7 +880,7 @@ void DiracOp::lanczos (int k0, int m, int f_size,
 #endif
 
 
-void moveFloattofloat NOINLINE_MACRO (float *out, Float * in, int f_size)
+void moveFloattofloat NOINLINE_MACRO (float *out, Float * in, size_t f_size)
 {
 #if 1
   float flt;
@@ -892,7 +892,7 @@ void moveFloattofloat NOINLINE_MACRO (float *out, Float * in, int f_size)
 };
 
 #if 1
-void movefloattoFloat NOINLINE_MACRO (Float * out, float *in, int f_size)
+void movefloattoFloat NOINLINE_MACRO (Float * out, float *in, size_t f_size)
 {
   float flt;
   for (int i = 0; i < f_size; i++) {

@@ -1,4 +1,4 @@
-/* conf.h.in.  Generated from configure.in by autoheader.  */
+/* conf.h.in.  Generated from configure.ac by autoheader.  */
 
 /* Define to 1 if the system has the type `bool_t'. */
 #undef HAVE_BOOL_T
@@ -99,8 +99,17 @@
 /* Define to the one symbol short name of this package. */
 #undef PACKAGE_TARNAME
 
+/* Define to the home page for this package. */
+#undef PACKAGE_URL
+
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
 
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS
+
+/* Define 1 if you have fftw3 library */
+#undef USE_FFTW
+
+/* Define 1 if you have zlib */
+#undef USE_ZLIB

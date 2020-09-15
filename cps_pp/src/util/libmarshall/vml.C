@@ -231,8 +231,11 @@ vml_enum (VML *vmls, char *name, enum_t *ep,struct vml_enum_map *list)
 	if(!val_str) {fprintf(stderr,"%d not in %s\n",ep,list->enum_name);exit(-1);}
   }
   
-  VmlEncode->Enum(vmls,list[0].enum_name,name,val_str);
+  bool_t out = VmlEncode->Enum(vmls,list[0].enum_name,name,val_str);
+  if(!out){fprintf(stderr,"Enum decode failed\n");exit(-1); }
+    
   if ( vmls->x_op == VML_DECODE ) { 
+    if(val_str == NULL){ fprintf(stderr,"%d not in %s\n",ep,list->enum_name);exit(-1); }
     *ep = *(vml_enum_val(val_str,list));
   }
   return VML_TRUE;

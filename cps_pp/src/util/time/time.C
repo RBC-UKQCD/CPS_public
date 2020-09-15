@@ -7,6 +7,7 @@
 #include <sys/time.h>
 #include <util/qcdio.h>
 #include <util/data_types.h>
+#include <util/time_cps.h>
 
 #undef ZERO_ONLY
 #if TARGET == BGL
@@ -27,7 +28,8 @@ CPS_START_NAMESPACE
 /*!
   \return The current time in seconds (accurate to the microsecond),
 */
-Float dclock(void){
+Float dclock(bool stop){
+	if(stop) Barrier();
 	struct timeval tp;
 	gettimeofday(&tp, NULL);
 	return((Float) tp.tv_sec + (Float) tp.tv_usec * 1e-6);
@@ -116,5 +118,131 @@ void print_asctime_(){
     date = localtime(&timer);
     printf(" : %s\n", asctime(date));
 }
+
+
+void TimeStamp::set_file(const char *filename){
+  stream = Fopen(ZERO_ONLY,filename,"w");
+  reset();
+}
+void TimeStamp::reset(){
+  cur_depth = 0;
+  start = dclock();
+  enabled = true;
+}
+void TimeStamp::close_file(){
+  Fclose(stream);
+  enabled=false;
+}
+void TimeStamp::vstamp(const char *format, va_list args){
+  char into[1024];
+  vsprintf(into,format,args);
+
+  Float time = dclock()-start;
+
+  Float rem = time;
+  int hours = int(floor(rem/3600));
+  rem -= hours*3600;
+  int mins = int(floor(rem/60));
+  rem -= mins*60;
+    
+  Fprintf(ZERO_ONLY,stream,"TimeStamp depth %d : %e secs (%d h %d m %.4f s): %s\n",cur_depth,time,hours,mins,rem,into);
+} 
+
+void TimeStamp::stamp(const char *format,...){
+  if(!enabled) return;
+
+  va_list args;
+  va_start(args,format);
+  vstamp(format,args);
+  va_end(args);
+}
+void TimeStamp::stamp_incr(const char *format,...){
+  if(!enabled) return;
+
+  va_list args;
+  va_start(args,format);
+  vstamp(format,args);
+  va_end(args);
+
+  incr_depth();
+}
+void TimeStamp::stamp_decr(const char *format,...){
+  if(!enabled) return;
+
+  va_list args;
+  va_start(args,format);
+  vstamp(format,args);
+  va_end(args);
+
+  decr_depth();
+}
+void TimeStamp::incr_stamp(const char *format,...){
+  if(!enabled) return;
+  incr_depth();
+
+  va_list args;
+  va_start(args,format);
+  vstamp(format,args);
+  va_end(args);
+}
+void TimeStamp::decr_stamp(const char *format,...){
+  if(!enabled) return;
+  decr_depth();
+
+  va_list args;
+  va_start(args,format);
+  vstamp(format,args);
+  va_end(args);
+}
+
+void TimeStamp::start_func(const char* cls, const char *fnc){
+  stamp("Starting %s::%s",cls,fnc);
+}
+void TimeStamp::end_func(const char* cls, const char *fnc){
+  stamp("Finished %s::%s",cls,fnc);
+}
+ 
+void TimeStamp::incr_depth(){ cur_depth++; }
+void TimeStamp::decr_depth(){ cur_depth--; }  
+
+int TimeStamp::cur_depth(0);
+FILE *TimeStamp::stream(NULL);
+bool TimeStamp::enabled(false);
+Float TimeStamp::start(0.0);
+
+
+Elapsed::Elapsed(const Float &delta){
+  hours=delta/3600.0;
+  mins=(delta-3600.0*hours)/60.0;
+  secs=delta-3600.0*hours-60.0*mins;
+}
+CPS_END_NAMESPACE
+
+#include <util/timer.h>
+CPS_START_NAMESPACE
+#if 1
+Float Timer::dtime_begin(dclock());
+Float Timer::dtime_last(dclock());
+double Timer::autodisplay_interval=60;
+double Timer::show_stop=1.;
+
+
+void Timer::reset(){
+  dtime_begin = dclock();
+  dtime_last = dtime_begin;
+}
+//Time since last reset
+Elapsed Timer::elapsed_time(){
+  return Elapsed(dclock()-dtime_begin);
+}
+//Time since last call to this function
+Elapsed Timer::relative_time(){
+  Float now = dclock();
+  Float delta = now - dtime_last;
+  dtime_last = now;
+  return Elapsed(delta);
+}
+#endif
+
 
 CPS_END_NAMESPACE

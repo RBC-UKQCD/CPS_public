@@ -32,7 +32,7 @@
  * From: @(#)rpc_parse.c 1.8 89/02/22 (C) 1987 SMI
  */
 const char parse_rcsid[] =
-  "$Id: rpc_parse.c,v 1.4 2005/05/09 07:16:03 chulwoo Exp $";
+  "$Id: rpc_parse.c,v 1.4.358.1 2012-11-15 18:17:08 ckelly Exp $";
 
 /*
  * rpc_parse.c, Parser for the RPC protocol compiler
@@ -64,6 +64,9 @@ static void unsigned_dec (const char **typep);
  * PAB Class definition parsing
  */
 static void def_class (definition * defp);
+
+/* CK include pragma parsing */
+static void def_include (definition * defp);
 
 /*
  * return the next definition you see
@@ -99,6 +102,9 @@ get_definition (void)
     case TOK_CLASS: /*PAB*/
       def_class (defp);
       break;
+    case TOK_INCLUDEPRAGMA: /*CK*/
+      def_include (defp);
+      break;
     case TOK_EOF:
       return (NULL);
     default:
@@ -114,6 +120,35 @@ isdefined (definition * defp)
 {
   STOREVAL (&defined, defp);
 }
+
+/*CK*/
+static void
+def_include (definition * defp)
+{
+  token tok;
+  defp->def_kind = DEF_INCLUDEPRAGMA;
+  
+  defp->def.in.is_relative = 0;
+  peek(&tok);
+  
+  if(tok.kind==TOK_STRCONST) defp->def.in.is_relative = 1;
+
+  //f_print (stderr,"def_include got relative %d\n",defp->def.in.is_relative);
+
+  if(defp->def.in.is_relative) scan(TOK_STRCONST,&tok);
+  else{ 
+    scan (TOK_LANGLE, &tok);
+    scan (TOK_IDENT, &tok);
+  }
+
+  defp->def_name = "";
+  defp->def.in.file = tok.str;
+
+  //f_print(stderr,"def_include got string '%s'\n",tok.str);
+  
+  if(!defp->def.in.is_relative) scan(TOK_RANGLE,&tok);
+}
+/*End CK*/
 
 static void
 def_struct (definition * defp)
@@ -316,6 +351,12 @@ def_union (definition *defp)
   defp->def_kind = DEF_UNION;
   scan (TOK_IDENT, &tok);
   defp->def_name = tok.str;
+
+  /*CK add optional extra open brace to enclose other declarations within 'union' struct*/
+  int other_decl = 0;
+  if(peekscan(TOK_LBRACE,&tok)) other_decl = 1; //consumes the token if returns true
+  /* end CK */
+
   scan (TOK_SWITCH, &tok);
   scan (TOK_LPAREN, &tok);
   get_declaration (&dec, DEF_UNION);
@@ -379,6 +420,27 @@ def_union (definition *defp)
     {
       defp->def.un.default_decl = NULL;
     }
+
+  /*CK extra declarations*/
+  if(other_decl){
+    decl_list **tailp = &defp->def.un.other_decls;
+    declaration dec;
+    decl_list *decls;
+    do
+      {
+	get_declaration (&dec, DEF_UNION);
+	decls = ALLOC (decl_list);
+	decls->decl = dec;
+	*tailp = decls;
+	tailp = &decls->next;
+	scan (TOK_SEMICOLON, &tok);
+	peek (&tok);
+      }
+    while (tok.kind != TOK_RBRACE);
+    get_token (&tok);
+    *tailp = NULL;
+  }
+  /*End CK*/
 }
 
 static const char *reserved_words[] =
@@ -480,6 +542,13 @@ get_declaration (declaration * dec, defkind dkind)
 
     dec->name = dec->prefix;
     dec->type = "";
+    dec->prefix = "";
+    return;
+  }
+
+  if ( streq (dec->type,"rpccommand") ) {
+    /* Added by CK */
+    dec->name = dec->prefix;
     dec->prefix = "";
     return;
   }
@@ -694,6 +763,10 @@ get_type (const char **prefixp, const char **typep, defkind dkind)
 	  strcat(memfun_string," ; ");
 	} else if ( tok.kind == TOK_COMMA ) { 
 	  strcat(memfun_string," , ");
+	} else if ( tok.kind == TOK_STAR ) {
+	  strcat(memfun_string," * "); /* Added by CK to allow pointers in memfun */
+	} else if ( tok.kind == TOK_AMPERSAND ) {
+	  strcat(memfun_string," & "); /* Added by CK to allow references in memfun */
 	} else {
 	  strcat(memfun_string," ");
 	  strcat(memfun_string,tok.str);
@@ -702,6 +775,12 @@ get_type (const char **prefixp, const char **typep, defkind dkind)
 
       *prefixp=memfun_string;
       break;
+    case TOK_RPCCOMMAND:
+      /* Added by CK to allow user to ask for specific hard-coded operations to be added to the source code */
+      *typep = tok.str;
+      get_token (&tok);
+      *prefixp=tok.str;
+      break;  
     default:
       error ("expected type specifier");
     }

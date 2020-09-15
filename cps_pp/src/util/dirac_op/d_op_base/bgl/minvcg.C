@@ -83,7 +83,7 @@ int DiracOp::MInvCG(Vector **psi, Vector *chi, Float chi_norm, Float *mass,
 //------------------------------------------------------------------
 
   int iz, k, s;
-  int f_size;
+  size_t f_size;
 
   if(lat.Fclass() == F_CLASS_CLOVER)
     f_size = lat.FsiteSize()*GJP.VolNodeSites() / 2;

@@ -24,6 +24,11 @@ enum DirType {DIR_X,
 // chiral projectors 1+-g5
 enum ChiralProj{PL=-6,PR=-7};
 
+enum PrecType {
+	PREC_SINGLE,
+	PREC_DOUBLE
+};
+
 /*------------------------------------------------------------------*/
 /*! The types of fermion action*/
 /*  ~~F_CLASS_WILSON_TM added for twisted mass Wilson fermions      */ 
@@ -40,12 +45,18 @@ enum FclassType {
     F_CLASS_WILSON_TM,
     F_CLASS_MDWF,
     F_CLASS_BFM,
-    F_CLASS_BFM_TYPE2,
+//    F_CLASS_BFM_TYPE2,
     F_CLASS_MOBIUS,
     F_CLASS_DWF4D,
     F_CLASS_DWF4D_PAIR,
     F_CLASS_ZMOBIUS,
-    F_CLASS_NAIVE
+    F_CLASS_NAIVE,
+    F_CLASS_GRID,
+    F_CLASS_GRID_GPARITY_MOBIUS,
+    F_CLASS_GRID_MOBIUS,
+    F_CLASS_GRID_ZMOBIUS,
+    F_CLASS_GRID_GPARITY_WILSON_TM,
+    F_CLASS_GRID_WILSON_TM
 };
 
 
@@ -145,7 +156,8 @@ enum StrOrdType {
     STAG_BLOCK = 4,
     DWF_5D_EOPREC = WILSON,  /*!< DWF with 5 dimensional even/odd precondition, it's actually same as WILSON. */
     DWF_4D_EOPREC = 5, /*!<  DWF with 4 dimensional even/odd precondition, for odd-odd preconditioning. This should work for Mobius as well. */
-    DWF_4D_EOPREC_EE = 6  /*!<  DWF with 4 dimensional even/odd precondition, for even-even preconditioning. This should work for Mobius as well. */
+    DWF_4D_EOPREC_EE = 6,  /*!<  DWF with 4 dimensional even/odd precondition, for even-even preconditioning. This should work for Mobius as well. */
+    S_INNER = 7 // s innermost, for Force term, bfm ordering, etc.
 };
 
 
@@ -260,7 +272,10 @@ enum DagType {
 /*------------------------------------------------------------------*/
 enum BndCndType {
     BND_CND_PRD,    /*!< Periodic */
-    BND_CND_APRD    /*!< Antiperiodic */
+    BND_CND_APRD,    /*!< Antiperiodic */
+    BND_CND_TWISTED,  /*!< Twisted BCs */
+    BND_CND_GPARITY,    /*!< G-parity */
+    BND_CND_GPARITY_TWISTED /*!< G-parity + Twisted BCs*/
 };
 
 
@@ -732,7 +747,8 @@ enum IntegratorType {
   INT_QUOTIENT,
   INT_RATIONAL,
   INT_RATIONAL_SPLIT,
-  INT_RATIONAL_QUOTIENT
+  INT_RATIONAL_QUOTIENT,
+  INT_EOFA
 };
 
 /*! Define the level of the integrator (used to determine whether a CSM.comment is necesssary. */
@@ -799,7 +815,8 @@ enum InverterType {
   EIGCG   = 2,  /* EigCG */
   LOWMODEAPPROX    = 3,  /* Low Mode Approximation */
   CG_LOWMODE_DEFL  = 4,  /* CG accelerated using low-mode deflation */
-  HDCG  = 5  /* HDCG */
+  HDCG  = 5,  /* HDCG */
+  FAKE  = 6  /* For testing */
 };
 
 /* Which type of approximation to use? */

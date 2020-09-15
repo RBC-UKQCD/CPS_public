@@ -88,7 +88,11 @@ int DiracOpWilsonTypes::BiCGstab(Vector *psi, Vector *chi,
 
   Float sigma[n_max+1];
   Complex gamma[n_max+1], gamma_prime[n_max+1], gamma_prime_prime[n_max+1];
+#ifndef MATRIX
   Complex tau[n_max+1][n_max+1];
+#else
+  MATRIX ( Complex, tau, n_max+1, n_max+1) ;
+#endif
     
   Float rsd_sq;
   Float rsdcg_sq;

@@ -8,8 +8,10 @@
 
 #include <config.h>
 #include <util/data_types.h>
+#include <comms/sysfunc_cps.h>
 #include <sys/time.h>
 #include <time.h>
+#include <string>
 
 CPS_START_NAMESPACE
 /*! \defgroup profiling Timing and performance functions
@@ -19,7 +21,7 @@ CPS_START_NAMESPACE
 
 //! Gets the wall-clock time.
 
-Float dclock(void);
+Float dclock(bool stop = false);
 Float print_time(const char *cname, const char *fname, Float time);
 
 //! Prints the FLOPS rate to stdout
@@ -54,5 +56,63 @@ void print_asctime_();
 
 /*! @} */
 
+//CK: static timestamp class with optional output stream and 'depth' tagging of stamps enabling easy parsing of output
+//    writes output to a file
+
+class TimeStamp{
+ protected:
+  static int cur_depth;
+  static FILE *stream;
+  static bool enabled;
+  static Float start;
+  
+  static void vstamp(const char *format, va_list args);
+ public:
+  static void set_file(const char *filename);
+  static void reset();
+  static void close_file();
+  static void stamp(const char *format,...);
+  static void incr_depth();
+  static void decr_depth();
+  
+  static void stamp_incr(const char *format,...);
+  static void stamp_decr(const char *format,...);
+
+  static void incr_stamp(const char *format,...);
+  static void decr_stamp(const char *format,...);
+
+  static void start_func(const char* cls, const char *fnc);
+  static void end_func(const char* cls, const char *fnc);
+};
+
+struct Elapsed{
+  int hours;
+  int mins;
+  Float secs;
+
+  Elapsed():hours(0),mins(0),secs(0){}
+  Elapsed(const Float &delta);
+  inline void print(const std::string &stamp = "Elapsed", FILE *to = stdout){
+    if(!UniqueID()){
+      fprintf(stdout,"%s %dh %dm %fs\n",stamp.c_str(),hours,mins,secs); fflush(stdout);
+    }
+  }
+};
+
+// Moving Timer to util/timer.h and merging with the existing version 
+#if 0
+class Timer{
+ protected:
+  static Float dtime_begin;
+  static Float dtime_last;
+
+ public:
+  static void reset();
+  //Time since last reset
+  static Elapsed elapsed_time();
+  //Time since last call to this function
+  static Elapsed relative_time();
+};
+#endif
 CPS_END_NAMESPACE
 #endif

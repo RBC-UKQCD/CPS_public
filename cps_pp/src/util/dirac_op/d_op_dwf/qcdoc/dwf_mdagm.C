@@ -43,7 +43,7 @@ void dwf_mdagm(Vector *out,
 	       Dwf *dwf_lib_arg)
 {
   Vector *frm_tmp1 = (Vector *) dwf_lib_arg->frm_tmp1;
-  int f_size = 24 * dwf_lib_arg->vol_4d * dwf_lib_arg->ls / 2;
+  size_t f_size = 24 * dwf_lib_arg->vol_4d * dwf_lib_arg->ls / 2;
   Float minus_kappa_sq = -dwf_lib_arg->dwf_kappa * dwf_lib_arg->dwf_kappa;
   Vector *frm_tmp2 = (Vector *) dwf_lib_arg->frm_tmp2;
   

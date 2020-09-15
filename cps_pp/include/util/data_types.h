@@ -37,5 +37,10 @@ CPS_START_NAMESPACE
 //typedef Rcomplex Complex;
 typedef std::complex<IFloat> Complex;
 
+//#define MATRIX(type,name,nrow,ncol) type name [ (nrow) ] [ (ncol) ]
+#define MATRIX(_type,_name,_nrow,_ncol) \
+std::vector < std::vector < _type >> _name; \
+(_name).resize( _nrow, std::vector <_type>(_ncol)) ;
+
 CPS_END_NAMESPACE
 #endif

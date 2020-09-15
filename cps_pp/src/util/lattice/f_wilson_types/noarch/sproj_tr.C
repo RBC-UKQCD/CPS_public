@@ -7,20 +7,6 @@ CPS_START_NAMESPACE
   
   $Id: sproj_tr.C,v 1.4 2004/08/18 11:58:04 zs Exp $
 */
-//--------------------------------------------------------------------
-//  CVS keywords
-//
-//  $Author: zs $
-//  $Date: 2004/08/18 11:58:04 $
-//  $Header: /space/cvs/cps/cps++/src/util/lattice/f_wilson_types/noarch/sproj_tr.C,v 1.4 2004/08/18 11:58:04 zs Exp $
-//  $Id: sproj_tr.C,v 1.4 2004/08/18 11:58:04 zs Exp $
-//  $Name: v5_0_16_hantao_io_test_v7 $
-//  $Locker:  $
-//  $Revision: 1.4 $
-//  $Source: /space/cvs/cps/cps++/src/util/lattice/f_wilson_types/noarch/sproj_tr.C,v $
-//  $State: Exp $
-//
-//--------------------------------------------------------------------
 ///------------------------------------------------------------------
 //
 // sproj_tr.C

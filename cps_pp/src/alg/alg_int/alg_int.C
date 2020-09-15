@@ -21,15 +21,24 @@ CPS_END_NAMESPACE
 #include<alg/alg_int.h>
 CPS_START_NAMESPACE
 
+std::vector<int> AlgInt::phi_veloc_all;
+std::vector<int> AlgInt::md_veloc_all;
+int AlgInt::veloc_id=0;
+int AlgInt::traj_num=0;
+
 AlgInt::AlgInt()
 {
   cname = "AlgInt()";
-  traj = -1;
+//  traj = -1;
 }
 
 AlgInt::~AlgInt()
 {
 
+}
+
+void AlgInt::copyConjLattice(){
+  //do nothing for all derived classes bar AlgActionGauge 
 }
 
 // Calculate preliminary force for force gradient. This is just a trap

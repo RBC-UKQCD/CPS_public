@@ -8,8 +8,6 @@
 
 #ifdef USE_QMP
 #include <comms/sysfunc_qmp.h>
-#elif TARGET == BGL
-#include <comms/sysfunc_bgl.h>
 #else
 #include <comms/sysfunc_noarch.h>
 #endif // TARGET

@@ -124,7 +124,7 @@ void zmobius_m5inv_dag0(Vector *inout,
   // const int s_node_coor = GJP.SnodeCoor();
   const int vol_4d_cb = mobius_lib_arg->vol_4d / 2;
   const int ls_stride = 24 * vol_4d_cb;
-  const int f_size = 24 * vol_4d_cb * ls;
+  const size_t f_size = 24 * vol_4d_cb * ls;
 
   // two_kappa is (- 2 \kappa) in the note
   const IFloat two_kappa = -mobius_lib_arg->mobius_kappa_b/mobius_lib_arg->mobius_kappa_c;
@@ -250,8 +250,8 @@ void zmobius_m5inv_cmplx_dag0(Vector *inout,
 			      Complex* K)
 {
   
-  int x;
-  int s;
+//  int x;
+//  int s;
 
   // Initializations
   //------------------------------------------------------------------
@@ -260,7 +260,7 @@ void zmobius_m5inv_cmplx_dag0(Vector *inout,
   // const int s_node_coor = GJP.SnodeCoor();
   const int vol_4d_cb = mobius_lib_arg->vol_4d / 2;
   const int ls_stride = 24 * vol_4d_cb;
-  const int f_size = 24 * vol_4d_cb * ls;
+  const size_t f_size = 24 * vol_4d_cb * ls;
 
   // two_kappa is (- 2 \kappa) in the note
   //const IFloat two_kappa = -mobius_lib_arg->mobius_kappa_b/mobius_lib_arg->mobius_kappa_c;
@@ -291,7 +291,8 @@ void zmobius_m5inv_cmplx_dag0(Vector *inout,
   // s = 0
   //-------
   //#pragma ivdep
-  for(x=0; x<vol_4d_cb; x+=4) {
+#pragma omp parallel for
+  for(int x=0; x<vol_4d_cb; x+=4) {
     // downer part  fout[x,ls-1] *= inv_d_last;
     VEC_TIMESEQU_COMPLEX(f_out+ 12+24*(x+vol_4d_cb*(ls-1)), inv_d_last, 12);
     VEC_TIMESEQU_COMPLEX(24+f_out+ 12+24*(x+vol_4d_cb*(ls-1)), inv_d_last, 12);
@@ -305,9 +306,10 @@ void zmobius_m5inv_cmplx_dag0(Vector *inout,
 
   // s = 1 ... ls - 2
   //-------------------
-  for(s=0; s<= ls-2 ;++s) {
+  for(int s=0; s<= ls-2 ;++s) {
     //#pragma ivdep
-    for(x=0; x<vol_4d_cb; x+=4) {
+#pragma omp parallel for
+    for(int x=0; x<vol_4d_cb; x+=4) {
       // upper part  fout[x,s+1] +=  -K[s+1] fout[x,s]
       ZAXPY(12, -K[s+1], f_out + 24*(x+vol_4d_cb*s),f_out + 24*(x+vol_4d_cb*(s+1)));
       // downer part fout[x,ls-1] +=  factL * fout[x,s]
@@ -346,9 +348,10 @@ void zmobius_m5inv_cmplx_dag0(Vector *inout,
 
   // s = ls-2, ... ,  0
   //----------------------
-  for(s=ls-2; s >=0 ; --s){
+  for(int s=ls-2; s >=0 ; --s){
     //#pragma ivdep
-    for(x=0; x<vol_4d_cb; x+=4) {
+#pragma omp parallel for
+    for(int x=0; x<vol_4d_cb; x+=4) {
       // upper fout[x,s] += factR* fout[x,ls-1]
       ZAXPY(12, factR, f_out +24*(x+vol_4d_cb*(ls-1)), f_out + 24*(x+vol_4d_cb*s));
       // downer fout[x,s] += -K[s] fout[x,s+1]
@@ -378,7 +381,8 @@ void zmobius_m5inv_cmplx_dag0(Vector *inout,
   // s = ls - 1
   //-------------
 
-  for(x=0; x<vol_4d_cb; x+=4) {
+#pragma omp parallel for
+  for(int x=0; x<vol_4d_cb; x+=4) {
     // upper   fou[x,ls-1] *= inv_d_last 
     VEC_TIMESEQU_COMPLEX(f_out+ 24*(x+vol_4d_cb*(ls-1)), inv_d_last, 12);
     VEC_TIMESEQU_COMPLEX(24+f_out+ 24*(x+vol_4d_cb*(ls-1)), inv_d_last, 12);      
@@ -411,7 +415,7 @@ void zmobius_m5inv_dag1(Vector *inout,
   // const int s_node_coor = GJP.SnodeCoor();
   const int vol_4d_cb = mobius_lib_arg->vol_4d / 2;
   const int ls_stride = 24 * vol_4d_cb;
-  const int f_size = 24 * vol_4d_cb * ls;
+  const size_t f_size = 24 * vol_4d_cb * ls;
 
   const IFloat two_kappa = -mobius_lib_arg->mobius_kappa_b/mobius_lib_arg->mobius_kappa_c;
   const IFloat inv_two_kappa = 1.0 / two_kappa;
@@ -533,8 +537,8 @@ void zmobius_m5inv_cmplx_dag1(Vector *inout,
 			      Complex* K)
 {
 
-  int x;
-  int s;
+//  int x;
+//  int s;
 
 // Initializations
 //------------------------------------------------------------------
@@ -543,7 +547,7 @@ void zmobius_m5inv_cmplx_dag1(Vector *inout,
   // const int s_node_coor = GJP.SnodeCoor();
   const int vol_4d_cb = mobius_lib_arg->vol_4d / 2;
   const int ls_stride = 24 * vol_4d_cb;
-  const int f_size = 24 * vol_4d_cb * ls;
+  const size_t f_size = 24 * vol_4d_cb * ls;
 
   //const IFloat two_kappa = -mobius_lib_arg->mobius_kappa_b/mobius_lib_arg->mobius_kappa_c;
   //const IFloat inv_two_kappa = 1.0 / two_kappa;
@@ -570,7 +574,8 @@ void zmobius_m5inv_cmplx_dag1(Vector *inout,
 
   // s = 0
   //-------
-  for(x=0; x<vol_4d_cb; x+=4) {
+#pragma omp parallel for
+  for(int x=0; x<vol_4d_cb; x+=4) {
     // upper part  fout[x,ls-1] *= d_last;
     VEC_TIMESEQU_COMPLEX(f_out+24*(x+vol_4d_cb*(ls-1)), inv_d_last, 12);
     VEC_TIMESEQU_COMPLEX(24+f_out+24*(x+vol_4d_cb*(ls-1)), inv_d_last, 12);
@@ -584,8 +589,9 @@ void zmobius_m5inv_cmplx_dag1(Vector *inout,
 
   // s = 1 ... ls - 2
   //-------------------
-  for(s=0; s<= ls-2 ;++s) {
-    for(x=0; x<vol_4d_cb; x+=4) {
+  for(int s=0; s<= ls-2 ;++s) {
+#pragma omp parallel for
+    for(int x=0; x<vol_4d_cb; x+=4) {
       // upper part fout[x,ls-1] +=  fact * fout[x,s]
       ZAXPY(12, factR, f_out +24*(x+vol_4d_cb*s),f_out +24*(x+vol_4d_cb*(ls-1)));
       // downer part  fout[x,s+1] +=  -conj(K[s])  fout[x,s]
@@ -627,8 +633,9 @@ void zmobius_m5inv_cmplx_dag1(Vector *inout,
 
   // s = ls-2, ... ,  0
   //----------------------
-  for(s=ls-2; s >=0 ; --s){
-    for(x=0; x<vol_4d_cb; x+=4) {
+  for(int s=ls-2; s >=0 ; --s){
+#pragma omp parallel for
+    for(int x=0; x<vol_4d_cb; x+=4) {
       // upper fout[x,s] += -conj(K[s+1]) fout[x,s+1]
       ZAXPY(12, -conj(K[s+1]), f_out+24*(x+vol_4d_cb*(s+1)),f_out +24*(x+vol_4d_cb*s));
       // downer fout[x,s] += factL* fout[x,ls-1]
@@ -648,7 +655,7 @@ void zmobius_m5inv_cmplx_dag1(Vector *inout,
       ZAXPY(12, -conj(K[s+1]), 72+f_out+24*(x+vol_4d_cb*(s+1)),72+f_out +24*(x+vol_4d_cb*s));
       // downer fout[x,s] += factL* fout[x,ls-1]
       ZAXPY(12, factL, 72+f_out +12+24*(x+vol_4d_cb*(ls-1)), 72+f_out + 12 + 24*(x+vol_4d_cb*s));
-}
+    }
     //FIXME : which is faster ?
     //fact *= inv_two_kappa;
     if(s>0) factL /= -conj(K[s-1]);
@@ -656,7 +663,8 @@ void zmobius_m5inv_cmplx_dag1(Vector *inout,
 
   // s = ls - 1
   //-------------
-  for(x=0; x<vol_4d_cb; x+=4) {
+#pragma omp parallel for
+  for(int x=0; x<vol_4d_cb; x+=4) {
     // downer  fou[x,ls-1] *= inv_d_last 
     VEC_TIMESEQU_COMPLEX(f_out+12+ 24*(x+vol_4d_cb*(ls-1)), inv_d_last, 12);
     VEC_TIMESEQU_COMPLEX(24+f_out+12+ 24*(x+vol_4d_cb*(ls-1)), inv_d_last, 12);
@@ -818,7 +826,7 @@ void zmobius_m5inv(Vector *out, Vector *in,
 		   Complex* K)
 {
   const int vol_4d_cb = mobius_lib_arg->vol_4d / 2;
-  const int f_size = 24 * mobius_lib_arg->ls * vol_4d_cb;
+  const size_t f_size = 24 * mobius_lib_arg->ls * vol_4d_cb;
   moveFloat( (Float*)out, (Float*)in, f_size );
 
   //zmobius_m5inv_dag0(out, mass, mobius_lib_arg);

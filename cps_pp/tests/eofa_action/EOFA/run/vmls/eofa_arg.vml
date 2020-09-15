@@ -1,0 +1,681 @@
+class ActionEOFAArg eofa_arg = {
+class ActionBilinearArg bi_arg = {
+FclassType fermion = F_CLASS_MOBIUS
+Array bilinears[10] = { 
+class BilinearDescr bilinears[0] = {
+double mass =   0.0000000000000000e+00
+int max_num_iter = 25000
+}
+class BilinearDescr bilinears[1] = {
+double mass =   0.0000000000000000e+00
+int max_num_iter = 25000
+}
+class BilinearDescr bilinears[2] = {
+double mass =   0.0000000000000000e+00
+int max_num_iter = 25000
+}
+class BilinearDescr bilinears[3] = {
+double mass =   0.0000000000000000e+00
+int max_num_iter = 25000
+}
+class BilinearDescr bilinears[4] = {
+double mass =   0.0000000000000000e+00
+int max_num_iter = 25000
+}
+class BilinearDescr bilinears[5] = {
+double mass =   0.0000000000000000e+00
+int max_num_iter = 25000
+}
+class BilinearDescr bilinears[6] = {
+double mass =   0.0000000000000000e+00
+int max_num_iter = 25000
+}
+class BilinearDescr bilinears[7] = {
+double mass =   0.0000000000000000e+00
+int max_num_iter = 25000
+}
+class BilinearDescr bilinears[8] = {
+double mass =   0.0000000000000000e+00
+int max_num_iter = 25000
+}
+class BilinearDescr bilinears[9] = {
+double mass =   0.0000000000000000e+00
+int max_num_iter = 25000
+}
+}
+class ActionArg action_arg = {
+ForceMeasure force_measure = FORCE_MEASURE_YES
+string force_label = "EOFA"
+}
+}
+Array LH_stop_rsd_fg[10] = {
+double LH_stop_rsd_fg[0] = 1.0e-12
+double LH_stop_rsd_fg[1] = 1.0e-12
+double LH_stop_rsd_fg[2] = 1.0e-12
+double LH_stop_rsd_fg[3] = 1.0e-12
+double LH_stop_rsd_fg[4] = 1.0e-12
+double LH_stop_rsd_fg[5] = 1.0e-12
+double LH_stop_rsd_fg[6] = 1.0e-12
+double LH_stop_rsd_fg[7] = 1.0e-12
+double LH_stop_rsd_fg[8] = 1.0e-12
+double LH_stop_rsd_fg[9] = 1.0e-12
+}
+Array LH_stop_rsd_md[10] = {
+double LH_stop_rsd_md[0] = 1.0e-12
+double LH_stop_rsd_md[1] = 1.0e-12
+double LH_stop_rsd_md[2] = 1.0e-12
+double LH_stop_rsd_md[3] = 1.0e-12
+double LH_stop_rsd_md[4] = 1.0e-12
+double LH_stop_rsd_md[5] = 1.0e-12
+double LH_stop_rsd_md[6] = 1.0e-12
+double LH_stop_rsd_md[7] = 1.0e-12
+double LH_stop_rsd_md[8] = 1.0e-12
+double LH_stop_rsd_md[9] = 1.0e-12
+}
+Array LH_stop_rsd_mc[10] = {
+double LH_stop_rsd_mc[0] = 1.0e-12
+double LH_stop_rsd_mc[1] = 1.0e-12
+double LH_stop_rsd_mc[2] = 1.0e-12
+double LH_stop_rsd_mc[3] = 1.0e-12
+double LH_stop_rsd_mc[4] = 1.0e-12
+double LH_stop_rsd_mc[5] = 1.0e-12
+double LH_stop_rsd_mc[6] = 1.0e-12
+double LH_stop_rsd_mc[7] = 1.0e-12
+double LH_stop_rsd_mc[8] = 1.0e-12
+double LH_stop_rsd_mc[9] = 1.0e-12
+}
+Array RH_stop_rsd_fg[10] = {
+double RH_stop_rsd_fg[0] = 1.0e-12
+double RH_stop_rsd_fg[1] = 1.0e-12
+double RH_stop_rsd_fg[2] = 1.0e-12
+double RH_stop_rsd_fg[3] = 1.0e-12
+double RH_stop_rsd_fg[4] = 1.0e-12
+double RH_stop_rsd_fg[5] = 1.0e-12
+double RH_stop_rsd_fg[6] = 1.0e-12
+double RH_stop_rsd_fg[7] = 1.0e-12
+double RH_stop_rsd_fg[8] = 1.0e-12
+double RH_stop_rsd_fg[9] = 1.0e-12
+}
+Array RH_stop_rsd_md[10] = {
+double RH_stop_rsd_md[0] = 1.0e-12
+double RH_stop_rsd_md[1] = 1.0e-12
+double RH_stop_rsd_md[2] = 1.0e-12
+double RH_stop_rsd_md[3] = 1.0e-12
+double RH_stop_rsd_md[4] = 1.0e-12
+double RH_stop_rsd_md[5] = 1.0e-12
+double RH_stop_rsd_md[6] = 1.0e-12
+double RH_stop_rsd_md[7] = 1.0e-12
+double RH_stop_rsd_md[8] = 1.0e-12
+double RH_stop_rsd_md[9] = 1.0e-12
+}
+Array RH_stop_rsd_mc[10] = {
+double RH_stop_rsd_mc[0] = 1.0e-12
+double RH_stop_rsd_mc[1] = 1.0e-12
+double RH_stop_rsd_mc[2] = 1.0e-12
+double RH_stop_rsd_mc[3] = 1.0e-12
+double RH_stop_rsd_mc[4] = 1.0e-12
+double RH_stop_rsd_mc[5] = 1.0e-12
+double RH_stop_rsd_mc[6] = 1.0e-12
+double RH_stop_rsd_mc[7] = 1.0e-12
+double RH_stop_rsd_mc[8] = 1.0e-12
+double RH_stop_rsd_mc[9] = 1.0e-12
+}
+double spread =   0.0000000000000000e+00
+int remez_generate = 0
+string rat_poles_file = "../vmls/s_eofa_poles.vml"
+Array num_mass[10] = { 
+double num_mass[0] = 0.032
+double num_mass[1] = 0.033
+double num_mass[2] = 0.034
+double num_mass[3] = 0.035
+double num_mass[4] = 0.036
+double num_mass[5] = 0.037
+double num_mass[6] = 0.038
+double num_mass[7] = 0.039
+double num_mass[8] = 0.040
+double num_mass[9] = 0.041
+}
+Array den_mass[10] = { 
+double den_mass[0] = 0.033
+double den_mass[1] = 0.034
+double den_mass[2] = 0.035
+double den_mass[3] = 0.036
+double den_mass[4] = 0.037
+double den_mass[5] = 0.038
+double den_mass[6] = 0.039
+double den_mass[7] = 0.040
+double den_mass[8] = 0.041
+double den_mass[9] = 0.042
+}
+Array LH_rat_approx[10] = { 
+class EOFARationalDescr LH_rat_approx[0] = {
+FieldType field_type = FERMION
+int power_num = 1
+int power_den = 2
+long precision = 40
+class ApproxDescr rat_approx = {
+RationalApproxType approx_type = RATIONAL_APPROX_POWER
+RationalBoundsType bounds_type = RATIONAL_BOUNDS_MANUAL
+double lambda_low = 0.95
+double lambda_high = 40.0  
+Array stop_rsd[12] = { 
+double stop_rsd[0] = 1.0e-12
+double stop_rsd[1] = 1.0e-12
+double stop_rsd[2] = 1.0e-12
+double stop_rsd[3] = 1.0e-12
+double stop_rsd[4] = 1.0e-12
+double stop_rsd[5] = 1.0e-12
+double stop_rsd[6] = 1.0e-12
+double stop_rsd[7] = 1.0e-12
+double stop_rsd[8] = 1.0e-12
+double stop_rsd[9] = 1.0e-12
+double stop_rsd[10] = 1.0e-12
+double stop_rsd[11] = 1.0e-12
+}
+}
+}
+class EOFARationalDescr LH_rat_approx[1] = {
+FieldType field_type = FERMION
+int power_num = 1
+int power_den = 2
+long precision = 40
+class ApproxDescr rat_approx = {
+RationalApproxType approx_type = RATIONAL_APPROX_POWER
+RationalBoundsType bounds_type = RATIONAL_BOUNDS_MANUAL
+double lambda_low = 0.95
+double lambda_high = 40.0  
+Array stop_rsd[12] = { 
+double stop_rsd[0] = 1.0e-12
+double stop_rsd[1] = 1.0e-12
+double stop_rsd[2] = 1.0e-12
+double stop_rsd[3] = 1.0e-12
+double stop_rsd[4] = 1.0e-12
+double stop_rsd[5] = 1.0e-12
+double stop_rsd[6] = 1.0e-12
+double stop_rsd[7] = 1.0e-12
+double stop_rsd[8] = 1.0e-12
+double stop_rsd[9] = 1.0e-12
+double stop_rsd[10] = 1.0e-12
+double stop_rsd[11] = 1.0e-12
+}
+}
+}
+class EOFARationalDescr LH_rat_approx[2] = {
+FieldType field_type = FERMION
+int power_num = 1
+int power_den = 2
+long precision = 40
+class ApproxDescr rat_approx = {
+RationalApproxType approx_type = RATIONAL_APPROX_POWER
+RationalBoundsType bounds_type = RATIONAL_BOUNDS_MANUAL
+double lambda_low = 0.95
+double lambda_high = 40.0  
+Array stop_rsd[12] = { 
+double stop_rsd[0] = 1.0e-12
+double stop_rsd[1] = 1.0e-12
+double stop_rsd[2] = 1.0e-12
+double stop_rsd[3] = 1.0e-12
+double stop_rsd[4] = 1.0e-12
+double stop_rsd[5] = 1.0e-12
+double stop_rsd[6] = 1.0e-12
+double stop_rsd[7] = 1.0e-12
+double stop_rsd[8] = 1.0e-12
+double stop_rsd[9] = 1.0e-12
+double stop_rsd[10] = 1.0e-12
+double stop_rsd[11] = 1.0e-12
+}
+}
+}
+class EOFARationalDescr LH_rat_approx[3] = {
+FieldType field_type = FERMION
+int power_num = 1
+int power_den = 2
+long precision = 40
+class ApproxDescr rat_approx = {
+RationalApproxType approx_type = RATIONAL_APPROX_POWER
+RationalBoundsType bounds_type = RATIONAL_BOUNDS_MANUAL
+double lambda_low = 0.95
+double lambda_high = 40.0  
+Array stop_rsd[12] = { 
+double stop_rsd[0] = 1.0e-12
+double stop_rsd[1] = 1.0e-12
+double stop_rsd[2] = 1.0e-12
+double stop_rsd[3] = 1.0e-12
+double stop_rsd[4] = 1.0e-12
+double stop_rsd[5] = 1.0e-12
+double stop_rsd[6] = 1.0e-12
+double stop_rsd[7] = 1.0e-12
+double stop_rsd[8] = 1.0e-12
+double stop_rsd[9] = 1.0e-12
+double stop_rsd[10] = 1.0e-12
+double stop_rsd[11] = 1.0e-12
+}
+}
+}
+class EOFARationalDescr LH_rat_approx[4] = {
+FieldType field_type = FERMION
+int power_num = 1
+int power_den = 2
+long precision = 40
+class ApproxDescr rat_approx = {
+RationalApproxType approx_type = RATIONAL_APPROX_POWER
+RationalBoundsType bounds_type = RATIONAL_BOUNDS_MANUAL
+double lambda_low = 0.95
+double lambda_high = 40.0  
+Array stop_rsd[12] = { 
+double stop_rsd[0] = 1.0e-12
+double stop_rsd[1] = 1.0e-12
+double stop_rsd[2] = 1.0e-12
+double stop_rsd[3] = 1.0e-12
+double stop_rsd[4] = 1.0e-12
+double stop_rsd[5] = 1.0e-12
+double stop_rsd[6] = 1.0e-12
+double stop_rsd[7] = 1.0e-12
+double stop_rsd[8] = 1.0e-12
+double stop_rsd[9] = 1.0e-12
+double stop_rsd[10] = 1.0e-12
+double stop_rsd[11] = 1.0e-12
+}
+}
+}
+class EOFARationalDescr LH_rat_approx[5] = {
+FieldType field_type = FERMION
+int power_num = 1
+int power_den = 2
+long precision = 40
+class ApproxDescr rat_approx = {
+RationalApproxType approx_type = RATIONAL_APPROX_POWER
+RationalBoundsType bounds_type = RATIONAL_BOUNDS_MANUAL
+double lambda_low = 0.95
+double lambda_high = 40.0  
+Array stop_rsd[12] = { 
+double stop_rsd[0] = 1.0e-12
+double stop_rsd[1] = 1.0e-12
+double stop_rsd[2] = 1.0e-12
+double stop_rsd[3] = 1.0e-12
+double stop_rsd[4] = 1.0e-12
+double stop_rsd[5] = 1.0e-12
+double stop_rsd[6] = 1.0e-12
+double stop_rsd[7] = 1.0e-12
+double stop_rsd[8] = 1.0e-12
+double stop_rsd[9] = 1.0e-12
+double stop_rsd[10] = 1.0e-12
+double stop_rsd[11] = 1.0e-12
+}
+}
+}
+class EOFARationalDescr LH_rat_approx[6] = {
+FieldType field_type = FERMION
+int power_num = 1
+int power_den = 2
+long precision = 40
+class ApproxDescr rat_approx = {
+RationalApproxType approx_type = RATIONAL_APPROX_POWER
+RationalBoundsType bounds_type = RATIONAL_BOUNDS_MANUAL
+double lambda_low = 0.95
+double lambda_high = 40.0  
+Array stop_rsd[12] = { 
+double stop_rsd[0] = 1.0e-12
+double stop_rsd[1] = 1.0e-12
+double stop_rsd[2] = 1.0e-12
+double stop_rsd[3] = 1.0e-12
+double stop_rsd[4] = 1.0e-12
+double stop_rsd[5] = 1.0e-12
+double stop_rsd[6] = 1.0e-12
+double stop_rsd[7] = 1.0e-12
+double stop_rsd[8] = 1.0e-12
+double stop_rsd[9] = 1.0e-12
+double stop_rsd[10] = 1.0e-12
+double stop_rsd[11] = 1.0e-12
+}
+}
+}
+class EOFARationalDescr LH_rat_approx[7] = {
+FieldType field_type = FERMION
+int power_num = 1
+int power_den = 2
+long precision = 40
+class ApproxDescr rat_approx = {
+RationalApproxType approx_type = RATIONAL_APPROX_POWER
+RationalBoundsType bounds_type = RATIONAL_BOUNDS_MANUAL
+double lambda_low = 0.95
+double lambda_high = 40.0  
+Array stop_rsd[12] = { 
+double stop_rsd[0] = 1.0e-12
+double stop_rsd[1] = 1.0e-12
+double stop_rsd[2] = 1.0e-12
+double stop_rsd[3] = 1.0e-12
+double stop_rsd[4] = 1.0e-12
+double stop_rsd[5] = 1.0e-12
+double stop_rsd[6] = 1.0e-12
+double stop_rsd[7] = 1.0e-12
+double stop_rsd[8] = 1.0e-12
+double stop_rsd[9] = 1.0e-12
+double stop_rsd[10] = 1.0e-12
+double stop_rsd[11] = 1.0e-12
+}
+}
+}
+class EOFARationalDescr LH_rat_approx[8] = {
+FieldType field_type = FERMION
+int power_num = 1
+int power_den = 2
+long precision = 40
+class ApproxDescr rat_approx = {
+RationalApproxType approx_type = RATIONAL_APPROX_POWER
+RationalBoundsType bounds_type = RATIONAL_BOUNDS_MANUAL
+double lambda_low = 0.95
+double lambda_high = 40.0  
+Array stop_rsd[12] = { 
+double stop_rsd[0] = 1.0e-12
+double stop_rsd[1] = 1.0e-12
+double stop_rsd[2] = 1.0e-12
+double stop_rsd[3] = 1.0e-12
+double stop_rsd[4] = 1.0e-12
+double stop_rsd[5] = 1.0e-12
+double stop_rsd[6] = 1.0e-12
+double stop_rsd[7] = 1.0e-12
+double stop_rsd[8] = 1.0e-12
+double stop_rsd[9] = 1.0e-12
+double stop_rsd[10] = 1.0e-12
+double stop_rsd[11] = 1.0e-12
+}
+}
+}
+class EOFARationalDescr LH_rat_approx[9] = {
+FieldType field_type = FERMION
+int power_num = 1
+int power_den = 2
+long precision = 40
+class ApproxDescr rat_approx = {
+RationalApproxType approx_type = RATIONAL_APPROX_POWER
+RationalBoundsType bounds_type = RATIONAL_BOUNDS_MANUAL
+double lambda_low = 0.95
+double lambda_high = 40.0  
+Array stop_rsd[12] = { 
+double stop_rsd[0] = 1.0e-12
+double stop_rsd[1] = 1.0e-12
+double stop_rsd[2] = 1.0e-12
+double stop_rsd[3] = 1.0e-12
+double stop_rsd[4] = 1.0e-12
+double stop_rsd[5] = 1.0e-12
+double stop_rsd[6] = 1.0e-12
+double stop_rsd[7] = 1.0e-12
+double stop_rsd[8] = 1.0e-12
+double stop_rsd[9] = 1.0e-12
+double stop_rsd[10] = 1.0e-12
+double stop_rsd[11] = 1.0e-12
+}
+}
+}
+}
+Array RH_rat_approx[10] = { 
+class EOFARationalDescr RH_rat_approx[0] = {
+FieldType field_type = FERMION
+int power_num = 1
+int power_den = 2
+long precision = 40
+class ApproxDescr rat_approx = {
+RationalApproxType approx_type = RATIONAL_APPROX_POWER
+RationalBoundsType bounds_type = RATIONAL_BOUNDS_MANUAL
+double lambda_low = 0.95
+double lambda_high = 40.0
+Array stop_rsd[12] = { 
+double stop_rsd[0] = 1.0e-12
+double stop_rsd[1] = 1.0e-12
+double stop_rsd[2] = 1.0e-12
+double stop_rsd[3] = 1.0e-12
+double stop_rsd[4] = 1.0e-12
+double stop_rsd[5] = 1.0e-12
+double stop_rsd[6] = 1.0e-12
+double stop_rsd[7] = 1.0e-12
+double stop_rsd[8] = 1.0e-12
+double stop_rsd[9] = 1.0e-12
+double stop_rsd[10] = 1.0e-12
+double stop_rsd[11] = 1.0e-12
+}
+}
+}
+class EOFARationalDescr RH_rat_approx[1] = {
+FieldType field_type = FERMION
+int power_num = 1
+int power_den = 2
+long precision = 40
+class ApproxDescr rat_approx = {
+RationalApproxType approx_type = RATIONAL_APPROX_POWER
+RationalBoundsType bounds_type = RATIONAL_BOUNDS_MANUAL
+double lambda_low = 0.95
+double lambda_high = 40.0
+Array stop_rsd[12] = { 
+double stop_rsd[0] = 1.0e-12
+double stop_rsd[1] = 1.0e-12
+double stop_rsd[2] = 1.0e-12
+double stop_rsd[3] = 1.0e-12
+double stop_rsd[4] = 1.0e-12
+double stop_rsd[5] = 1.0e-12
+double stop_rsd[6] = 1.0e-12
+double stop_rsd[7] = 1.0e-12
+double stop_rsd[8] = 1.0e-12
+double stop_rsd[9] = 1.0e-12
+double stop_rsd[10] = 1.0e-12
+double stop_rsd[11] = 1.0e-12
+}
+}
+}
+class EOFARationalDescr RH_rat_approx[2] = {
+FieldType field_type = FERMION
+int power_num = 1
+int power_den = 2
+long precision = 40
+class ApproxDescr rat_approx = {
+RationalApproxType approx_type = RATIONAL_APPROX_POWER
+RationalBoundsType bounds_type = RATIONAL_BOUNDS_MANUAL
+double lambda_low = 0.95
+double lambda_high = 40.0
+Array stop_rsd[12] = { 
+double stop_rsd[0] = 1.0e-12
+double stop_rsd[1] = 1.0e-12
+double stop_rsd[2] = 1.0e-12
+double stop_rsd[3] = 1.0e-12
+double stop_rsd[4] = 1.0e-12
+double stop_rsd[5] = 1.0e-12
+double stop_rsd[6] = 1.0e-12
+double stop_rsd[7] = 1.0e-12
+double stop_rsd[8] = 1.0e-12
+double stop_rsd[9] = 1.0e-12
+double stop_rsd[10] = 1.0e-12
+double stop_rsd[11] = 1.0e-12
+}
+}
+}
+class EOFARationalDescr RH_rat_approx[3] = {
+FieldType field_type = FERMION
+int power_num = 1
+int power_den = 2
+long precision = 40
+class ApproxDescr rat_approx = {
+RationalApproxType approx_type = RATIONAL_APPROX_POWER
+RationalBoundsType bounds_type = RATIONAL_BOUNDS_MANUAL
+double lambda_low = 0.95
+double lambda_high = 40.0
+Array stop_rsd[12] = { 
+double stop_rsd[0] = 1.0e-12
+double stop_rsd[1] = 1.0e-12
+double stop_rsd[2] = 1.0e-12
+double stop_rsd[3] = 1.0e-12
+double stop_rsd[4] = 1.0e-12
+double stop_rsd[5] = 1.0e-12
+double stop_rsd[6] = 1.0e-12
+double stop_rsd[7] = 1.0e-12
+double stop_rsd[8] = 1.0e-12
+double stop_rsd[9] = 1.0e-12
+double stop_rsd[10] = 1.0e-12
+double stop_rsd[11] = 1.0e-12
+}
+}
+}
+class EOFARationalDescr RH_rat_approx[4] = {
+FieldType field_type = FERMION
+int power_num = 1
+int power_den = 2
+long precision = 40
+class ApproxDescr rat_approx = {
+RationalApproxType approx_type = RATIONAL_APPROX_POWER
+RationalBoundsType bounds_type = RATIONAL_BOUNDS_MANUAL
+double lambda_low = 0.95
+double lambda_high = 40.0
+Array stop_rsd[12] = { 
+double stop_rsd[0] = 1.0e-12
+double stop_rsd[1] = 1.0e-12
+double stop_rsd[2] = 1.0e-12
+double stop_rsd[3] = 1.0e-12
+double stop_rsd[4] = 1.0e-12
+double stop_rsd[5] = 1.0e-12
+double stop_rsd[6] = 1.0e-12
+double stop_rsd[7] = 1.0e-12
+double stop_rsd[8] = 1.0e-12
+double stop_rsd[9] = 1.0e-12
+double stop_rsd[10] = 1.0e-12
+double stop_rsd[11] = 1.0e-12
+}
+}
+}
+class EOFARationalDescr RH_rat_approx[5] = {
+FieldType field_type = FERMION
+int power_num = 1
+int power_den = 2
+long precision = 40
+class ApproxDescr rat_approx = {
+RationalApproxType approx_type = RATIONAL_APPROX_POWER
+RationalBoundsType bounds_type = RATIONAL_BOUNDS_MANUAL
+double lambda_low = 0.95
+double lambda_high = 40.0
+Array stop_rsd[12] = { 
+double stop_rsd[0] = 1.0e-12
+double stop_rsd[1] = 1.0e-12
+double stop_rsd[2] = 1.0e-12
+double stop_rsd[3] = 1.0e-12
+double stop_rsd[4] = 1.0e-12
+double stop_rsd[5] = 1.0e-12
+double stop_rsd[6] = 1.0e-12
+double stop_rsd[7] = 1.0e-12
+double stop_rsd[8] = 1.0e-12
+double stop_rsd[9] = 1.0e-12
+double stop_rsd[10] = 1.0e-12
+double stop_rsd[11] = 1.0e-12
+}
+}
+}
+class EOFARationalDescr RH_rat_approx[6] = {
+FieldType field_type = FERMION
+int power_num = 1
+int power_den = 2
+long precision = 40
+class ApproxDescr rat_approx = {
+RationalApproxType approx_type = RATIONAL_APPROX_POWER
+RationalBoundsType bounds_type = RATIONAL_BOUNDS_MANUAL
+double lambda_low = 0.95
+double lambda_high = 40.0
+Array stop_rsd[12] = { 
+double stop_rsd[0] = 1.0e-12
+double stop_rsd[1] = 1.0e-12
+double stop_rsd[2] = 1.0e-12
+double stop_rsd[3] = 1.0e-12
+double stop_rsd[4] = 1.0e-12
+double stop_rsd[5] = 1.0e-12
+double stop_rsd[6] = 1.0e-12
+double stop_rsd[7] = 1.0e-12
+double stop_rsd[8] = 1.0e-12
+double stop_rsd[9] = 1.0e-12
+double stop_rsd[10] = 1.0e-12
+double stop_rsd[11] = 1.0e-12
+}
+}
+}
+class EOFARationalDescr RH_rat_approx[7] = {
+FieldType field_type = FERMION
+int power_num = 1
+int power_den = 2
+long precision = 40
+class ApproxDescr rat_approx = {
+RationalApproxType approx_type = RATIONAL_APPROX_POWER
+RationalBoundsType bounds_type = RATIONAL_BOUNDS_MANUAL
+double lambda_low = 0.95
+double lambda_high = 40.0
+Array stop_rsd[12] = { 
+double stop_rsd[0] = 1.0e-12
+double stop_rsd[1] = 1.0e-12
+double stop_rsd[2] = 1.0e-12
+double stop_rsd[3] = 1.0e-12
+double stop_rsd[4] = 1.0e-12
+double stop_rsd[5] = 1.0e-12
+double stop_rsd[6] = 1.0e-12
+double stop_rsd[7] = 1.0e-12
+double stop_rsd[8] = 1.0e-12
+double stop_rsd[9] = 1.0e-12
+double stop_rsd[10] = 1.0e-12
+double stop_rsd[11] = 1.0e-12
+}
+}
+}
+class EOFARationalDescr RH_rat_approx[8] = {
+FieldType field_type = FERMION
+int power_num = 1
+int power_den = 2
+long precision = 40
+class ApproxDescr rat_approx = {
+RationalApproxType approx_type = RATIONAL_APPROX_POWER
+RationalBoundsType bounds_type = RATIONAL_BOUNDS_MANUAL
+double lambda_low = 0.95
+double lambda_high = 40.0
+Array stop_rsd[12] = { 
+double stop_rsd[0] = 1.0e-12
+double stop_rsd[1] = 1.0e-12
+double stop_rsd[2] = 1.0e-12
+double stop_rsd[3] = 1.0e-12
+double stop_rsd[4] = 1.0e-12
+double stop_rsd[5] = 1.0e-12
+double stop_rsd[6] = 1.0e-12
+double stop_rsd[7] = 1.0e-12
+double stop_rsd[8] = 1.0e-12
+double stop_rsd[9] = 1.0e-12
+double stop_rsd[10] = 1.0e-12
+double stop_rsd[11] = 1.0e-12
+}
+}
+}
+class EOFARationalDescr RH_rat_approx[9] = {
+FieldType field_type = FERMION
+int power_num = 1
+int power_den = 2
+long precision = 40
+class ApproxDescr rat_approx = {
+RationalApproxType approx_type = RATIONAL_APPROX_POWER
+RationalBoundsType bounds_type = RATIONAL_BOUNDS_MANUAL
+double lambda_low = 0.95
+double lambda_high = 40.0
+Array stop_rsd[12] = { 
+double stop_rsd[0] = 1.0e-12
+double stop_rsd[1] = 1.0e-12
+double stop_rsd[2] = 1.0e-12
+double stop_rsd[3] = 1.0e-12
+double stop_rsd[4] = 1.0e-12
+double stop_rsd[5] = 1.0e-12
+double stop_rsd[6] = 1.0e-12
+double stop_rsd[7] = 1.0e-12
+double stop_rsd[8] = 1.0e-12
+double stop_rsd[9] = 1.0e-12
+double stop_rsd[10] = 1.0e-12
+double stop_rsd[11] = 1.0e-12
+}
+}
+}
+}
+class EigenDescr eigen = {
+EigenMeasure eigen_measure = EIGEN_MEASURE_NO
+double stop_rsd = 1.0e-05
+int max_num_iter = 10000
+string eig_lo_stem = "eig_low"
+string eig_hi_stem = "eig_high"
+}
+}

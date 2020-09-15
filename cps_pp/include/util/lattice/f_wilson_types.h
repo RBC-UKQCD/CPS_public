@@ -1,7 +1,11 @@
+#include<config.h>
+//#include<util/dirac_op.h>
 #ifndef INCLUDED_F_WILSON_TYPES_H
 #define INCLUDED_F_WILSON_TYPES_H           //!< Prevent multiple inclusion
 
 #include<util/dwf.h>
+#include<util/gjp.h>
+//#include<util/error.h>
 
 CPS_START_NAMESPACE
 
@@ -97,6 +101,7 @@ class FwilsonTypes : public virtual Lattice
     //!< Method to ensure bosonic force works (does nothing for Wilson
     //!< theories.
     void BforceVector(Vector *in, CgArg *cg_arg);
+//    virtual int FwilsonType(){ return 1; }
 };
 
 
@@ -429,11 +434,17 @@ class FwilsonTm : public virtual Fwilson
 		   CnvFrmType cnv_frm = CNV_FRM_YES);
 
     
-    int FeigSolv(Vector **f_eigenv, Float *lambda,
-                 Float *chirality, int *valid_eig,
-                 Float **hsum,
-                 EigArg *eig_arg,
-                 CnvFrmType cnv_frm);
+    int FeigSolv(Vector **f_eigenv, Float *lambda, 
+		 Float *chirality, int *valid_eig,
+		 Float **hsum,
+		 EigArg *eig_arg, 
+		 CnvFrmType cnv_frm = CNV_FRM_YES);
+    //CK: modified in f_wilsonTm to create wilsonTm fermions 
+    int FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift, 
+		    int Nshift, int isz, CgArg **cg_arg, 
+		    CnvFrmType cnv_frm, MultiShiftSolveType type, 
+		    Float *alpha, Vector **f_out_d);
+
 
 
    //
@@ -453,6 +464,18 @@ class FwilsonTm : public virtual Fwilson
 
     Float BhamiltonNode(Vector *boson, Float mass, Float epsilon);
 
+    //Implementations of the above for G-parity boundary conditions (note, the standard versions will redirect to these functions when G-parity is active)
+    ForceArg EvolveMomFforceGparity(Matrix *mom, Vector *frm, 
+				 Float mass, Float epsilon, Float step_size);
+
+    ForceArg EvolveMomFforceGparity(Matrix *mom, Vector *phi, Vector *eta,
+				    Float mass, Float epsilon, Float step_size);
+
+    //Added by CK:
+    ForceArg RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
+				  int isz, Float *alpha, Float mass, Float epsilon, Float dt,
+				  Vector **sol_d, ForceMeasure measure);
+
     //
     //~~ the following functions are "normal" versions without the
     //~~ epsilon parameter; should never be called by wilsonTm fermions
@@ -463,8 +486,10 @@ class FwilsonTm : public virtual Fwilson
  
     ForceArg EvolveMomFforce(Matrix *mom, Vector *frm, 
 				 Float mass, Float step_size);
+    
     ForceArg EvolveMomFforce(Matrix *mom, Vector *phi, Vector *eta,
 				  Float mass, Float step_size);
+
     Float BhamiltonNode(Vector *boson, Float mass);
 };
 
@@ -654,6 +679,8 @@ class FdwfBase : public virtual FwilsonTypes
     FclassType Fclass() const;
         // It returns the type of fermion class
 
+    virtual int F5D(){return 1;}
+
     int FsiteOffsetChkb(const int *x) const;
         // Sets the offsets for the fermion fields on a 
         // checkerboard. The fermion field storage order
@@ -661,24 +688,16 @@ class FdwfBase : public virtual FwilsonTypes
         // to the Dwf fermion type. x[i] is the 
         // ith coordinate where i = {0,1,2,3,4} = {x,y,z,t,s}.
 
-#if 0
-    int FsiteOffset(const int *x) const;
-        // Sets the offsets for the fermion fields on a 
-        // checkerboard. The fermion field storage order
-        // is the canonical one. X[I] is the
-        // ith coordinate where i = {0,1,2,3} = {x,y,z,t}.
-#endif
-
-    int FsiteSize() const;
+    virtual int FsiteSize() const;
         // Returns the number of fermion field 
         // components (including real/imaginary) on a
         // site of the 4-D lattice.
 
-    int FchkbEvl() const;
+    virtual int FchkbEvl() const;
         // Returns 0 => If no checkerboard is used for the evolution
         //      or the CG that inverts the evolution matrix.
 
-    int FmatEvlInv(Vector *f_out, Vector *f_in, 
+    virtual int FmatEvlInv(Vector *f_out, Vector *f_in, 
 		   CgArg *cg_arg, 
 		   Float *true_res,
 		   CnvFrmType cnv_frm = CNV_FRM_YES);
@@ -695,19 +714,19 @@ class FdwfBase : public virtual FwilsonTypes
         // in true_res.
         // *true_res = |src - MatPcDagMatPc * sol| / |src|
 	// The function returns the total number of CG iterations.
-    int FmatEvlInv(Vector *f_out, Vector *f_in, 
+    virtual int FmatEvlInv(Vector *f_out, Vector *f_in, 
 		   CgArg *cg_arg, 
 		   CnvFrmType cnv_frm = CNV_FRM_YES);
 
-    int FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift, 
+    virtual int FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift, 
 		    int Nshift, int isz, CgArg **cg_arg, 
 		    CnvFrmType cnv_frm, MultiShiftSolveType type, Float *alpha,
 		    Vector **f_out_d);
 
-    void FminResExt(Vector *sol, Vector *source, Vector **sol_old, 
+    virtual void FminResExt(Vector *sol, Vector *source, Vector **sol_old, 
 		     Vector **vm, int degree, CgArg *cg_arg, CnvFrmType cnv_frm);
     
-    int FmatInv(Vector *f_out, Vector *f_in, 
+    virtual int FmatInv(Vector *f_out, Vector *f_in, 
 		CgArg *cg_arg, 
 		Float *true_res,
 		CnvFrmType cnv_frm = CNV_FRM_YES,
@@ -730,7 +749,7 @@ class FdwfBase : public virtual FwilsonTypes
         // is less by half the size of a fermion vector.
 	// The function returns the total number of CG iterations.
 
-    int FmatInvMobius(Vector * f_out,
+    virtual int FmatInvMobius(Vector * f_out,
                       Vector * f_in,
                       CgArg * cg_arg_dwf,
                       MdwfArg * mdwf_arg,
@@ -742,19 +761,19 @@ class FdwfBase : public virtual FwilsonTypes
     // ======================================================================
     // n_restart: How many restarts we perform
       
-    int FmatInv(Vector *f_out, Vector *f_in, 
+    virtual int FmatInv(Vector *f_out, Vector *f_in, 
 		CgArg *cg_arg, 
 		CnvFrmType cnv_frm = CNV_FRM_YES,
 		PreserveType prs_f_in = PRESERVE_YES);
 	
-    int eig_FmatInv(Vector **V, const int vec_len, Float *M, const int nev, const int m, float **U, Rcomplex *invH, const int def_len, const Float *restart,const int restart_len,
+    virtual int eig_FmatInv(Vector **V, const int vec_len, Float *M, const int nev, const int m, float **U, Rcomplex *invH, const int def_len, const Float *restart,const int restart_len,
 			Vector *f_out, Vector *f_in, 
 		CgArg *cg_arg, 
 		Float *true_res,
 		CnvFrmType cnv_frm = CNV_FRM_YES,
 		PreserveType prs_f_in = PRESERVE_YES);
 	
-    void Ffour2five(Vector *five, Vector *four, int s_u, int s_l, int Ncb=2);
+    virtual void Ffour2five(Vector *five, Vector *four, int s_u, int s_l, int Ncb=2);
     //!< Transforms a 4-dimensional fermion field into a 5-dimensional field.
     /* The 5d field is zero */
     // The 5d field is zero
@@ -766,7 +785,7 @@ class FdwfBase : public virtual FwilsonTypes
     // s coordinate i.e. their range is from 
     // 0 to [GJP.Snodes() * GJP.SnodeSites() - 1]
 
-    void Ffive2four(Vector *four, Vector *five, int s_u, int s_l, int Ncb=2);
+    virtual void Ffive2four(Vector *four, Vector *five, int s_u, int s_l, int Ncb=2);
     //!< Transforms a 5-dimensional fermion field into a 4-dimensional field.
     //The 4d field has
         // the upper two components (right chirality) equal to the
@@ -779,10 +798,10 @@ class FdwfBase : public virtual FwilsonTypes
         // 0 to [GJP.Snodes() * GJP.SnodeSites() - 1]
         // The same 4D field is generarted in all s node slices.
 
-    void Fsolfour2five(Vector *sol_5d, Vector *sol_4d, Vector *src_5d, CgArg *cg_arg);
+    virtual void Fsolfour2five(Vector *sol_5d, Vector *sol_4d, Vector *src_5d, CgArg *cg_arg);
     // Recover the 5D solution from the 4D solution, without solve the equation again.
 
-    int FeigSolv(Vector **f_eigenv, Float *lambda,
+    virtual int FeigSolv(Vector **f_eigenv, Float *lambda,
 		 Float *chirality, int *valid_eig,
 		 Float **hsum,
 		 EigArg *eig_arg, 
@@ -795,7 +814,7 @@ class FdwfBase : public virtual FwilsonTypes
         // defined initially, lambda are the eigenvalues returned 
         // on solution. f_eigenv is defined on the whole lattice.
 	// The function returns the total number of Ritz iterations.
-    int FeigSolv(Vector **f_eigenv, Float *lambda,
+    virtual int FeigSolv(Vector **f_eigenv, Float *lambda,
 		 LanczosArg *eig_arg, 
 		 CnvFrmType cnv_frm = CNV_FRM_YES);
         // It finds the eigenvectors and eigenvalues of A where
@@ -807,16 +826,22 @@ class FdwfBase : public virtual FwilsonTypes
         // on solution. f_eigenv is defined on the whole lattice.
 	// The function returns the total number of iterations.
 
-    Float SetPhi(Vector *phi, Vector *frm1, Vector *frm2,	       
+    virtual Float SetPhi(Vector *phi, Vector *frm1, Vector *frm2,	       
 		 Float mass, DagType dag);
 	// It sets the pseudofermion field phi from frm1, frm2.
 	
-    ForceArg EvolveMomFforce(Matrix *mom, Vector *frm, 
+    virtual ForceArg EvolveMomFforce(Matrix *mom, Vector *frm, 
 			  Float mass, Float step_size);
         // It evolves the canonical momentum mom by step_size
         // using the fermion force.
 
-    ForceArg EvolveMomFforce(Matrix *mom, Vector *phi, Vector *eta,
+    virtual ForceArg EvolveMomFforceGparity(Matrix *mom, Vector *frm, 
+				    Float mass, Float step_size);
+        // It evolve the canonical momentum mom  by step_size in G-parity scenario
+        // using the bosonic quotient force.
+        // It is automatically called by EvolveMomFforce when appropriate
+
+    virtual ForceArg EvolveMomFforce(Matrix *mom, Vector *phi, Vector *eta,
 			  Float mass, Float step_size);
         // It evolve the canonical momentum mom  by step_size
         // using the bosonic quotient force.
@@ -824,20 +849,20 @@ class FdwfBase : public virtual FwilsonTypes
     ForceArg EvolveMomFforceInt(Matrix *mom, Vector *v1, Vector *v2,
 			  Float mass, Float step_size);
 
-    ForceArg RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
+    virtual ForceArg RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
 			      int isz, Float *alpha, Float mass, Float dt,
 			      Vector **sol_d, ForceMeasure measure);
 
-    Float FhamiltonNode( Vector *phi,  Vector *chi) ;
+    virtual Float FhamiltonNode( Vector *phi,  Vector *chi) ;
         // The fermion Hamiltonian of the node sublattice.
         // chi must be the solution of Cg with source phi.	       
 
-    void Fconvert(Vector *f_field,
+    virtual void Fconvert(Vector *f_field,
 			  StrOrdType to,
 		  StrOrdType from, int cb=2);
         // Convert fermion field f_field from -> to
 
-    void SpinProject(Vector * out, Vector *in, int s_size, int type);
+    virtual void SpinProject(Vector * out, Vector *in, int s_size, int type);
     //--------------------------------------------------------------------
     // void SpinProject():
     //
@@ -867,13 +892,15 @@ class FdwfBase : public virtual FwilsonTypes
     // in and out vectors.
     //--------------------------------------------------------------------
 
-    Float BhamiltonNode(Vector *boson, Float mass);
+    virtual Float BhamiltonNode(Vector *boson, Float mass);
         // The boson Hamiltonian of the node sublattice
 
-    void Freflex (Vector *out, Vector *in);
+    virtual void Freflex (Vector *out, Vector *in);
     //!< Does something really cool.
        // Reflexion in s operator, needed for the hermitian version 
        // of the dirac operator in the Ritz solver.
+    virtual void Fdslash(Vector *f_out, Vector *f_in, CgArg *cg_arg,
+                 CnvFrmType cnv_frm, int dir_flag);
 };
 
 //------------------------------------------------------------------
@@ -883,7 +910,7 @@ class FdwfBase : public virtual FwilsonTypes
   \ingroup factions
 */
 //------------------------------------------------------------------
-class Fdwf : public FdwfBase {
+class Fdwf : public virtual FdwfBase {
  private:
     const char *cname;    // Class name.
     
@@ -911,6 +938,7 @@ class Fmdwf : public virtual Lattice {
   FclassType Fclass() const;
   // It returns the type of fermion class
   
+  virtual int F5D(){return 1;}
   //! Multiplication of a lattice spin-colour vector by gamma_5.
   void Gamma5(Vector *v_out, Vector *v_in, int num_sites);
 
@@ -1043,6 +1071,7 @@ class Fmdwf : public virtual Lattice {
   // on solution. f_eigenv is defined on the whole lattice.
   // The function returns the total number of Ritz iterations.
   
+
   Float SetPhi(Vector *phi, Vector *frm1, Vector *frm2,	       
                Float mass, DagType dag);
   // It sets the pseudofermion field phi from frm1, frm2.
@@ -1125,28 +1154,39 @@ class Fmdwf : public virtual Lattice {
   void Dminus(Vector *out, Vector *in);
 };
 
-class Fmobius : public FdwfBase {
+class Fmobius : public virtual FdwfBase {
  private:
     char *cname;    // Class name.
     
  public:
 
-    Fmobius(void);
-    ~Fmobius(void);
+//    Fmobius(void):FdwfBase(),cname("Fmobius"){
+//	  full_size =  GJP.VolNodeSites() * (size_t) FsiteSize();
+//	  half_size = full_size/2;
+//    }
+     Fmobius(void);
+    ~Fmobius(void){}
 
-    FclassType Fclass(void) const;
+//    FclassType Fclass(void) const;
+    FclassType Fclass(void) const { return F_CLASS_MOBIUS;}
 
     int FmatInv(Vector *f_out, Vector *f_in,
                 CgArg *cg_arg,
                 Float *true_res,
                 CnvFrmType cnv_frm,
-                PreserveType prs_f_in, int dminus=1);
+                PreserveType prs_f_in, int dminus);
+  int FmatInv(Vector *f_out, Vector *f_in, 
+              CgArg *cg_arg, 
+              Float *true_res,
+              CnvFrmType cnv_frm = CNV_FRM_YES,
+              PreserveType prs_f_in = PRESERVE_YES)
+    { return FmatInv(f_out,f_in,cg_arg,true_res,cnv_frm, prs_f_in,1);}
     int FmatInvTest(Vector *f_out, Vector *f_in,
                 CgArg *cg_arg,
                 Float *true_res,
                 CnvFrmType cnv_frm,
                 PreserveType prs_f_in)
-    { FmatInv(f_out,f_in,cg_arg,true_res,cnv_frm, prs_f_in,0);}
+    { return FmatInv(f_out,f_in,cg_arg,true_res,cnv_frm, prs_f_in,0);}
 
     int FmatInv(Vector *f_out,
                 Vector *f_in,
@@ -1167,11 +1207,89 @@ class Fmobius : public FdwfBase {
 		 CnvFrmType cnv_frm);
 
     void Fdslash(Vector *f_out, Vector *f_in, CgArg *cg_arg,
-                 CnvFrmType cnv_frm, int dir_flag);
+        CnvFrmType cnv_frm, int dir_flag);
+
+
+  int FmatEvlInv(Vector *f_out, Vector *f_in, 
+		 CgArg *cg_arg, 
+		 Float *true_res,
+		 CnvFrmType cnv_frm = CNV_FRM_YES);
+  int FmatEvlInv(Vector *f_out, Vector *f_in, 
+		 CgArg *cg_arg, 
+		 CnvFrmType cnv_frm = CNV_FRM_YES)
+  {
+    return FmatEvlInv(f_out, f_in, cg_arg, NULL, cnv_frm);
+  }
+  
+  int FmatEvlMInv(Vector **f_out, Vector *f_in, Float *shift, 
+		  int Nshift, int isz, CgArg **cg_arg, 
+		  CnvFrmType cnv_frm, MultiShiftSolveType type, Float *alpha,
+		  Vector **f_out_d);
+
+  Float SetPhi(Vector *phi, Vector *frm1, Vector *frm2,	       
+               Float mass, DagType dag);
+  // It sets the pseudofermion field phi from frm1, frm2.
+  
+  ForceArg EvolveMomFforce(Matrix *mom, Vector *frm, 
+                           Float mass, Float step_size);
+  ForceArg EvolveMomFforceBase(Matrix *mom, Vector *frm, Vector *frm2,
+                           Float mass, Float step_size);
+  // It evolves the canonical momentum mom by step_size
+  // using the fermion force.
+  
+  ForceArg EvolveMomFforce(Matrix *mom, Vector *phi, Vector *eta,
+                           Float mass, Float step_size);
+  // It evolve the canonical momentum mom  by step_size
+  // using the bosonic quotient force.
+  
+  ForceArg RHMC_EvolveMomFforce(Matrix *mom, Vector **sol, int degree,
+                                int isz, Float *alpha, Float mass, Float dt,
+                                Vector **sol_d, ForceMeasure measure);
+
+  void SetEOFAParams(Float m1, Float m2, Float m3, Float a, int pm) override {}; // does nothing
+  void FminResExt(Vector* soln, Vector* src, Vector** soln_old,
+      Vector** vm, int degree, Float m1, Float m2, Float m3,
+      Float a, int pm, CgArg* cg_arg, CnvFrmType cnv_frm) override;
+  void ChiralProj_p(Vector* f_out, const Vector* f_in);
+  void ChiralProj_m(Vector* f_out, const Vector* f_in);
+  void ChiralProj(Vector* f_out, const Vector* f_in, int pm) override
+  {
+    const char* fname = "ChiralProj(V*,V*,i)";
+
+    if(pm == -1){ ChiralProj_m(f_out, f_in); }
+    else if(pm == 1){ ChiralProj_p(f_out, f_in); }
+    else{ ERR.General(cname, fname, "Unrecognized sign %d\n", pm); } 
+  }
+
+  Float kt(Float m1, Float m2) override;
+  void g5R5(Vector* f_out, Vector* f_in) override;
+  
+  void Omega_p(Vector* f_out, Vector* f_in);
+  void Omega_m(Vector* f_out, Vector* f_in);
+  void Omega_p_dag(Vector* f_out, Vector* f_in);
+  void Omega_m_dag(Vector* f_out, Vector* f_in);
+  void Omega(Vector* f_out, Vector* f_in, int pm, int dag) override
+  {
+    const char* fname = "Omega(V*,V*,i,i)";
+
+    if(     (pm == 1 ) && (dag == 0)){ Omega_p(f_out, f_in);     }
+    else if((pm == -1) && (dag == 0)){ Omega_m(f_out, f_in);     }
+    else if((pm == 1 ) && (dag == 1)){ Omega_p_dag(f_out, f_in); }
+    else if((pm == -1) && (dag == 1)){ Omega_m_dag(f_out, f_in); }
+    else{ ERR.General(cname, fname, "Unrecognized (pm,dag) = (%d,%d)\n", pm, dag); }
+  }
+
+  void Dtilde(Vector* f_out, Vector* f_in, Float m) override;
+  void DtildeInv(Vector* f_out, Vector* f_in, Float m) override;
+  void HeofapaD_proj(Vector* f_out, Vector* f_in, Float m1, 
+      Float m2, Float m3, Float a, int pm) override;
+  int FmatEvlMeofa(Vector* f_out, Vector* f_in, CgArg* cg_arg,
+      Float m1, Float m2, Float m3, Float a, int pm, 
+      Vector* prec_soln = nullptr) override;
 };
 
 
-class Fzmobius : public FdwfBase {
+class Fzmobius : public virtual FdwfBase {
  private:
     char *cname;    // Class name.
     
@@ -1182,17 +1300,25 @@ class Fzmobius : public FdwfBase {
 
     FclassType Fclass(void) const;
 
+//    virtual int F5D(){return 1;}
+
     int FmatInv(Vector *f_out, Vector *f_in, 
 		CgArg *cg_arg, 
 		Float *true_res,
 		CnvFrmType cnv_frm,
-		PreserveType prs_f_in, int dminus=1);
+		PreserveType prs_f_in, int dminus);
+    int FmatInv(Vector *f_out, Vector *f_in, 
+		CgArg *cg_arg, 
+		Float *true_res,
+		CnvFrmType cnv_frm,
+		PreserveType prs_f_in)
+    { return FmatInv(f_out,f_in,cg_arg,true_res,cnv_frm, prs_f_in,1);}
     int FmatInvTest(Vector *f_out, Vector *f_in, 
 		CgArg *cg_arg, 
 		Float *true_res,
 		CnvFrmType cnv_frm,
 		PreserveType prs_f_in)
-    { FmatInv(f_out,f_in,cg_arg,true_res,cnv_frm, prs_f_in,0);}
+    { return FmatInv(f_out,f_in,cg_arg,true_res,cnv_frm, prs_f_in,0);}
 
     int FmatInv(Vector *f_out,
                 Vector *f_in,
@@ -1214,6 +1340,8 @@ class Fzmobius : public FdwfBase {
 
     void Fdslash(Vector *f_out, Vector *f_in, CgArg *cg_arg,
                  CnvFrmType cnv_frm, int dir_flag);
+    void MatPc (Vector * f_out, Vector * f_in, Float mass, Float epsilon,
+              DagType dag);
 };
 
 CPS_END_NAMESPACE

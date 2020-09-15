@@ -3,7 +3,12 @@
  */
 
 #include "alg/mobius_arg.h"
+#include "alg/cg_arg.h"
 CPS_START_NAMESPACE
+CgArg::CgArg()
+{
+  Inverter=CG;
+}
 
 MobiusArg::MobiusArg()
 {

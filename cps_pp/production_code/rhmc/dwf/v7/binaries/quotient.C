@@ -285,7 +285,11 @@ void checkpoint(int traj)
   WriteLatticeParallel wl;
   wl.setHeader(evo_arg.ensemble_id,evo_arg.ensemble_label,traj);
   wl.write(lat,wt_arg);
-     
+#if TARGET == BGQ
+  wl.setSerial();
+  LRG.setSerial();
+#endif
+
   if(!wl.good()) 
     ERR.General(cname,fname,"Failed write lattice %s",lat_file);
 

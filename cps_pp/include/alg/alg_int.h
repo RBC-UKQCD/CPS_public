@@ -1,6 +1,12 @@
 // -*- mode:c++; c-basic-offset:4 -*-
 #include<config.h>
 #include<vector>
+#ifdef HAVE_VELOC
+#include<veloc.h>
+#include<util/time_cps.h>
+#endif
+#include<util/misc.h>
+#include<util/time_cps.h>
 CPS_START_NAMESPACE
 //------------------------------------------------------------------
 /*!\file
@@ -34,13 +40,23 @@ class AlgInt {
 
 private:
     const char *cname;
+    static int veloc_id;
 
 protected:
     //!< the current trajectory number
-    int traj;
     IntegratorType int_type;
+    static std::vector<int> md_veloc_all;
+    static std::vector<int> phi_veloc_all;
 
 public:
+
+    static int VeloCCounter(){
+       int tmp = veloc_id++; 
+       return tmp;
+    }
+    int s_ckpt;
+
+    static int traj_num;
   
     AlgInt();
     virtual ~AlgInt();
@@ -64,6 +80,51 @@ public:
 
     //!< method used to reinitialise the integrator
     virtual void init() = 0;
+
+  //!< when G-parity active, this function (which should be do something only by AlgActionGauge) copy-conjugates the gauge field
+  virtual void copyConjLattice();
+//int  getVer(const char *cname,const char *fname){
+int  getVer(const char *_label){
+   int veloc_v=-1;
+#ifdef HAVE_VELOC
+   Float dtime2 = -dclock();
+  {
+    VRB.Result(cname,"getVer()","VELOC_Restart_test %s\n",_label);
+    veloc_v = VELOC_Restart_test(_label,65536);
+    VRB.Result(cname,"getVer()","Veloc label version: %s %d\n",
+              _label,veloc_v);
+  }
+   dtime2 += dclock();
+//   print_flops(fname,"VeloC_Restart_test()",0,dtime2);
+#if 0
+    std::stringstream veloc_label;
+    veloc_label <<"MD_traj"<<traj_num;
+    std::string veloc_str = veloc_label.str();
+    std::cout <<"Veloc label: "<<veloc_str.c_str()<<std::endl;
+    veloc_v = VELOC_Restart_test(veloc_str.c_str(),65536);
+    VRB.Result(cname,fname,"Veloc label version: %s %d\n",
+              (veloc_str).c_str(),veloc_v);
+  }
+   dtime2 += dclock();
+   print_flops(fname,"VeloC_Restart_test()",0,dtime2);
+#endif
+#endif
+   return veloc_v;
+}
+
+int protect (const char *cname,const char *fname, void *p, size_t m_size, int d_size){
+ int veloc_id= -1;
+#ifdef HAVE_VELOC
+ veloc_id= VeloCCounter();
+  Float dtime = -dclock();
+  VRB.Result(cname,fname,"VELOC_Mem_protect \n");
+ VELOC_Mem_protect (  veloc_id  , p, m_size, d_size );
+ VRB.Result(cname,fname,"VELOC id size=%d %d :%d\n",veloc_id,m_size,d_size);
+ dtime +=dclock();
+ print_flops(fname,"VeloC()",0,dtime);
+#endif
+ return veloc_id;
+}
 
 };
 
@@ -105,6 +166,68 @@ public:
     //!< AlgIntAB factory
     static AlgIntAB& Create(AlgInt &A, AlgInt &B, IntABArg &ab_arg);
     static void Destroy(AlgIntAB&);
+
+    int checkpoint( const char *cname, const char *fname, int &i, int _steps) {
+       Float dtime = -dclock();
+#ifdef HAVE_VELOC
+#if 1
+       std::string veloc_label , veloc_label2;
+       veloc_label = "MD_traj"+toString(traj_num);
+       veloc_label2 = "RNG_traj"+toString(traj_num);
+       int veloc_v = VELOC_Restart_test(veloc_label.c_str(),_steps+2);
+       VRB.Result(cname,fname,"Veloc label version i steps : %s %d %d %d\n",veloc_label.c_str(),veloc_v,i,_steps);
+       if(veloc_v == VELOC_FAILURE  || (veloc_v < (i+2) ) ){ // no restart, checkpoint
+        VELOC_Checkpoint_begin(veloc_label.c_str(), i+2 ); //leaving room for heatbath
+        VELOC_Checkpoint_selective(VELOC_CKPT_SOME,md_veloc_all.data(),md_veloc_all.size());
+//        VELOC_Checkpoint_mem();
+        VELOC_Checkpoint_end(1 );
+       if(veloc_v == VELOC_FAILURE  || (veloc_v <2 ) ){ // no restart, checkpoint
+       VRB.Result(cname,fname, "Veloc Checkpoint label2: %s .\n",veloc_label2.c_str());
+        LRG.Write(veloc_label2.c_str());
+#else
+       std::stringstream veloc_label , veloc_label2;
+       veloc_label <<"MD_traj"<<traj_num;
+       std::string veloc_str = veloc_label.str();
+       veloc_label2 <<"RNG_traj"<<traj_num;
+       std::string veloc_str2 = veloc_label2.str();
+//     int veloc_v = VELOC_Restart_test("MD_traj",_steps+2);
+       int veloc_v = VELOC_Restart_test((veloc_str).c_str(),_steps+2);
+       VRB.Result(cname,fname,"Veloc label version i steps : %s %d %d %d\n",(veloc_str.c_str()),veloc_v,i,_steps);
+// no restart, checkpoint
+       if(veloc_v == VELOC_FAILURE  || (veloc_v < (i+2) ) ){ 
+//leaving room for heatbath
+        VELOC_Checkpoint_begin((veloc_str).c_str(), i+2 ); 
+        VELOC_Checkpoint_mem();
+        VELOC_Checkpoint_end(1 );
+       if(veloc_v == VELOC_FAILURE  || (veloc_v <2 ) ){ // no restart, checkpoint
+       VRB.Result(cname,fname, "Veloc Checkpoint label2: %s .\n",(veloc_str2).c_str());
+        LRG.Write((veloc_str2).c_str());
+#endif
+        }
+        } else {
+       assert(veloc_v <(_steps+2));
+        i = veloc_v-2;
+#if 1
+        VELOC_Restart_begin (veloc_label.c_str(), i+2 );
+//        VELOC_Recover_mem();
+        VELOC_Recover_selective(VELOC_CKPT_SOME,md_veloc_all.data(),md_veloc_all.size());
+        VELOC_Restart_end(1 );
+       VRB.Result(cname,fname, "Veloc Recover label2: %s .\n",veloc_label.c_str());
+        LRG.Read(veloc_label2.c_str());
+#else
+        VELOC_Restart_begin (veloc_str.c_str(), i+2 );
+        VELOC_Recover_mem();
+        VELOC_Restart_end(1 );
+       VRB.Result(cname,fname, "Veloc Recover label2: %s .\n",(veloc_str2).c_str());
+        LRG.Read(veloc_str2.c_str());
+#endif
+       }
+       dtime += dclock();
+       print_flops(fname,"VeloC()",0,dtime);
+//       exit(-43);
+#endif
+       return i;
+    }
 
 };
 
@@ -254,6 +377,7 @@ class AlgHamiltonian : public AlgInt {
 
 protected:
     int g_size;
+    Float h_init;
 
 private:
     const char *cname;
@@ -266,6 +390,9 @@ public:
     virtual Float energy() = 0;
     virtual void evolve(Float dt, int steps) = 0;
     virtual void cost(CgStats*) = 0;
+
+
+
 
 };
 
@@ -282,6 +409,7 @@ private:
     Matrix *mom;
 
 public:
+//    int veloc_id;
     AlgMomentum();
     virtual ~AlgMomentum();
 
@@ -357,7 +485,7 @@ protected:
     //!< Number of Vectors in a Vector array
     int f_vec_count;
     //!< Number of Floats in a Vector array
-    int f_size;
+    size_t f_size;
     //!< Number of checkerboards
     int Ncb;
 
@@ -370,6 +498,7 @@ protected:
 
     int md_steps;
     bool skip_force;
+    std::vector<int> phi_veloc;
 
 public:
     AlgActionBilinear();
@@ -385,6 +514,8 @@ public:
     virtual void heatbath() = 0;
     virtual Float energy() = 0;
     virtual void evolve(Float dt, int steps) = 0;
+
+    Vector** getPhi(){ return phi; }
 
     void init();
     // for HMC restarting. Not working yet
@@ -416,8 +547,8 @@ private:
     RemezArg *remez_arg_md;
     RemezArg *remez_arg_mc;
 
-protected:
-
+    //protected:
+public: //CK: temporarily public for testing
     //!< Has any evolution taken place?
     int evolved;
 
@@ -427,7 +558,7 @@ protected:
     //!< Has the energy been evaluated?
     int energyEval;
 
-    Float h_init;
+//    Float h_init;
 
     //!<  frm_cg_arg_fg is specific to force gradient integrator and has no use otherwise.
     CgArg ***frm_cg_arg_fg;
@@ -474,6 +605,8 @@ protected:
     //!< Used to store calculated eigenvalue bounds
 
     //!< Automatic generation of the rational approximation.
+    //Note masses are only used to bound the eigenvalues if RATIONAL_BOUNDS_AUTOMATIC is switched on
+    //hence no modification is required for twisted mass fermions
     void generateApprox(Float *mass, RemezArg **remez_arg_md, 
                         RemezArg **remez_arg_mc, RationalDescr *rat);
   
@@ -481,11 +614,20 @@ protected:
     void destroyApprox(RemezArg *remez_arg_md, RemezArg *remez_arg_mc);
   
     //!< Allocate and setup cg arguments
+    //CK: added for twisted mass fermions. For non-twisted mass fermions pass either NULL or a float array of size n_masses for the epsilon parameter
+    void generateCgArg(Float *mass,
+		       Float *epsilon,
+                       CgArg **** cg_arg_fg,
+                       CgArg **** cg_arg_md, 
+                       CgArg **** cg_arg_mc, const char *label, 
+                       RationalDescr *rat_des); 
+    //CK: passes epsilon=NULL to the above. Has a catch to prevent mistakenly using this function for twisted mass fermions 
     void generateCgArg(Float *mass,
                        CgArg **** cg_arg_fg,
                        CgArg **** cg_arg_md, 
                        CgArg **** cg_arg_mc, const char *label, 
                        RationalDescr *rat_des);
+
 
     //<! Free cg args
     void destroyCgArg(CgArg ***cg_arg_fg,
@@ -500,7 +642,8 @@ protected:
     //!< Free EigArg
     void destroyEigArg();
 
-    void checkApprox(Float *mass, RemezArg *remez_arg, EigenDescr eigen);
+    void checkApprox(Float *mass, Float *epsilon, RemezArg *remez_arg, EigenDescr eigen); //For non-twisted mass fermions pass either NULL or a float array of size n_masses for the epsilon parameter
+    void checkApprox(Float *mass, RemezArg *remez_arg, EigenDescr eigen); //passes epsilon=NULL to the above. Has a catch to prevent mistakenly using this function for twisted mass fermions
     //!< Check that the approximation is still valid
 
 public:
@@ -530,6 +673,7 @@ public:
     void checkSplit();
     //!< Check that all the partial fractions have been accounted for
   
+    const ActionRationalArg & getRationalArg() const{ return *rat_arg; }
 };
 
 /*!< 
@@ -613,7 +757,7 @@ private:
     CgArg **frm_cg_arg_mc;   //!< Pointer to an array of solver parameters.
 
     int evolved;
-    Float h_init;
+//    Float h_init;
 
     //!< Stores the history of cg solutions - used by chronological inversion
     Vector ***v;
@@ -682,7 +826,7 @@ private:
     std::vector<Float> frm_mass_epsilon; //!< The fermion mass parameter that appears in the quotient
 
     int evolved;
-    Float h_init;
+//    Float h_init;
 
     //!< Stores the history of cg solutions - used by chronological inversion
     Vector ***v;
@@ -690,6 +834,7 @@ private:
     Vector *cg_sol;
     Vector *tmp1;
     Vector *tmp2;
+    Vector *tmp3;// temporarily keep RGV for debugging
 
     //!< Stores the orthogonalised vectors multiplied by MatPcDagMatPc
     //!< These currently live in AlgActionQuotient for a future
@@ -738,10 +883,18 @@ private:
     int **fractionSplit;
     ActionRationalQuotientArg *rat_quo_arg;
 
-protected:
+
+    //protected:
+public:
+    //CK: temporarily public, for testing
 
     Float *bsn_mass;  //!< The boson mass parameter that appears in the quotient
     Float *frm_mass;  //!< The fermion mass parameter that appears in the quotient
+
+    //CK: ~~added for twisted mass Wilson fermions (for DSDR term with G-parity square-root)
+    Float* bsn_mass_epsilon; //!< The boson mass parameter that appears in the quotient
+    Float* frm_mass_epsilon; //!< The fermion mass parameter that appears in the quotient
+
     //!< This is where the rational parameters are stored
     RemezArg *frm_remez_arg_md;
     RemezArg *frm_remez_arg_mc;
@@ -785,6 +938,74 @@ public:
     void set_skip_force(bool _skip_force) { skip_force = _skip_force; }
 };
 
+// Exact One Flavor Algorithm (EOFA)
+// Describes a single flavor of Domain Wall fermion as a
+// quotient det(D(mf))/det(D(mb)).
+class AlgActionEOFA : public AlgActionBilinear
+{
+  private:
+    const char* cname;
+    ActionEOFAArg* eofa_arg;
+
+  protected:
+    bool fg_forecast;
+    bool heatbath_forecast;
+    bool heatbath_test;
+    int evolved;
+    int heatbathEval;
+    int energyEval;
+    Float h_init;
+    Float* num_mass;
+    Float* den_mass;
+    RemezArg* LH_remez_arg;
+    RemezArg* RH_remez_arg;
+    CgArg** LH_cg_arg_fg;
+    CgArg** LH_cg_arg_md;
+    CgArg** LH_cg_arg_mc;
+    CgArg*** LH_cg_arg_heatbath;
+    CgArg** RH_cg_arg_fg;
+    CgArg** RH_cg_arg_md;
+    CgArg** RH_cg_arg_mc;
+    CgArg*** RH_cg_arg_heatbath;
+    Vector** frmn_tmp;
+    EigArg eig_arg;
+    char eig_file[256];
+    CommonArg ca_eig;
+    Float** lambda_low;
+    Float** lambda_high;
+
+    void generateApprox(Float* mass, RemezArg** remez_arg, EOFARationalDescr* rat);
+    void destroyApprox(RemezArg* remez_arg);
+    static int compareApprox(RemezArg& arg1, RemezArg& arg2);
+    void generateCgArg(Float* mass, CgArg**** cg_arg, const char* l, EOFARationalDescr* rat);
+    void generateCgArg(Float* mass, CgArg*** cg_arg_fg, CgArg*** cg_arg_mc, CgArg*** cg_arg_md,
+        const char* l, Float* stop_rsd_fg, Float* stop_rsd_mc, Float* stop_rsd_md);
+    void destroyCgArg(CgArg*** cg_arg, const char* l, RemezArg* remez_arg);
+    void destroyCgArg(CgArg** cg_arg_fg, CgArg** cg_arg_mc, CgArg** cg_arg_md, const char* l);
+    void generateEigArg(const EigenDescr& eigen);
+    void destroyEigArg();
+    void checkApprox(Float* mass, RemezArg* remez_arg, EigenDescr& eigen);
+
+  public:
+    AlgActionEOFA();
+    AlgActionEOFA(AlgMomentum& mom, ActionEOFAArg& arg, bool _heatbath_forecast=true, 
+        bool _heatbath_test=true, int traj_num=0);
+    std::vector<double> eig_range(Float m_num, Float m_den);
+    double ritz(Float m_num, Float m_den, bool compute_min);
+    void Meofa(Vector* out, const Vector* in, Float m_num, Float m_den, Lattice& lat);
+    void reweight(Float* rw_fac, Float* norm);
+    void heatbath();
+    Float energy();
+    virtual void prepare_fg(Matrix* force, Float dt_ratio);
+    void evolve(Float dt, int steps);
+    void init(int traj_num);
+    bool loadPoles();
+    bool savePoles();
+    bool checkPolesFile(const RemezArg& ra, const EOFARationalDescr& r);
+    void set_skip_force(bool _skip_force) { skip_force = _skip_force; }
+    virtual ~AlgActionEOFA();
+};
+
 /*!< 
   Class describing the pure gauge action contribution to the
   Hamiltonian.
@@ -814,6 +1035,8 @@ public:
 
     void init();
 
+  //!< when G-parity active, this function (which should be do something only by AlgActionGauge) copy-conjugates the gauge field
+  void copyConjLattice();
 };
 
 #endif

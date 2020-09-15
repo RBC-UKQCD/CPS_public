@@ -17,6 +17,7 @@ CPS_END_NAMESPACE
 //#include <comms/nga_reg.h>
 #include <comms/glb.h>
 #include <comms/cbuf.h>
+#include <util/qioarg.h>
 CPS_START_NAMESPACE
 #ifdef _TARTAN
 CPS_END_NAMESPACE
@@ -32,7 +33,7 @@ enum { MATRIX_SIZE = 18 };
 GimprRect::GimprRect()
 {
   cname = "GimprRect";
-  char *fname = "GimprRect()";
+  const char *fname = "GimprRect()";
   VRB.Func(cname,fname);
 
 // This action cannot be used with anisotropic lattices
@@ -50,7 +51,7 @@ GimprRect::GimprRect()
 //------------------------------------------------------------------------------
 GimprRect::~GimprRect()
 {
-  char *fname = "~GimprRect()";
+  const char *fname = "~GimprRect()";
   VRB.Func(cname,fname);
 }
 
@@ -65,6 +66,13 @@ GclassType GimprRect::Gclass(void){
 
 unsigned GimprRect::CBUF_MODE4 = 0xcca52112;
 
+//CK for testing
+unsigned int MCheckSum2(Matrix &matrix){
+  FPConv fp;
+  enum FP_FORMAT format = FP_IEEE64LITTLE;
+  uint32_t csum_contrib = fp.checksum((char *)&matrix,18,format);
+  return csum_contrib;
+}
 
 //------------------------------------------------------------------------------
 // GforceSite(Matrix& force, int *x, int mu):
@@ -73,7 +81,7 @@ unsigned GimprRect::CBUF_MODE4 = 0xcca52112;
 void GimprRect::GforceSite(Matrix& force, int *x, int mu)
 {
   const char *fname = "GforceSite(M&,i*,i)";
-  setCbufCntrlReg(4, CBUF_MODE4);
+//  setCbufCntrlReg(4, CBUF_MODE4);
 
   Matrix *u_off = GaugeField()+GsiteOffset(x)+mu;
 
@@ -85,6 +93,8 @@ void GimprRect::GforceSite(Matrix& force, int *x, int mu)
   Staple(mt1, x, mu);	
   ForceFlops += 198*3*3+12+216*3;
 
+  Float nstaple = mt1.norm();
+  unsigned int cksumstaple = MCheckSum2(mt1);
   //----------------------------------------------------------------------------
   // mt2 = U_mu(x)
   //----------------------------------------------------------------------------
@@ -107,6 +117,8 @@ void GimprRect::GforceSite(Matrix& force, int *x, int mu)
   RectStaple(mt1, x, mu);
   ForceFlops += 198*3*18+216*3*6;
 
+  Float nrect = mt1.norm();
+  unsigned int cksumrect = MCheckSum2(mt1);
   //----------------------------------------------------------------------------
   // mt2 = -(beta*c_1/3)*U_mu(x)
   //----------------------------------------------------------------------------
@@ -127,6 +139,12 @@ void GimprRect::GforceSite(Matrix& force, int *x, int mu)
   mt1.Dagger(force);
   force.TrLessAntiHermMatrix(mt1);
   ForceFlops +=198+24;
+  // printf("GForceSite %d %d %d %d, %d: norms: staple %e, rect %e, checksums %u %u\n",
+  // 	 x[0]+GJP.XnodeCoor()*GJP.XnodeSites(),
+  // 	 x[1]+GJP.YnodeCoor()*GJP.YnodeSites(),
+  // 	 x[2]+GJP.ZnodeCoor()*GJP.ZnodeSites(),
+  // 	 x[3]+GJP.TnodeCoor()*GJP.TnodeSites(),
+  // 	 mu,nstaple,nrect,cksumstaple,cksumrect);
 }
 
 
@@ -135,12 +153,40 @@ void GimprRect::GforceSite(Matrix& force, int *x, int mu)
 // The pure gauge Hamiltonian of the node sublattice.
 //------------------------------------------------------------------------------
 Float GimprRect::GhamiltonNode(void){
-  char *fname = "GhamiltonNode()";
+  const char *fname = "GhamiltonNode()";
   VRB.Func(cname,fname);
 
-  Float sum ;
+  //test checksum the lattice prior to calculating energy
+  {
+    unsigned int gcsum = CheckSum();
+
+    //note: for 2f G-parity the above lat.CheckSum just checksums the flavour-0 part
+    //      so for correct comparison between 1f and 2f we need to do both flavours
+    //      this takes extra computation so make it optional
+
+    if(GJP.Gparity() && GJP.Gparity1f2fComparisonCode()){
+      CopyConjGaugeField();
+      gcsum += CheckSum(GaugeField() + 4*GJP.VolNodeSites());
+    }
+
+    QioControl qc;
+    gcsum = qc.globalSumUint(gcsum);
+    if(UniqueID()==0) printf("GimprRect::GhamiltonNode lattice checksum %u\n",gcsum);
+  }
+
+  Float sum(0.0);
   sum  = plaq_coeff * SumReTrPlaqNode() ;
+  {
+    Float gsum_h(sum);
+    glb_sum(&gsum_h);
+    if(UniqueID()==0)   printf("GimprRect::GhamiltonNode plaquette contrib %e\n",gsum_h);
+  }
   sum += rect_coeff * SumReTrRectNode() ;
+  {
+    Float gsum_h(sum);
+    glb_sum(&gsum_h);
+    if(UniqueID()==0)   printf("GimprRect::GhamiltonNode plaquette+rect contrib %e\n",gsum_h);
+  }
   return sum ;
 }
 
@@ -152,7 +198,7 @@ Float GimprRect::GhamiltonNode(void){
 //------------------------------------------------------------------------------
 void GimprRect::GactionGradient(Matrix &grad, int *x, int mu)
 {
-  char *fname = "GactionGradient(M&,i*,i)" ;
+  const char *fname = "GactionGradient(M&,i*,i)" ;
   VRB.Func(cname, fname) ;
 
   //----------------------------------------------------------------------------
@@ -220,7 +266,7 @@ void GimprRect::GactionGradient(Matrix &grad, int *x, int mu)
 //------------------------------------------------------------------------
 void GimprRect::
 AllStaple(Matrix &stap, const int *x, int mu){
-  char * fname = "AllStaple()"; 
+  const char * fname = "AllStaple()"; 
   VRB.Func(cname, fname);
 
   Matrix mat;

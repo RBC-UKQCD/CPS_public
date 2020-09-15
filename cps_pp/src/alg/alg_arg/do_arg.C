@@ -224,6 +224,10 @@ vml_DoArgExt (VML *vmls, char *name,DoArgExt *objp)
 		 return FALSE;
 	 if (!vml_Float (vmls, "twist_bc_t", &objp->twist_bc_t))
 		 return FALSE;
+	 if (!vml_int (vmls, "gparity_1f_X", &objp->gparity_1f_X))
+		 return FALSE;
+	 if (!vml_int (vmls, "gparity_1f_Y", &objp->gparity_1f_Y))
+		 return FALSE;
 	 if (!vml_StartConfType (vmls, "start_u1_conf_kind", &objp->start_u1_conf_kind))
 		 return FALSE;
 	 if (!vml_u_long (vmls, "start_u1_conf_load_addr", &objp->start_u1_conf_load_addr))

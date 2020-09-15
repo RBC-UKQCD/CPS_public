@@ -27,6 +27,8 @@ CPS_END_NAMESPACE
 #include<alg/alg_remez.h>
 CPS_START_NAMESPACE
 
+//std::vector<int> AlgActionBilinear::phi_veloc_all;
+
 //!< Dummy constructor - does nothing
 AlgActionBilinear::AlgActionBilinear() 
   : AlgAction() ,skip_force(false)
@@ -39,7 +41,7 @@ AlgActionBilinear::AlgActionBilinear(AlgMomentum &mom,
   : AlgAction(mom, b_arg.action_arg) ,skip_force(false){
 
   cname = "AlgActionBiliniear";
-  char *fname="AlgActionBilinear(FclassType, int, HmdArg*, Matrix*)";
+  const char *fname="AlgActionBilinear(FclassType, int, HmdArg*, Matrix*)";
   VRB.Func(cname,fname);
 
   //!< First copy required instance parameters
@@ -64,6 +66,8 @@ AlgActionBilinear::AlgActionBilinear(AlgMomentum &mom,
     // Ls for Fbfm can depend on input mass, so we can't choose the right
     // sizes for Fbfm without knowing the masses.
     if (bi_arg->fermion != F_CLASS_BFM) {
+    if(GJP.Gparity()) f_vec_count *= 2; //2 stacked G-parity flavors
+
 	//!< Number of Floats in a Vector array
 	f_size = GJP.VolNodeSites() * lat.FsiteSize() / (lat.FchkbEvl() + 1);
 	//!< Number of Vectors in a Vector array
@@ -79,16 +83,22 @@ AlgActionBilinear::AlgActionBilinear(AlgMomentum &mom,
 
     if(lat.FchkbEvl() == 1) Ncb = 1;      //!< Half Checkerboard
     else if(lat.FchkbEvl() == 0) Ncb = 2; //!< Full Checkerboard
-    
+
     LatticeFactory::Destroy();
-    
+
     //!< Allocate memory for the phi field array
-    phi = (Vector **) smalloc(n_masses * sizeof(Vector*),
-			      "phi",fname,cname);
+    phi = (Vector **) smalloc(n_masses * sizeof(Vector*), "phi",fname,cname);
+//    protect (cname,fname,phi,n_mass,sizeof(Vector*));
     
     if (bi_arg->fermion != F_CLASS_BFM) {
 	for (int i = 0; i < n_masses; i++) {
-	    phi[i] = (Vector *)smalloc(f_size*sizeof(Float), "phi[i]", fname, cname);
+	    phi[i] = (Vector *)smalloc(cname,fname,"phi[i]",f_size*sizeof(Float));
+#if 1
+            int veloc_id = protect (cname,fname,phi[i],f_size,sizeof(Float));
+	    phi_veloc.push_back(veloc_id);
+	    phi_veloc_all.push_back(veloc_id);
+	     VRB.Result(cname,fname,"veloc_id[%d]=%d\n",i,phi_veloc[i]);
+#endif
 	}
     } else {
 	VRB.Result(cname, fname, "Postponing allocation of phi; should be allocated momentarily by AlgActionQuotient or AlgActionRationalQuotient.\n");
@@ -102,7 +112,6 @@ AlgActionBilinear::AlgActionBilinear(AlgMomentum &mom,
       mass[i] = bi_arg->bilinears.bilinears_val[i].mass;
       max_num_iter[i] = bi_arg->bilinears.bilinears_val[i].max_num_iter;
     }
-
   }
 
   init();
@@ -113,19 +122,19 @@ void AlgActionBilinear::SaveState(std::string name){
   const char *fname = "SaveState()";
   VRB.Func(cname,fname);
   for (int i=0;i<n_masses;i++){
-    std::stringstream dirname;
-    dirname << name << "." << i;
+    std::string dirname;
+    dirname = name +"." +std::to_string(i);
     CPS_NAMESPACE::sync();
 //    if(!UniqueID())
-    if(mkdir((dirname.str()).c_str(),0777)!=0 && errno != EEXIST)
-      ERR.General(cname,fname,"cannot create directory %s\n",(dirname.str()).c_str());
+    if(mkdir((dirname).c_str(),0777)!=0 && errno != EEXIST)
+      ERR.General(cname,fname,"cannot create directory %s\n",(dirname).c_str());
     CPS_NAMESPACE::sync();
     //ugly, but C++ file io is very slow on some systems
-    std::stringstream filename;
-    filename <<dirname.str()<<"/"<<dirname.str();
-    VRB.Result(cname,fname,"opening %s\n",(filename.str()).c_str());
+    std::string filename;
+    filename =dirname+"/"+dirname;
+    VRB.Result(cname,fname,"opening %s\n",filename.c_str());
 #if 1
-    FILE *fp = Fopen(ADD_ID,(filename.str()).c_str(),"w");
+    FILE *fp = Fopen(ADD_ID,(filename).c_str(),"w");
     fwrite(phi[i],sizeof(Float),f_size,fp);
     fclose(fp);
 #endif
@@ -136,14 +145,18 @@ void AlgActionBilinear::LoadState(std::string name){
   const char *fname = "LoadState()";
   VRB.Func(cname,fname);
   for (int i=0;i<n_masses;i++){
-    std::stringstream dirname;
-    dirname << name << "." << i;
+//    std::stringstream dirname;
+//    dirname << name << "." << i;
+    std::string dirname;
+    dirname = name +"." +std::to_string(i);
     //ugly, but C++ file io is very slow on some systems
-    std::stringstream filename;
-    filename <<dirname.str()<<"/"<<dirname.str();
-    VRB.Result(cname,fname,"opening %s\n",(filename.str()).c_str());
+//    std::stringstream filename;
+//    filename <<dirname.str()<<"/"<<dirname.str();
+    std::string filename;
+    filename =dirname+"/"+dirname;
+    VRB.Result(cname,fname,"opening %s\n",(filename).c_str());
 #if 1
-    FILE *fp = Fopen(ADD_ID,(filename.str()).c_str(),"r");
+    FILE *fp = Fopen(ADD_ID,(filename).c_str(),"r");
     Fread(phi[i],sizeof(Float),f_size,fp);
     Fclose(fp);
 #endif

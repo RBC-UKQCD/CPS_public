@@ -30,7 +30,7 @@
 //template<class Float> void matrix_dgemm (const int M,const int N, const int K, Float **A, const double *B, double *C);
 //void min_eig_index(int *INDEX, int nev,double *EIG, int n);
 //void invert_H_matrix(complex<double> *data, int n); //if n is large enough, must be parallerized!!!
-//template<class Float> void eigcg_vec_mult(Float* V, const int m, double *QZ, const int n, const int f_size_cb, const int nthread, const int me);
+//template<class Float> void eigcg_vec_mult(Float* V, const int m, double *QZ, const int n, const size_t f_size_cb, const int nthread, const int me);
 
 template<class Float, class Float_h>
 int bfm_evo<Float>::HD_CGNE_M(BfmMultiGrid<Float_h> &hdcg, Fermion_t solution[2], Fermion_t source[2])
@@ -82,7 +82,7 @@ void myaxpy(Float *r, Float *x, Float *y, double a, int len)
 }
 
 template<class Float>
-void eigcg_vec_mult3(Float* V, const int m, double *QZ, const int n, const int f_size_cb,
+void eigcg_vec_mult3(Float* V, const int m, double *QZ, const int n, const size_t f_size_cb,
                      const int nthread, const int me,
                      bfm_evo<Float> &bfmobj)
 //QZ is saved in column major format. 

@@ -6,6 +6,7 @@ QPropWArg::QPropWArg()
 : 
   file(NULL),
   t(0),
+  flavor(0),
   gauge_fix_src(0),
   gauge_fix_snk(0),
   store_midprop(0),

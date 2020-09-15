@@ -36,6 +36,37 @@ void Matrix::Trans(const IFloat *m)
   dst[3] = src[1]; dst[4] = src[4]; dst[5] = src[7];
   dst[6] = src[2]; dst[7] = src[5]; dst[8] = src[8];
 }
+//------------------------------------------------------------------
+/*!
+  \param m A linear array representation of a 3x3 complex matrix, such that 
+  real part of the (i,j) element is at array position [6i+2j] 
+  and the imaginary part of the (i,j) element is at array position [6i+2j+1].
+  \post This matrix is the complex conjugate of \a m.
+*/  
+void Matrix::Conj(const IFloat *m) 
+{
+  u[0]  =  m[0]; 
+  u[1]  = -m[1]; 
+  u[2]  =  m[2]; 
+  u[3]  = -m[3]; 
+  u[4]  =  m[4]; 
+  u[5]  = -m[5];
+
+  u[6]  =  m[6]; 
+  u[7]  = -m[7]; 
+  u[8]  =  m[8]; 
+  u[9]  = -m[9]; 
+  u[10] =  m[10]; 
+  u[11] = -m[11];
+
+  u[12] =  m[12]; 
+  u[13] = -m[13]; 
+  u[14] =  m[14]; 
+  u[15] = -m[15]; 
+  u[16] =  m[16]; 
+  u[17] = -m[17];
+}
+
 
 /*!
   \return <em>|U^dagger U - I|^2</em>, where the norm used is the L2 norm
@@ -61,6 +92,7 @@ IFloat Matrix::ErrorSU3() const
       \param j The column index,
       \return  The (i,j) matrix element
     */
+#ifndef VEC_INLINE
 Complex& Matrix::operator()(int i, int j)
 { return ((Complex*)u)[i*COLORS+j]; }
 
@@ -73,6 +105,7 @@ Complex& Matrix::operator()(int i, int j)
     */
 const Complex& Matrix::operator()(int i, int j) const
 { return ((Complex*)u)[i*COLORS+j]; }
+#endif
 
 
 //------------------------------------------------------------------
@@ -103,17 +136,17 @@ Complex Matrix::Char10() const
 
 //------------------------------------------------------------------
 /*!
-  \param len The number of real numbers in the vectors.
+  \param len The number of real numbers in the vectors.  //CK: WRONG. len is the number of Floats in the vectors.
   \return The square norm of this vector summed over all nodes.
 */
 //------------------------------------------------------------------
-Float Vector::NormSqGlbSum(int len)
+Float Vector::NormSqGlbSum(size_t len)
 {
   IFloat sum = dotProduct((IFloat *)&v, (IFloat *)&v, len);
   glb_sum_five((Float *)&sum);
   return Float(sum);
 }
-Float Vector::NormSqGlbSum4D(int len)
+Float Vector::NormSqGlbSum4D(size_t len)
 {
   IFloat sum = dotProduct((IFloat *)&v, (IFloat *)&v, len);
   glb_sum((Float *)&sum);
@@ -289,23 +322,55 @@ void Vector::SliceArraySumFive(Float *sum, const Float *f_in, const int dir)
   int coord[5] = {GJP.XnodeCoor(),GJP.YnodeCoor(),
 		  GJP.ZnodeCoor(),GJP.TnodeCoor(),
                   GJP.SnodeCoor()};
-  int len2 = 1;
-  for(int i=0; i < dir; ++i)
-    len2 *= nx[i];
-
-  int len1 = len2 * nx[dir];
-  int plane_offset = nx[dir]*coord[dir];
-
+  //regular: idx = x + Lx*y + Lx*Ly*z + Lx*Ly*Lz*t + Lx*Ly*Lz*Lt*s
+  //2f G-parity: idx = x + Lx*y + Lx*Ly*z + Lx*Ly*Lz*t + Lx*Ly*Lz*Lt*f + Lx*Ly*Lz*Lt*2*s
+  //          where f is the flavour index
+  //for 2f G-parity we stack the hyperplane sum for the second flavour after the first
+  bool gp_dir = false;
+  if(GJP.Bc(dir) == BND_CND_GPARITY){
+    gp_dir = true;
+    nxx[dir]*=2;
+  }
+  
   int j;
   for(j=0; j < nxx[dir]; ++j)
     sum[j] = 0.0;
 
-  for(j=0; j < GJP.VolNodeSites()*GJP.SnodeSites(); ++j)
-  {
-    int hypsec = j % len1;
-    int plane  = hypsec / len2;
-    sum[plane+plane_offset] += f_in[j];
+  if(!GJP.Gparity()){
+    int len2 = 1;
+    for(int i=0; i < dir; ++i)
+      len2 *= nx[i];
+    
+    int len1 = len2 * nx[dir];
+    int plane_offset = nx[dir]*coord[dir];
+
+    for(j=0; j < GJP.VolNodeSites()*GJP.SnodeSites(); ++j){
+      int hypsec = j % len1;
+      int plane  = hypsec / len2; //index of the hyperplane. e.g. if slicing over time direction, then plane = t
+      sum[plane+plane_offset] += f_in[j];
+    }
+  }else{
+    int plane_offset = nx[dir]*coord[dir];
+    if(gp_dir) plane_offset*=2;
+
+    for(j=0; j < 2*GJP.VolNodeSites()*GJP.SnodeSites(); ++j){
+      int pos[5];
+      int rem = j;
+      pos[0] = rem % nx[0]; rem /= nx[0];
+      pos[1] = rem % nx[1]; rem /= nx[1];
+      pos[2] = rem % nx[2]; rem /= nx[2];
+      pos[3] = rem % nx[3]; rem /= nx[3];
+      int f = rem %2; rem/=2;
+      pos[4] = rem % nx[4];
+
+      int idx;
+      if(gp_dir) idx = pos[dir] + f*nx[dir];
+      else idx = pos[dir];
+      
+      sum[idx + plane_offset] += f_in[j];
+    }
   }
+
 
   for(j=0; j < nxx[dir]; ++j)
   {

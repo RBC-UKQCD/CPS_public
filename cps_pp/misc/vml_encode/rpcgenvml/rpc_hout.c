@@ -32,7 +32,7 @@
  * From: @(#)rpc_hout.c 1.12 89/02/22 (C) 1987 SMI
  */
 char hout_rcsid[] =
-  "$Id: rpc_hout.c,v 1.3 2005/05/09 07:16:03 chulwoo Exp $";
+  "$Id: rpc_hout.c,v 1.3.358.2 2013-06-25 19:56:57 ckelly Exp $";
 
 /*
  * rpc_hout.c, Header file outputter for the RPC protocol compiler
@@ -47,6 +47,7 @@ static void pconstdef (definition * def);
 static void pargdef (definition * def);
 static void pstructdef (definition * def);
 static void pclassdef (definition * def);
+static void pincludedef (definition * def);
 static void puniondef (definition * def);
 static void pdefine (const char *name, const char *num);
 static int define_printed (proc_list * stop, version_list * start);
@@ -106,6 +107,9 @@ print_datadef (definition *def)
     case DEF_CLASS: /*PAB*/
       pclassdef (def);
       break;
+    case DEF_INCLUDEPRAGMA: /*CK*/
+      pincludedef (def);
+      break;
     case DEF_UNION:
       puniondef (def);
       break;
@@ -122,7 +126,7 @@ print_datadef (definition *def)
       pconstdef (def);
       break;
     }
-  if (def->def_kind != DEF_PROGRAM && def->def_kind != DEF_CONST)
+  if (def->def_kind != DEF_PROGRAM && def->def_kind != DEF_CONST && def->def_kind != DEF_INCLUDEPRAGMA)
     {
       storexdrfuncdecl(def->def_name,
  		       def->def_kind != DEF_TYPEDEF ||
@@ -226,9 +230,204 @@ pargdef (definition * def)
 
 }
 
+/*CK hard-coded command support*/
+static void 
+prpc_generate_member_lambda_def(){
+  f_print (fout, "\t   template <typename T> void datamem_lambda(T &func);\n");
+}
+static void 
+prpc_generate_member_lambda_code(const char *name, decl_list *dl){
+  f_print (fout, "template <typename T> void %s::datamem_lambda(T &func){\n",name);
+
+  decl_list *l;
+  for (l = dl; l != NULL; l = l->next){
+    declaration *dec = &l->decl;
+    if (streq (dec->type, "rpccommand") || streq (dec->type, "") ) continue;
+
+    f_print(fout,"\t");
+    
+    if (streq (dec->type, "string")){
+      f_print (fout, "func.template doit<char *>(&%s::%s,*this);\n",name,dec->name); continue;
+    }
+    char buf[8];			/* enough to hold "struct ", include NUL */
+    const char *prefix = "";
+    const char *type;
+
+    if (streq (dec->type, "bool")) type = "bool_t";
+    else if (streq (dec->type, "opaque")) type = "char";
+    else{
+      if (dec->prefix){
+	s_print (buf, "%s ", dec->prefix);
+	prefix = buf;
+      }
+      type = dec->type;
+    }
+    switch (dec->rel){
+    case REL_ALIAS:
+      f_print (fout, "func.template doit<%s%s>(&%s::%s,*this);\n", prefix, type, name,dec->name);
+      break;
+    case REL_VECTOR:
+      f_print (fout, "func.template doit_vector<%s%s,%s>(&%s::%s,*this);\n", prefix, type, dec->array_max,name,dec->name);
+      break;
+    case REL_POINTER:
+      f_print (fout, "func.template doit<%s%s *>(&%s::%s,*this);\n", prefix, type, name, dec->name);
+      break;
+    case REL_ARRAY:
+      f_print (fout, "func.template doit_arraystruct<%s%s>(&%s::%s,*this);\n",prefix,type,name,dec->name);
+      break;
+    }
+  }
+
+  f_print (fout,"}\n");
+}
+
+
+static void 
+prpc_generate_union_typemap_def(const char *enum_type){
+  f_print (fout, "\t   template <typename T> static %s type_map();\n",enum_type);
+}
+static void 
+prpc_generate_union_typemap_code(definition *def){
+  const char *enum_type = def->def.un.enum_decl.type;
+  const char *name = def->def_name;
+  
+  const declaration* default_decl = def->def.un.default_decl;
+  f_print (fout, "template <typename T> %s %s::type_map(){\n",enum_type,name);
+  if(default_decl){
+    f_print (fout, "\t return %s;\n",default_decl->type);
+  }else{
+    f_print (fout, "\t return -1000;\n"); //this should cause a compiler error if it is instantiated to catch invalid types
+  }
+  f_print( fout, "}\n");
+
+  //now forward declare the specializations for implementation in .C file
+
+  case_list* c = def->def.un.cases;
+  case_list* l;
+  for (l = c; l != NULL; l = l->next){
+    f_print (fout, "template <> %s %s::type_map<%s>();\n",enum_type,name,l->case_decl.type);
+  }
+}
+
+static void 
+prpc_generate_deepcopy_method_def(const char *type){
+  f_print (fout, "\t   void deep_copy(const %s &rhs);\n",type);
+}
+static void 
+prpc_generate_deepcopy_method_code(definition *def){
+  if(def->def_kind != DEF_STRUCT && def->def_kind != DEF_CLASS && def->def_kind != DEF_UNION){ error("deepcopy method only applicable to struct, class and union\n"); }
+  //now specialize the deepcopy class template
+  const char *name = def->def_name;
+  f_print (fout, "template<> struct rpc_deepcopy<%s>{\n",name);
+  f_print (fout, "\tstatic void doit(%s &into, %s const &from);\n",name,name);
+  f_print (fout, "};\n\n");
+}
+static void 
+prpc_generate_print_method_def(){
+  f_print (fout, "\t   void print(const std::string &prefix =\"\");\n");
+}
+static void 
+prpc_generate_print_method_code(definition *def){
+  if(def->def_kind != DEF_STRUCT && def->def_kind != DEF_CLASS && def->def_kind != DEF_UNION){ error("print method only applicable to struct, class and union\n"); }
+  
+  //now specialize the deepcopy class template
+  const char *name = def->def_name;
+  f_print (fout, "#ifndef _USE_STDLIB\n#error \"Cannot generate rpc_print commands without the standard library\"\n#endif\n");
+  f_print (fout, "template<> struct rpc_print<%s>{\n",name);
+  f_print (fout, "\tstatic void doit(%s const &what, const std::string &prefix=\"\" );\n",name,name);
+  f_print (fout, "};\n\n");
+}
+static void
+prpccommandprior(definition *def){
+  //above the struct/class definition
+  const char *name = def->def_name;
+  decl_list *dl;
+  if(def->def_kind == DEF_STRUCT) dl = def->def.st.decls;
+  else if(def->def_kind == DEF_CLASS) dl = def->def.ct.decls;
+  else if(def->def_kind == DEF_UNION) dl = def->def.un.other_decls;
+  else return;
+
+  int include_vml_templates = 0;
+  
+  decl_list *l;
+  for (l = dl; l != NULL; l = l->next)
+    {
+      if(streq (l->decl.type, "rpccommand")){
+	if(streq(l->decl.name, "GENERATE_DEEPCOPY_METHOD")){
+	  include_vml_templates = 1;
+	}else if(streq(l->decl.name, "GENERATE_PRINT_METHOD")){
+	  include_vml_templates = 1;
+	}
+      }
+    }
+
+  if(include_vml_templates){
+    f_print (fout, "\n#include <util/vml/vml_templates.h>\n"); //include the template header
+  }
+}
+
+
+static void
+prpccommandinternal(definition *def){
+  const char *name = def->def_name;
+  decl_list *dl;
+  if(def->def_kind == DEF_STRUCT) dl = def->def.st.decls;
+  else if(def->def_kind == DEF_CLASS) dl = def->def.ct.decls;
+  else if(def->def_kind == DEF_UNION) dl = def->def.un.other_decls;
+  else return;
+
+  decl_list *l;
+  for (l = dl; l != NULL; l = l->next)
+    {
+      if(streq (l->decl.type, "rpccommand")){
+	if(streq(l->decl.name, "GENERATE_MEMBER_LAMBDAFUNC")){
+	  prpc_generate_member_lambda_def();
+	}else if(streq(l->decl.name, "GENERATE_UNION_TYPEMAP")){
+	  if(def->def_kind != DEF_UNION){
+	    error("rpccommand GENERATE_UNION_TYPEMAP not valid for non-union types\n");
+	  }
+	  prpc_generate_union_typemap_def(def->def.un.enum_decl.type);
+	}else if(streq(l->decl.name, "GENERATE_DEEPCOPY_METHOD")){
+	  prpc_generate_deepcopy_method_def(def->def_name);
+	}else if(streq(l->decl.name, "GENERATE_PRINT_METHOD")){
+	  prpc_generate_print_method_def();
+	}
+      }
+    }
+}
+
+static void
+prpccommandexternal(definition *def){
+  const char *name = def->def_name;
+  decl_list *dl;
+  if(def->def_kind == DEF_STRUCT) dl = def->def.st.decls;
+  else if(def->def_kind == DEF_CLASS) dl = def->def.ct.decls;
+  else if(def->def_kind == DEF_UNION) dl = def->def.un.other_decls;
+  else return;
+
+  decl_list *l;
+  for (l = dl; l != NULL; l = l->next)
+    {
+      if(streq (l->decl.type, "rpccommand")){
+	if(streq(l->decl.name, "test")){
+	  f_print (fout, "EXTERNAL TEST COMMAND HERE\n");
+	}else if(streq(l->decl.name, "GENERATE_MEMBER_LAMBDAFUNC")){
+	  prpc_generate_member_lambda_code(name,dl);
+	}else if(streq(l->decl.name, "GENERATE_UNION_TYPEMAP")){
+	  prpc_generate_union_typemap_code(def);
+	}else if(streq(l->decl.name, "GENERATE_DEEPCOPY_METHOD")){
+	  prpc_generate_deepcopy_method_code(def);
+	}else if(streq(l->decl.name, "GENERATE_PRINT_METHOD")){
+	  prpc_generate_print_method_code(def);
+	}
+      }
+    }
+}
+/* End CK */
 static void
 pstructdef (definition *def)
 {
+  prpccommandprior(def);
   decl_list *l;
   const char *name = def->def_name;
 
@@ -237,14 +436,18 @@ pstructdef (definition *def)
     {
       pdeclaration (name, &l->decl, 1, ";\n");
     }
+  prpccommandinternal(def);
   f_print (fout, "};\n");
   f_print (fout, "typedef struct %s %s;\n", name, name);
+  prpccommandexternal(def);
 }
 
 /*PAB class support*/
 static void
 pclassdef (definition *def)
 {
+  prpccommandprior(def);
+  
   decl_list *l;
   const char *name = def->def_name;
   f_print (fout, "class VML;\n");
@@ -258,12 +461,26 @@ pclassdef (definition *def)
     {
       pdeclaration (name, &l->decl, 1, ";\n");
     }
+  prpccommandinternal(def);
   f_print (fout, "};\n");
+  
+  prpccommandexternal(def);
+}
+
+/*CK include pragma support*/
+static void
+pincludedef (definition *def)
+{
+  f_print (fout,"CPS_END_NAMESPACE\n");
+  if(def->def.in.is_relative) f_print (fout,"#include %s\n",def->def.in.file);
+  else f_print (fout,"#include <%s>\n",def->def.in.file);
+  f_print (fout,"CPS_START_NAMESPACE\n");
 }
 
 static void
 puniondef (definition *def)
 {
+  prpccommandprior(def);
   case_list *l;
   const char *name = def->def_name;
   declaration *decl;
@@ -290,8 +507,17 @@ puniondef (definition *def)
       pdeclaration (name, decl, 2, ";\n");
     }
   f_print (fout, "\t} %s_u;\n", name);
+  /*Added by CK*/
+  decl_list *ld;
+  for (ld = def->def.un.other_decls; ld != NULL; ld = ld->next)
+    {
+      pdeclaration (name, &ld->decl, 1, ";\n");
+    }
+  prpccommandinternal(def);  
+  /*End CK*/
   f_print (fout, "};\n");
   f_print (fout, "typedef struct %s %s;\n", name, name);
+  prpccommandexternal(def); /*Added by CK*/
 }
 
 static void
@@ -581,6 +807,11 @@ pdeclaration (const char *name, declaration * dec, int tab,
 
   if (streq (dec->type, "void"))
     {
+      return;
+    }
+  if (streq (dec->type, "rpccommand"))
+    {
+      /*CK: This is a command for the preprocessor to do something, print nothing out here*/ 
       return;
     }
   tabify (fout, tab);

@@ -302,7 +302,15 @@ class qio_writePropagator: private qio_init {
   int SourceHypercube(void)
     { return source_hypercube;}
 
- 
+   //! write a G-parity propagator, format 12 pairs of source and sink
+  /*!
+    \param outfile file to write to
+    \param sType source type (scalar, full)
+    \param prop    pointer to sinks
+    \param source pointer to scalar source
+   */  
+  void write_12pairs_gparity(char *outfile, const QIO_PROP_SOURCE_TYPES sType, const void *prop, const void *source, 
+			     int volFormat=QIO_VOLFMT, FP_FORMAT floatFormat=FP_AUTOMATIC);
  private:
 
   QIO_Writer *qio_Output;

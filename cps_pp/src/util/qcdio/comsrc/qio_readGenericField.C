@@ -28,7 +28,7 @@ void qio_putGenField(char *buf_, size_t site_index, int count, void *arg)
   
 
   const int n_field = qio_genfield_glb. n_fields;
-  const int f_size = qio_genfield_glb. f_size_per_site;
+  const size_t f_size = qio_genfield_glb. f_size_per_site;
   const int n_sites = qio_genfield_glb. n_sites;
   
   /*
@@ -125,7 +125,7 @@ void qio_readGenericFields::qio_openInput(char *filename, QIO_String *record_fil
 
 void qio_readGenericFields::read_genericfields(
 						 char *infile,
-						 int n_fields, int f_size_per_site, void *field,
+						 int n_fields, size_t f_size_per_site, void *field,
 						 int volFormat, FP_FORMAT floatFormat)
  {
 
@@ -226,7 +226,7 @@ void qio_readGenericFields::read_genericfields(
 			       n_fields* f_size_per_site*sizeof(float),
 			       sizeof(float), field);
     }
-  //int f_size = f_size_per_site*GJP.VolNodeSites();
+  //size_t f_size = f_size_per_site*GJP.VolNodeSites();
   //for(int i=0;i<f_size;i++)
   //printf("EVEC %d %e\n",i,*((float*)field+i));exit(0);
 

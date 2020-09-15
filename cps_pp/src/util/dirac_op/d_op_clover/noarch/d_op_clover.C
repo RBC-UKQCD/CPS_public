@@ -520,7 +520,7 @@ void DiracOpClover::CalcHmdForceVecs(Vector *chi)
   Vector *chi_new, *rho, *psi, *sigma ;
 
   int half_sites = GJP.VolNodeSites() / 2 ;
-  int f_size_cb = lat.FsiteSize() * half_sites;
+  size_t f_size_cb = lat.FsiteSize() * half_sites;
 
   chi_new = f_out ;
 

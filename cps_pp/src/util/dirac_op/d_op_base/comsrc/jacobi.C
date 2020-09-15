@@ -85,7 +85,7 @@ int DiracOp::Jacobi(Vector **psi, int N_eig, Float *lambda, Complex *off_diag,
 
 // Set the node checkerboard size of the fermion field
 //------------------------------------------------------------------
-  int f_size = RitzLatSize();
+  size_t f_size = RitzLatSize();
     
 // Set the node checkerboard size of the fermion field
 //------------------------------------------------------------------

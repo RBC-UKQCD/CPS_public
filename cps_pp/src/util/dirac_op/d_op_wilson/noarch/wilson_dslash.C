@@ -1,4 +1,5 @@
 #include <config.h>
+#if (!defined USE_SSE) && (!defined SSE_TO_C)
 #include <stdio.h>
 #include <math.h>
 /*! \file
@@ -40,39 +41,135 @@
 #include <util/error.h>
 #include <comms/scu.h>
 
+#include <util/gjp.h>
 
-#ifndef USE_QMP
+#ifndef USE_QMP //if USE_QMP then it compiles the vectorised wilson dslash instead
+
 CPS_START_NAMESPACE
 //! Access to the elements of the \e SU(3) matrix
 /*!
   Gets the element of the \e SU(3) matrix \e u with row \e row,
   column \e col and complex component \e d
 */
-#define U(r,row,col,d)  *(u+(r+2*(row+3*(col+3*d))))
+#define UELEM(u,r,row,col,d) *(u+(r+2*(row+3*(col+3*d))))
 //! Access to the elements of a spinor vector.
 /*!
-  Gets the element of the spinor \e psi with spin \e s,
+  Gets the element of the spinor \e f with spin \e s,
   colour \e c and complex component \e r
 */
-#define PSI(r,c,s)      *(psi +(r+2*(c+3*s)))
-
-//! As above, but the vector is called chi
-#define CHI(r,c,s)      *(chi +(r+2*(c+3*s)))
-#define TMP(r,c,s)      *(tmp +(r+2*(c+3*s))) 
-#define TMP1(r,c,s)     *(tmp1+(r+2*(c+3*s))) 
-#define TMP2(r,c,s)     *(tmp2+(r+2*(c+3*s))) 
-#define TMP3(r,c,s)     *(tmp3+(r+2*(c+3*s))) 
-#define TMP4(r,c,s)     *(tmp4+(r+2*(c+3*s))) 
-#define TMP5(r,c,s)     *(tmp5+(r+2*(c+3*s))) 
-#define TMP6(r,c,s)     *(tmp6+(r+2*(c+3*s))) 
-#define TMP7(r,c,s)     *(tmp7+(r+2*(c+3*s))) 
-#define TMP8(r,c,s)     *(tmp8+(r+2*(c+3*s))) 
-#define FBUF(r,c,s)     *(fbuf+(r+2*(c+3*s))) 
+#define FERM(f,r,c,s) *(f +(r+2*(c+3*s)))
 
 
+//pm is minus (0) or plus (1)
+static void OneMinusPlusGammaTimesPsi(Float *into, Float *psi, const int &sdag, const int &mu, const int &mp){
+  Float sign = -1.0;
+  if(mp==1) sign = 1.0;
+  
+  int c;
 
+  if(mu==0){
+    //1+-GAMMA_X
+    for(c=0;c<3;c++){
+      FERM(into,0,c,0) = FERM(psi,0,c,0) + sign*sdag * ( -FERM(psi,1,c,3) ); 
+      FERM(into,1,c,0) = FERM(psi,1,c,0) + sign*sdag * (  FERM(psi,0,c,3) ); 
 
+      FERM(into,0,c,1) = FERM(psi,0,c,1) + sign*sdag * ( -FERM(psi,1,c,2) ); 
+      FERM(into,1,c,1) = FERM(psi,1,c,1) + sign*sdag * (  FERM(psi,0,c,2) ); 
 
+      FERM(into,0,c,2) = FERM(psi,0,c,2) + sign*sdag * (  FERM(psi,1,c,1) ); 
+      FERM(into,1,c,2) = FERM(psi,1,c,2) + sign*sdag * ( -FERM(psi,0,c,1) ); 
+
+      FERM(into,0,c,3) = FERM(psi,0,c,3) + sign*sdag * (  FERM(psi,1,c,0) ); 
+      FERM(into,1,c,3) = FERM(psi,1,c,3) + sign*sdag * ( -FERM(psi,0,c,0) ); 
+    }
+  }else if(mu==1){
+    for(c=0;c<3;c++){
+      FERM(into,0,c,0) = FERM(psi,0,c,0) + sign*sdag * ( -FERM(psi,0,c,3) ); 
+      FERM(into,1,c,0) = FERM(psi,1,c,0) + sign*sdag * ( -FERM(psi,1,c,3) ); 
+
+      FERM(into,0,c,1) = FERM(psi,0,c,1) + sign*sdag * (  FERM(psi,0,c,2) ); 
+      FERM(into,1,c,1) = FERM(psi,1,c,1) + sign*sdag * (  FERM(psi,1,c,2) ); 
+
+      FERM(into,0,c,2) = FERM(psi,0,c,2) + sign*sdag * (  FERM(psi,0,c,1) ); 
+      FERM(into,1,c,2) = FERM(psi,1,c,2) + sign*sdag * (  FERM(psi,1,c,1) ); 
+
+      FERM(into,0,c,3) = FERM(psi,0,c,3) + sign*sdag * ( -FERM(psi,0,c,0) ); 
+      FERM(into,1,c,3) = FERM(psi,1,c,3) + sign*sdag * ( -FERM(psi,1,c,0) ); 
+    }
+  }else if(mu==2){
+    for(c=0;c<3;c++){
+      FERM(into,0,c,0) = FERM(psi,0,c,0) + sign*sdag * ( -FERM(psi,1,c,2) ); 
+      FERM(into,1,c,0) = FERM(psi,1,c,0) + sign*sdag * (  FERM(psi,0,c,2) ); 
+
+      FERM(into,0,c,1) = FERM(psi,0,c,1) + sign*sdag * (  FERM(psi,1,c,3) ); 
+      FERM(into,1,c,1) = FERM(psi,1,c,1) + sign*sdag * ( -FERM(psi,0,c,3) ); 
+
+      FERM(into,0,c,2) = FERM(psi,0,c,2) + sign*sdag * (  FERM(psi,1,c,0) ); 
+      FERM(into,1,c,2) = FERM(psi,1,c,2) + sign*sdag * ( -FERM(psi,0,c,0) ); 
+
+      FERM(into,0,c,3) = FERM(psi,0,c,3) + sign*sdag * ( -FERM(psi,1,c,1) ); 
+      FERM(into,1,c,3) = FERM(psi,1,c,3) + sign*sdag * (  FERM(psi,0,c,1) ); 
+    }
+  }else if(mu==3){
+    for(c=0;c<3;c++){
+      FERM(into,0,c,0) = FERM(psi,0,c,0) + sign*sdag * (  FERM(psi,0,c,2) ); 
+      FERM(into,1,c,0) = FERM(psi,1,c,0) + sign*sdag * (  FERM(psi,1,c,2) ); 
+
+      FERM(into,0,c,1) = FERM(psi,0,c,1) + sign*sdag * (  FERM(psi,0,c,3) ); 
+      FERM(into,1,c,1) = FERM(psi,1,c,1) + sign*sdag * (  FERM(psi,1,c,3) ); 
+
+      FERM(into,0,c,2) = FERM(psi,0,c,2) + sign*sdag * (  FERM(psi,0,c,0) ); 
+      FERM(into,1,c,2) = FERM(psi,1,c,2) + sign*sdag * (  FERM(psi,1,c,0) ); 
+
+      FERM(into,0,c,3) = FERM(psi,0,c,3) + sign*sdag * (  FERM(psi,0,c,1) ); 
+      FERM(into,1,c,3) = FERM(psi,1,c,3) + sign*sdag * (  FERM(psi,1,c,1) ); 
+    }
+  }
+}
+
+//rowcol is whether the multiplication is on the row or column index of the gauge field
+static void UmuTimes(Float *into, Float *u, Float *psi, const int &mu, const int &rowcol){
+  if(rowcol==0){
+    for(int s=0;s<4;s++){
+      for(int c=0;c<3;c++){
+	FERM(into,0,c,s) = (  UELEM(u,0,c,0,mu) * FERM(psi,0,0,s)
+			      + UELEM(u,0,c,1,mu) * FERM(psi,0,1,s)
+			      + UELEM(u,0,c,2,mu) * FERM(psi,0,2,s) 
+			      - UELEM(u,1,c,0,mu) * FERM(psi,1,0,s)
+			      - UELEM(u,1,c,1,mu) * FERM(psi,1,1,s)
+			      - UELEM(u,1,c,2,mu) * FERM(psi,1,2,s) );
+	FERM(into,1,c,s) = (  UELEM(u,0,c,0,mu) * FERM(psi,1,0,s)
+			      + UELEM(u,0,c,1,mu) * FERM(psi,1,1,s)
+			      + UELEM(u,0,c,2,mu) * FERM(psi,1,2,s) 
+			      + UELEM(u,1,c,0,mu) * FERM(psi,0,0,s)
+			      + UELEM(u,1,c,1,mu) * FERM(psi,0,1,s)
+			      + UELEM(u,1,c,2,mu) * FERM(psi,0,2,s) );
+      }
+    }
+  }else{
+    for(int s=0;s<4;s++){
+      for(int c=0;c<3;c++){
+	FERM(into,0,c,s) = (  UELEM(u,0,0,c,mu) * FERM(psi,0,0,s)
+			 + UELEM(u,0,1,c,mu) * FERM(psi,0,1,s)
+			 + UELEM(u,0,2,c,mu) * FERM(psi,0,2,s) 
+			 + UELEM(u,1,0,c,mu) * FERM(psi,1,0,s)
+			 + UELEM(u,1,1,c,mu) * FERM(psi,1,1,s)
+			 + UELEM(u,1,2,c,mu) * FERM(psi,1,2,s) );
+	FERM(into,1,c,s) = (  UELEM(u,0,0,c,mu) * FERM(psi,1,0,s)
+			 + UELEM(u,0,1,c,mu) * FERM(psi,1,1,s)
+			 + UELEM(u,0,2,c,mu) * FERM(psi,1,2,s) 
+			 - UELEM(u,1,0,c,mu) * FERM(psi,0,0,s)
+			 - UELEM(u,1,1,c,mu) * FERM(psi,0,1,s)
+			 - UELEM(u,1,2,c,mu) * FERM(psi,0,2,s) );
+      }
+    }
+  }
+}
+
+//CK: vastly improved wilson code + added G-parity functionality
+//Calculates the wilson Dslash for the part of the fermion field on checkerboard cb (not the mass term)
+//Note that due to the fact that the massless Dslash at a site x uses only the fields at x +- mu, not at x,
+//the actual sites at which the Dlash is evaluated have the opposite parity to cb.
 	void wilson_dslash(IFloat *chi_p_f, 
 		   IFloat *u_p_f, 
 		   IFloat *psi_p_f, 
@@ -83,27 +180,28 @@ CPS_START_NAMESPACE
   char *fname = "wilson_dslash";
   int lx, ly, lz, lt;
   int x, y, z, t;
-  int xp, yp, zp, tp;
-  int xm, ym, zm, tm;
   int xyzt;
-  int xpyzt, xypzt, xyzpt, xyztp;
-  int xmyzt, xymzt, xyzmt, xyztm;
   int cbn;
   int parity;
   int sdag;                 /* = +/-1 if dag = 0/1 */
   int r, c, s, mu;
   int vol;
-  Float tmp[SPINOR_SIZE];
-  Float tmp1[SPINOR_SIZE];
-  Float tmp2[SPINOR_SIZE];
-  Float tmp3[SPINOR_SIZE];
-  Float tmp4[SPINOR_SIZE];
-  Float tmp5[SPINOR_SIZE];
-  Float tmp6[SPINOR_SIZE];
-  Float tmp7[SPINOR_SIZE];
-  Float tmp8[SPINOR_SIZE];
-  Float fbuf[SPINOR_SIZE];
-  
+
+  int buf_size = SPINOR_SIZE;
+  if(GJP.Gparity()) buf_size*=2;
+  int flav_fbuf_offset = SPINOR_SIZE;
+
+  Float tmp[buf_size];
+  Float tmp1[buf_size];
+  Float tmp2[buf_size];
+  Float tmp3[buf_size];
+  Float tmp4[buf_size];
+  Float tmp5[buf_size];
+  Float tmp6[buf_size];
+  Float tmp7[buf_size];
+  Float tmp8[buf_size];
+  Float fbuf[buf_size];
+
 /*--------------------------------------------------------------------------*/
 /* Initializations                                                          */
 /*--------------------------------------------------------------------------*/
@@ -114,6 +212,10 @@ CPS_START_NAMESPACE
   Float *u;
   Float *psi;
 
+  //for G-parity
+  Float *chi_f1;
+  Float *u_f1;
+  Float *psi_f1;
 
   lx = wilson_p->ptr[0];
   ly = wilson_p->ptr[1];
@@ -137,6 +239,41 @@ CPS_START_NAMESPACE
     ERR.General(" ",fname,"cb must be 0 or 1");
   }
 
+  //DEBUG
+  // for(x=0; x<lx; x++){
+  //   for(y=0; y<ly; y++){
+  //     for(z=0; z<lz; z++){
+  // 	for(t=0; t<lt; t++){
+  // 	  xyzt = (x/2)+(lx/2)*(y+ly*(z+lz*t));
+  // 	  psi = psi_p + SPINOR_SIZE * xyzt;
+  // 	  if(GJP.Gparity()){
+  // 	    printf("x=(%d,%d,%d,%d)  psi0_x = (%f,%f)\n",x,y,z,t,*psi,*(psi+1));
+  // 	  }else{
+  // 	    int gpx = x; 
+  // 	    int gpf = 0;
+  // 	    if(gpx>=lx/2){ gpx-=lx/2; gpf = 1; }
+  // 	    printf("x=(%d,%d,%d,%d)  psi%d_x = (%f,%f)\n",gpx,y,z,t,gpf,*psi,*(psi+1));
+  // 	    fflush(stdout);
+  // 	  }
+  // 	}
+  //     }
+  //   }
+  // }
+  // if(GJP.Gparity()){
+  //   for(x=0; x<lx; x++){
+  //     for(y=0; y<ly; y++){
+  // 	for(z=0; z<lz; z++){
+  // 	  for(t=0; t<lt; t++){
+  // 	    xyzt = (x/2)+(lx/2)*(y+ly*(z+lz*t));
+  // 	    psi_f1 = psi_p + SPINOR_SIZE * (xyzt + vol);
+  // 	    printf("x=(%d,%d,%d,%d)  psi1_x = (%f,%f)\n",x,y,z,t,*psi_f1,*(psi_f1+1));
+  // 	  }
+  // 	}
+  //     }
+  //   }
+  // }
+  //DEBUG
+
 /*--------------------------------------------------------------------------*/
 /* Loop over sites                                                          */
 /*--------------------------------------------------------------------------*/
@@ -144,422 +281,192 @@ CPS_START_NAMESPACE
     for(y=0; y<ly; y++){
       for(z=0; z<lz; z++){
 	for(t=0; t<lt; t++){
-//	printf("wilson_dslash: %d %d %d %d\n",x,y,z,t);
 	 parity = x+y+z+t;
 	 parity = parity % 2;
 	 if(parity == cbn){
-
 	   /* x,y,z,t addressing of cbn checkerboard */
 	   xyzt = (x/2)+(lx/2)*(y+ly*(z+lz*t));
 
-	   /* x,y,z,t addressing of cb checkerboard */
-	   xp = (x+1) % lx;
-	   yp = (y+1) % ly;
-	   zp = (z+1) % lz;
-	   tp = (t+1) % lt;
-	   xm = x-1 + ( (lx-x)/lx ) * lx;
-	   ym = y-1 + ( (ly-y)/ly ) * ly;
-	   zm = z-1 + ( (lz-z)/lz ) * lz;
-	   tm = t-1 + ( (lt-t)/lt ) * lt;
-	   xpyzt = (xp/2)+(lx/2)*(y+ly*(z+lz*t));
-	   xmyzt = (xm/2)+(lx/2)*(y+ly*(z+lz*t));
-	   xypzt = (x/2)+(lx/2)*(yp+ly*(z+lz*t));
-	   xymzt = (x/2)+(lx/2)*(ym+ly*(z+lz*t));
-	   xyzpt = (x/2)+(lx/2)*(y+ly*(zp+lz*t));
-	   xyzmt = (x/2)+(lx/2)*(y+ly*(zm+lz*t));
-	   xyztp = (x/2)+(lx/2)*(y+ly*(z+lz*tp));
-	   xyztm = (x/2)+(lx/2)*(y+ly*(z+lz*tm));
+	   int pos[4] = {x,y,z,t};
+	   int lattsz[4] = {lx,ly,lz,lt};
+	   Float *temps[4][2] = { {tmp1,tmp5}, {tmp2,tmp6}, {tmp3,tmp7}, {tmp4,tmp8} };
 
+	   int u_cboff = vol; //vol is the checkerboard volume, i.e. half the 4d volume
+	   if(GJP.Gparity()) u_cboff*=2; //[(f0 odd)(f1 odd)(f0 even)(f1 even)]  each bracket is one cbvolume
+
+	   for(int mu=0;mu<4;mu++){
+	     /* x,y,z,t addressing of cb checkerboard */
+	     int posp[4] = {x,y,z,t};
+	     posp[mu] = (posp[mu]+1)%lattsz[mu];
+
+	     int posp_xyzt = (posp[0]/2)+(lx/2)*(posp[1]+ly*(posp[2]+lz*posp[3]));
+
+	     /* 1-gamma_mu */
+	     /*-----------*/
+
+	     u   = u_p + GAUGE_SIZE * ( xyzt  + u_cboff * cbn);
+	     psi = psi_p + SPINOR_SIZE * posp_xyzt;
+
+	     if(GJP.Gparity()){
+	       u_f1 = u_p + GAUGE_SIZE * ( xyzt  + u_cboff * cbn + vol);
+	       psi_f1 = psi_p + SPINOR_SIZE * (posp_xyzt + vol);
+	     }
+
+	     if(pos[mu] == lattsz[mu]-1){
+	       if(!GJP.Gparity()){
+		 getPlusData((IFloat *)fbuf, (IFloat *) psi, SPINOR_SIZE, mu);
+		 psi = fbuf;
+	       }else{
+		 IFloat* psi_f0_recv_to = (IFloat*)fbuf; //f0 receives f0
+		 IFloat* psi_f1_recv_to = (IFloat*)(fbuf + flav_fbuf_offset); //f1 receives f1
+		 if(GJP.Bc(mu) == BND_CND_GPARITY && GJP.NodeCoor(mu)==GJP.Nodes(mu)-1){
+		   //do the G-parity flavour twist. (assumes minus sign is on the gauge links on the boundary)
+		   psi_f0_recv_to = (IFloat*)(fbuf + flav_fbuf_offset); //f0 receives f1
+		   psi_f1_recv_to = (IFloat*)fbuf; //f1 receives f0
+		 }
+		 getPlusData(psi_f0_recv_to, (IFloat *) psi, SPINOR_SIZE, mu);
+		 getPlusData(psi_f1_recv_to, (IFloat *) psi_f1, SPINOR_SIZE, mu);
+		 psi = fbuf;//is either f0 or f1 depending on how the buffers were set
+		 psi_f1 = fbuf+flav_fbuf_offset;
+	       }
+	     }
+
+	     OneMinusPlusGammaTimesPsi(tmp,psi,sdag,mu,0);
+	     if(GJP.Gparity()) OneMinusPlusGammaTimesPsi(tmp+SPINOR_SIZE,psi_f1,sdag,mu,0);
+	     
+	     /* multiply by U_mu */
+	     UmuTimes(temps[mu][0],u,tmp,mu,0);
+	     if(GJP.Gparity()) UmuTimes(temps[mu][0]+SPINOR_SIZE,u_f1,tmp+SPINOR_SIZE,mu,0);
+	   }
+	   for(int mu=0;mu<4;mu++){
+	     /* x,y,z,t addressing of cb checkerboard */
+	     int posm[4] = {x,y,z,t};
+	     posm[mu] = posm[mu]-1 + ( (lattsz[mu]-posm[mu])/lattsz[mu] ) * lattsz[mu];
+	     
+	     //looks like checkerboard is divided across the x-direction
+	     int posm_xyzt = (posm[0]/2)+(lx/2)*(posm[1]+ly*(posm[2]+lz*posm[3]));
+
+	     /* 1+gamma_mu */
+	     /*-----------*/
+
+	     u   = u_p + GAUGE_SIZE * ( posm_xyzt  + u_cboff * cb);
+	     psi = psi_p + SPINOR_SIZE * posm_xyzt;
 	   
+	     if(GJP.Gparity()){
+	       u_f1 = u_p + GAUGE_SIZE * ( posm_xyzt  + u_cboff * cb + vol);
+	       psi_f1 = psi_p + SPINOR_SIZE * (posm_xyzt + vol);
+	     }
 
-	   /* 1-gamma_0 */
-	   /*-----------*/
-	   u   = u_p + GAUGE_SIZE * ( xyzt  + vol * cbn);
-	   psi = psi_p + SPINOR_SIZE * xpyzt;
-	   if(x == lx-1){
-	     getPlusData((IFloat *)fbuf, (IFloat *) psi, SPINOR_SIZE, 0);
-	     psi = fbuf;
-	   }
-#if 0
- 	     for(int l = 0; l<2;l++)
- 	     for(int m = 0; m<3;m++)
- 	     for(int n = 0; n<3;n++)
-	     if( fabs(PSI(l,m,n)) > 1e-10) {
-		printf("PSI_xp(%d %d %d %d) (%d %d %d) = %e\n",
-		x,y,z,t,l,m,n,PSI(l,m,n));
- 	     }
-#endif
-	   for(c=0;c<3;c++){
-	     TMP(0,c,0) = PSI(0,c,0) - sdag * ( -PSI(1,c,3) ); 
-	     TMP(1,c,0) = PSI(1,c,0) - sdag * (  PSI(0,c,3) ); 
+	     OneMinusPlusGammaTimesPsi(tmp,psi,sdag,mu,1);
+	     if(GJP.Gparity()) OneMinusPlusGammaTimesPsi(tmp+SPINOR_SIZE,psi_f1,sdag,mu,1);
 
-	     TMP(0,c,1) = PSI(0,c,1) - sdag * ( -PSI(1,c,2) ); 
-	     TMP(1,c,1) = PSI(1,c,1) - sdag * (  PSI(0,c,2) ); 
+	     /* multiply by U_mu */
+	     UmuTimes(temps[mu][1],u,tmp,mu,1);
+	     if(GJP.Gparity()) UmuTimes(temps[mu][1]+SPINOR_SIZE,u_f1,tmp+SPINOR_SIZE,mu,1);
 
-	     TMP(0,c,2) = PSI(0,c,2) - sdag * (  PSI(1,c,1) ); 
-	     TMP(1,c,2) = PSI(1,c,2) - sdag * ( -PSI(0,c,1) ); 
+	     if(pos[mu] == 0){
+	       if(!GJP.Gparity()){
+		 getMinusData((IFloat *)fbuf, (IFloat *)temps[mu][1], SPINOR_SIZE, mu);
+		 moveMem((IFloat *)temps[mu][1], (IFloat *)fbuf, 
+			 SPINOR_SIZE*sizeof(Float) / sizeof(char));
+	       }else{
+		 IFloat* psi_f0_recv_to = (IFloat*)fbuf;
+		 IFloat* psi_f1_recv_to = (IFloat*)(fbuf + flav_fbuf_offset);
+		 if(GJP.Bc(mu) == BND_CND_GPARITY && GJP.NodeCoor(mu)==0){
+		   //do the G-parity flavour twist. (assumes minus sign is on the gauge links on the boundary)
+		   psi_f0_recv_to = (IFloat*)(fbuf + flav_fbuf_offset);
+		   psi_f1_recv_to = (IFloat*)fbuf;
+		 }
+		 getMinusData((IFloat *)psi_f0_recv_to, (IFloat *)temps[mu][1], SPINOR_SIZE, mu);
+		 getMinusData((IFloat *)psi_f1_recv_to, (IFloat *)temps[mu][1]+SPINOR_SIZE, SPINOR_SIZE, mu);
 
-	     TMP(0,c,3) = PSI(0,c,3) - sdag * (  PSI(1,c,0) ); 
-	     TMP(1,c,3) = PSI(1,c,3) - sdag * ( -PSI(0,c,0) ); 
-	   }
-	   /* multiply by U_mu */
-	   mu = 0;
-	   for(s=0;s<4;s++){
-	     for(c=0;c<3;c++){
-	       TMP1(0,c,s) = (  U(0,c,0,mu) * TMP(0,0,s)
-			      + U(0,c,1,mu) * TMP(0,1,s)
-			      + U(0,c,2,mu) * TMP(0,2,s) 
-			      - U(1,c,0,mu) * TMP(1,0,s)
-			      - U(1,c,1,mu) * TMP(1,1,s)
-			      - U(1,c,2,mu) * TMP(1,2,s) );
-	       TMP1(1,c,s) = (  U(0,c,0,mu) * TMP(1,0,s)
-			      + U(0,c,1,mu) * TMP(1,1,s)
-			      + U(0,c,2,mu) * TMP(1,2,s) 
-			      + U(1,c,0,mu) * TMP(0,0,s)
-			      + U(1,c,1,mu) * TMP(0,1,s)
-			      + U(1,c,2,mu) * TMP(0,2,s) );
+		 moveMem((IFloat *)temps[mu][1], (IFloat *)fbuf, 
+			 SPINOR_SIZE*sizeof(Float) / sizeof(char));
+		 moveMem((IFloat *)(temps[mu][1]+SPINOR_SIZE), (IFloat *)(fbuf+ flav_fbuf_offset), 
+			 SPINOR_SIZE*sizeof(Float) / sizeof(char));
+
+	       }
 	     }
 	   }
-
-
-	   /* 1-gamma_1 */
-	   /*-----------*/
-	   u   = u_p + GAUGE_SIZE * ( xyzt  + vol * cbn);
-	   psi = psi_p + SPINOR_SIZE * xypzt;
-	   if(y == ly-1){
-	     getPlusData((IFloat *)fbuf, (IFloat *) psi, SPINOR_SIZE, 1);
-	     psi = fbuf;
-#if 0
- 	     for(int l = 0; l<2;l++)
- 	     for(int m = 0; m<3;m++)
- 	     for(int n = 0; n<3;n++)
-	     if( fabs(PSI(l,m,n)) > 1e-10) {
-		printf("PSI_yp(%d %d %d %d) (%d %d %d) = %e\n",
-		x,y,z,t,l,m,n,PSI(l,m,n));
- 	     }
-#endif
-	   }
-	   for(c=0;c<3;c++){
-	     TMP(0,c,0) = PSI(0,c,0) - sdag * ( -PSI(0,c,3) ); 
-	     TMP(1,c,0) = PSI(1,c,0) - sdag * ( -PSI(1,c,3) ); 
-
-	     TMP(0,c,1) = PSI(0,c,1) - sdag * (  PSI(0,c,2) ); 
-	     TMP(1,c,1) = PSI(1,c,1) - sdag * (  PSI(1,c,2) ); 
-
-	     TMP(0,c,2) = PSI(0,c,2) - sdag * (  PSI(0,c,1) ); 
-	     TMP(1,c,2) = PSI(1,c,2) - sdag * (  PSI(1,c,1) ); 
-
-	     TMP(0,c,3) = PSI(0,c,3) - sdag * ( -PSI(0,c,0) ); 
-	     TMP(1,c,3) = PSI(1,c,3) - sdag * ( -PSI(1,c,0) ); 
-	   }
-	   /* multiply by U_mu */
-	   mu = 1;
-	   for(s=0;s<4;s++){
-	     for(c=0;c<3;c++){
-	       TMP2(0,c,s) = (  U(0,c,0,mu) * TMP(0,0,s)
-			      + U(0,c,1,mu) * TMP(0,1,s)
-			      + U(0,c,2,mu) * TMP(0,2,s) 
-			      - U(1,c,0,mu) * TMP(1,0,s)
-			      - U(1,c,1,mu) * TMP(1,1,s)
-			      - U(1,c,2,mu) * TMP(1,2,s) );
-	       TMP2(1,c,s) = (  U(0,c,0,mu) * TMP(1,0,s)
-			      + U(0,c,1,mu) * TMP(1,1,s)
-			      + U(0,c,2,mu) * TMP(1,2,s) 
-			      + U(1,c,0,mu) * TMP(0,0,s)
-			      + U(1,c,1,mu) * TMP(0,1,s)
-			      + U(1,c,2,mu) * TMP(0,2,s) );
-	     }
-	   }
-
-
-	   /* 1-gamma_2 */
-	   /*-----------*/
-	   u   = u_p + GAUGE_SIZE * ( xyzt  + vol * cbn);
-	   psi = psi_p + SPINOR_SIZE * xyzpt;
-	   if(z == lz-1){
-	     getPlusData((IFloat *)fbuf, (IFloat *) psi, SPINOR_SIZE, 2);
-	     psi = fbuf;
-#if 0
- 	     for(int l = 0; l<2;l++)
- 	     for(int m = 0; m<3;m++)
- 	     for(int n = 0; n<3;n++)
-	     if( fabs(PSI(l,m,n)) > 1e-10) {
-		printf("PSI_zp(%d %d %d %d) (%d %d %d) = %e\n",
-		x,y,z,t,l,m,n,PSI(l,m,n));
- 	     }
-#endif
-	   }
-	   for(c=0;c<3;c++){
-	     TMP(0,c,0) = PSI(0,c,0) - sdag * ( -PSI(1,c,2) ); 
-	     TMP(1,c,0) = PSI(1,c,0) - sdag * (  PSI(0,c,2) ); 
-
-	     TMP(0,c,1) = PSI(0,c,1) - sdag * (  PSI(1,c,3) ); 
-	     TMP(1,c,1) = PSI(1,c,1) - sdag * ( -PSI(0,c,3) ); 
-
-	     TMP(0,c,2) = PSI(0,c,2) - sdag * (  PSI(1,c,0) ); 
-	     TMP(1,c,2) = PSI(1,c,2) - sdag * ( -PSI(0,c,0) ); 
-
-	     TMP(0,c,3) = PSI(0,c,3) - sdag * ( -PSI(1,c,1) ); 
-	     TMP(1,c,3) = PSI(1,c,3) - sdag * (  PSI(0,c,1) ); 
-	   }
-	   /* multiply by U_mu */
-	   mu = 2;
-	   for(s=0;s<4;s++){
-	     for(c=0;c<3;c++){
-	       TMP3(0,c,s) = (  U(0,c,0,mu) * TMP(0,0,s)
-			      + U(0,c,1,mu) * TMP(0,1,s)
-			      + U(0,c,2,mu) * TMP(0,2,s) 
-			      - U(1,c,0,mu) * TMP(1,0,s)
-			      - U(1,c,1,mu) * TMP(1,1,s)
-			      - U(1,c,2,mu) * TMP(1,2,s) );
-	       TMP3(1,c,s) = (  U(0,c,0,mu) * TMP(1,0,s)
-			      + U(0,c,1,mu) * TMP(1,1,s)
-			      + U(0,c,2,mu) * TMP(1,2,s) 
-			      + U(1,c,0,mu) * TMP(0,0,s)
-			      + U(1,c,1,mu) * TMP(0,1,s)
-			      + U(1,c,2,mu) * TMP(0,2,s) );
-	     }
-	   }
-
-
-	   /* 1-gamma_3 */
-	   /*-----------*/
-	   u   = u_p + GAUGE_SIZE * ( xyzt  + vol * cbn);
-	   psi = psi_p + SPINOR_SIZE * xyztp;
-	   if(t == lt-1){
-	     getPlusData((IFloat *)fbuf, (IFloat *) psi, SPINOR_SIZE, 3);
-	     psi = fbuf;
-#if 0
- 	     for(int l = 0; l<2;l++)
- 	     for(int m = 0; m<3;m++)
- 	     for(int n = 0; n<3;n++)
-	     if( fabs(PSI(l,m,n)) > 1e-10) {
-		printf("PSI_tp(%d %d %d %d) (%d %d %d) = %e\n",
-		x,y,z,t,l,m,n,PSI(l,m,n));
- 	     }
-#endif
-	   }
-	   for(c=0;c<3;c++){
-	     TMP(0,c,0) = PSI(0,c,0) - sdag * (  PSI(0,c,2) ); 
-	     TMP(1,c,0) = PSI(1,c,0) - sdag * (  PSI(1,c,2) ); 
-
-	     TMP(0,c,1) = PSI(0,c,1) - sdag * (  PSI(0,c,3) ); 
-	     TMP(1,c,1) = PSI(1,c,1) - sdag * (  PSI(1,c,3) ); 
-
-	     TMP(0,c,2) = PSI(0,c,2) - sdag * (  PSI(0,c,0) ); 
-	     TMP(1,c,2) = PSI(1,c,2) - sdag * (  PSI(1,c,0) ); 
-
-	     TMP(0,c,3) = PSI(0,c,3) - sdag * (  PSI(0,c,1) ); 
-	     TMP(1,c,3) = PSI(1,c,3) - sdag * (  PSI(1,c,1) ); 
-	   }
-	   /* multiply by U_mu */
-	   mu = 3;
-	   for(s=0;s<4;s++){
-	     for(c=0;c<3;c++){
-	       TMP4(0,c,s) = (  U(0,c,0,mu) * TMP(0,0,s)
-			      + U(0,c,1,mu) * TMP(0,1,s)
-			      + U(0,c,2,mu) * TMP(0,2,s) 
-			      - U(1,c,0,mu) * TMP(1,0,s)
-			      - U(1,c,1,mu) * TMP(1,1,s)
-			      - U(1,c,2,mu) * TMP(1,2,s) );
-	       TMP4(1,c,s) = (  U(0,c,0,mu) * TMP(1,0,s)
-			      + U(0,c,1,mu) * TMP(1,1,s)
-			      + U(0,c,2,mu) * TMP(1,2,s) 
-			      + U(1,c,0,mu) * TMP(0,0,s)
-			      + U(1,c,1,mu) * TMP(0,1,s)
-			      + U(1,c,2,mu) * TMP(0,2,s) );
-	     }
-	   }
-
-
-	   /* 1+gamma_0 */
-	   /*-----------*/
-	   u   = u_p + GAUGE_SIZE * ( xmyzt  + vol * cb);
-	   psi = psi_p + SPINOR_SIZE * xmyzt;
-	   for(c=0;c<3;c++){
-	     TMP(0,c,0) = PSI(0,c,0) + sdag * ( -PSI(1,c,3) ); 
-	     TMP(1,c,0) = PSI(1,c,0) + sdag * (  PSI(0,c,3) ); 
-
-	     TMP(0,c,1) = PSI(0,c,1) + sdag * ( -PSI(1,c,2) ); 
-	     TMP(1,c,1) = PSI(1,c,1) + sdag * (  PSI(0,c,2) ); 
-
-	     TMP(0,c,2) = PSI(0,c,2) + sdag * (  PSI(1,c,1) ); 
-	     TMP(1,c,2) = PSI(1,c,2) + sdag * ( -PSI(0,c,1) ); 
-
-	     TMP(0,c,3) = PSI(0,c,3) + sdag * (  PSI(1,c,0) ); 
-	     TMP(1,c,3) = PSI(1,c,3) + sdag * ( -PSI(0,c,0) ); 
-	   }
-	   /* multiply by U_mu */
-	   mu = 0;
-	   for(s=0;s<4;s++){
-	     for(c=0;c<3;c++){
-	       TMP5(0,c,s) = (  U(0,0,c,mu) * TMP(0,0,s)
-			      + U(0,1,c,mu) * TMP(0,1,s)
-			      + U(0,2,c,mu) * TMP(0,2,s) 
-			      + U(1,0,c,mu) * TMP(1,0,s)
-			      + U(1,1,c,mu) * TMP(1,1,s)
-			      + U(1,2,c,mu) * TMP(1,2,s) );
-	       TMP5(1,c,s) = (  U(0,0,c,mu) * TMP(1,0,s)
-			      + U(0,1,c,mu) * TMP(1,1,s)
-			      + U(0,2,c,mu) * TMP(1,2,s) 
-			      - U(1,0,c,mu) * TMP(0,0,s)
-			      - U(1,1,c,mu) * TMP(0,1,s)
-			      - U(1,2,c,mu) * TMP(0,2,s) );
-	     }
-	   }
-	   if(x == 0){
-	     getMinusData((IFloat *)fbuf, (IFloat *)tmp5, SPINOR_SIZE, 0);
-	     moveMem((IFloat *)tmp5, (IFloat *)fbuf, 
-			SPINOR_SIZE*sizeof(Float) / sizeof(char));
-	   }
-
-
-
-	   /* 1+gamma_1 */
-	   /*-----------*/
-	   u   = u_p + GAUGE_SIZE * ( xymzt  + vol * cb);
-	   psi = psi_p + SPINOR_SIZE * xymzt;
-	   for(c=0;c<3;c++){
-	     TMP(0,c,0) = PSI(0,c,0) + sdag * ( -PSI(0,c,3) ); 
-	     TMP(1,c,0) = PSI(1,c,0) + sdag * ( -PSI(1,c,3) ); 
-
-	     TMP(0,c,1) = PSI(0,c,1) + sdag * (  PSI(0,c,2) ); 
-	     TMP(1,c,1) = PSI(1,c,1) + sdag * (  PSI(1,c,2) ); 
-
-	     TMP(0,c,2) = PSI(0,c,2) + sdag * (  PSI(0,c,1) ); 
-	     TMP(1,c,2) = PSI(1,c,2) + sdag * (  PSI(1,c,1) ); 
-
-	     TMP(0,c,3) = PSI(0,c,3) + sdag * ( -PSI(0,c,0) ); 
-	     TMP(1,c,3) = PSI(1,c,3) + sdag * ( -PSI(1,c,0) ); 
-	   }
-	   /* multiply by U_mu */
-	   mu = 1;
-	   for(s=0;s<4;s++){
-	     for(c=0;c<3;c++){
-	       TMP6(0,c,s) = (  U(0,0,c,mu) * TMP(0,0,s)
-			      + U(0,1,c,mu) * TMP(0,1,s)
-			      + U(0,2,c,mu) * TMP(0,2,s) 
-			      + U(1,0,c,mu) * TMP(1,0,s)
-			      + U(1,1,c,mu) * TMP(1,1,s)
-			      + U(1,2,c,mu) * TMP(1,2,s) );
-	       TMP6(1,c,s) = (  U(0,0,c,mu) * TMP(1,0,s)
-			      + U(0,1,c,mu) * TMP(1,1,s)
-			      + U(0,2,c,mu) * TMP(1,2,s) 
-			      - U(1,0,c,mu) * TMP(0,0,s)
-			      - U(1,1,c,mu) * TMP(0,1,s)
-			      - U(1,2,c,mu) * TMP(0,2,s) );
-	     }
-	   }
-	   if(y == 0){
-	     getMinusData((IFloat *)fbuf, (IFloat *)tmp6, SPINOR_SIZE, 1);
-	     moveMem((IFloat *)tmp6, (IFloat *)fbuf, 
-		SPINOR_SIZE*sizeof(Float) / sizeof(char));
-	   }
-
-
-	   /* 1+gamma_2 */
-	   /*-----------*/
-	   u   = u_p + GAUGE_SIZE * ( xyzmt  + vol * cb);
-	   psi = psi_p + SPINOR_SIZE * xyzmt;
-	   for(c=0;c<3;c++){
-	     TMP(0,c,0) = PSI(0,c,0) + sdag * ( -PSI(1,c,2) ); 
-	     TMP(1,c,0) = PSI(1,c,0) + sdag * (  PSI(0,c,2) ); 
-
-	     TMP(0,c,1) = PSI(0,c,1) + sdag * (  PSI(1,c,3) ); 
-	     TMP(1,c,1) = PSI(1,c,1) + sdag * ( -PSI(0,c,3) ); 
-
-	     TMP(0,c,2) = PSI(0,c,2) + sdag * (  PSI(1,c,0) ); 
-	     TMP(1,c,2) = PSI(1,c,2) + sdag * ( -PSI(0,c,0) ); 
-
-	     TMP(0,c,3) = PSI(0,c,3) + sdag * ( -PSI(1,c,1) ); 
-	     TMP(1,c,3) = PSI(1,c,3) + sdag * (  PSI(0,c,1) ); 
-	   }
-	   /* multiply by U_mu */
-	   mu = 2;
-	   for(s=0;s<4;s++){
-	     for(c=0;c<3;c++){
-	       TMP7(0,c,s) = (  U(0,0,c,mu) * TMP(0,0,s)
-			      + U(0,1,c,mu) * TMP(0,1,s)
-			      + U(0,2,c,mu) * TMP(0,2,s) 
-			      + U(1,0,c,mu) * TMP(1,0,s)
-			      + U(1,1,c,mu) * TMP(1,1,s)
-			      + U(1,2,c,mu) * TMP(1,2,s) );
-	       TMP7(1,c,s) = (  U(0,0,c,mu) * TMP(1,0,s)
-			      + U(0,1,c,mu) * TMP(1,1,s)
-			      + U(0,2,c,mu) * TMP(1,2,s) 
-			      - U(1,0,c,mu) * TMP(0,0,s)
-			      - U(1,1,c,mu) * TMP(0,1,s)
-			      - U(1,2,c,mu) * TMP(0,2,s) );
-	     }
-	   }
-	   if(z == 0){
-	     getMinusData((IFloat *)fbuf, (IFloat *)tmp7, SPINOR_SIZE, 2);
-	     moveMem((IFloat *)tmp7, (IFloat *)fbuf, 
-		SPINOR_SIZE*sizeof(Float) / sizeof(char));
-	   }
-
-
-	   /* 1+gamma_3 */
-	   /*-----------*/
-	   u   = u_p + GAUGE_SIZE * ( xyztm  + vol * cb);
-	   psi = psi_p + SPINOR_SIZE * xyztm;
-	   for(c=0;c<3;c++){
-	     TMP(0,c,0) = PSI(0,c,0) + sdag * (  PSI(0,c,2) ); 
-	     TMP(1,c,0) = PSI(1,c,0) + sdag * (  PSI(1,c,2) ); 
-
-	     TMP(0,c,1) = PSI(0,c,1) + sdag * (  PSI(0,c,3) ); 
-	     TMP(1,c,1) = PSI(1,c,1) + sdag * (  PSI(1,c,3) ); 
-
-	     TMP(0,c,2) = PSI(0,c,2) + sdag * (  PSI(0,c,0) ); 
-	     TMP(1,c,2) = PSI(1,c,2) + sdag * (  PSI(1,c,0) ); 
-
-	     TMP(0,c,3) = PSI(0,c,3) + sdag * (  PSI(0,c,1) ); 
-	     TMP(1,c,3) = PSI(1,c,3) + sdag * (  PSI(1,c,1) ); 
-	   }
-	   /* multiply by U_mu */
-	   mu = 3;
-	   for(s=0;s<4;s++){
-	     for(c=0;c<3;c++){
-	       TMP8(0,c,s) = (  U(0,0,c,mu) * TMP(0,0,s)
-			      + U(0,1,c,mu) * TMP(0,1,s)
-			      + U(0,2,c,mu) * TMP(0,2,s) 
-			      + U(1,0,c,mu) * TMP(1,0,s)
-			      + U(1,1,c,mu) * TMP(1,1,s)
-			      + U(1,2,c,mu) * TMP(1,2,s) );
-	       TMP8(1,c,s) = (  U(0,0,c,mu) * TMP(1,0,s)
-			      + U(0,1,c,mu) * TMP(1,1,s)
-			      + U(0,2,c,mu) * TMP(1,2,s) 
-			      - U(1,0,c,mu) * TMP(0,0,s)
-			      - U(1,1,c,mu) * TMP(0,1,s)
-			      - U(1,2,c,mu) * TMP(0,2,s) );
-	     }
-	   }
-	   if(t == 0){
-	     getMinusData((IFloat *)fbuf, (IFloat *)tmp8, SPINOR_SIZE, 3);
-	     moveMem((IFloat *)tmp8, (IFloat *)fbuf, 
-		SPINOR_SIZE*sizeof(Float) / sizeof(char));
-	   }
-
 
 
 	   /* Add all contributions */
+	   //DEBUG
+	   // if(GJP.Gparity() && x==0 && y==0 && z==1 && t==1){
+	   //   printf("Temp contributions to chi0 (%d %d %d %d)\n",x,y,z,t);
+	   //   for(int mu=0;mu<4;mu++){
+	   //     for(int mp=0; mp<2; mp++){
+	   // 	 Float sum(0.0);
+	   // 	 for(int i=0;i<SPINOR_SIZE;i++){
+	   // 	   sum += temps[mu][mp][i];
+	   // 	 }
+	   // 	 printf("tmp[%d][%d] = %f\n",mu,mp,sum);
+	   //     }
+	   //   }
+	   //   printf("Temp contributions to chi1 (%d %d %d %d)\n",x,y,z,t);
+	   //   for(int mu=0;mu<4;mu++){
+	   //     for(int mp=0; mp<2; mp++){
+	   // 	 Float sum(0.0);
+	   // 	 for(int i=0;i<SPINOR_SIZE;i++){
+	   // 	   sum += temps[mu][mp][i+SPINOR_SIZE];
+	   // 	 }
+	   // 	 printf("tmp[%d][%d] = %f\n",mu,mp,sum);
+	   //     }
+	   //   }
+	   // }else if(!GJP.Gparity() && (x==0 || x==2) && y==0 && z==1 && t==1){
+	   //   if(x<lx/2){
+	   //     printf("Temp contributions to chi0 (%d %d %d %d)\n",x,y,z,t);
+	   //   }else{
+	   //     printf("Temp contributions to chi1 (%d %d %d %d)\n",x-lx/2,y,z,t);
+	   //   }
+
+	   //   for(int mu=0;mu<4;mu++){
+	   //     for(int mp=0; mp<2; mp++){
+	   // 	 Float sum(0.0);
+	   // 	 for(int i=0;i<SPINOR_SIZE;i++){
+	   // 	   sum += temps[mu][mp][i];
+	   // 	 }
+	   // 	 printf("tmp[%d][%d] = %f\n",mu,mp,sum);
+	   //     }
+	   //   }
+	   // }
+	   //DEBUG
+	 
 
 	   chi = chi_p + SPINOR_SIZE * xyzt;
 	   for(s=0;s<4;s++){
 	     for(c=0;c<3;c++){
 	       for(r=0;r<2;r++){
-		 CHI(r,c,s) = (  TMP1(r,c,s)
-			       + TMP2(r,c,s)
-			       + TMP3(r,c,s)
-			       + TMP4(r,c,s)
-			       + TMP5(r,c,s)
-			       + TMP6(r,c,s)
-			       + TMP7(r,c,s)
-			       + TMP8(r,c,s) );
+		 FERM(chi,r,c,s) = (  FERM(tmp1,r,c,s)
+				      + FERM(tmp2,r,c,s)
+				      + FERM(tmp3,r,c,s)
+				      + FERM(tmp4,r,c,s)
+				      + FERM(tmp5,r,c,s)
+				      + FERM(tmp6,r,c,s)
+				      + FERM(tmp7,r,c,s)
+				      + FERM(tmp8,r,c,s) );
 	       }
 	     }
 	   }
 	   
+
+	   if(GJP.Gparity()){
+	     chi_f1 = chi_p + SPINOR_SIZE * (xyzt + vol);
+	     for(s=0;s<4;s++){
+	       for(c=0;c<3;c++){
+		 for(r=0;r<2;r++){
+		   FERM(chi_f1,r,c,s) = (  FERM(tmp1+SPINOR_SIZE,r,c,s)
+					   + FERM(tmp2+SPINOR_SIZE,r,c,s)
+					   + FERM(tmp3+SPINOR_SIZE,r,c,s)
+					   + FERM(tmp4+SPINOR_SIZE,r,c,s)
+					   + FERM(tmp5+SPINOR_SIZE,r,c,s)
+					   + FERM(tmp6+SPINOR_SIZE,r,c,s)
+					   + FERM(tmp7+SPINOR_SIZE,r,c,s)
+					   + FERM(tmp8+SPINOR_SIZE,r,c,s) );
+		 }
+	       }
+	     }	     
+	   }
 	   
 
 
@@ -568,18 +475,51 @@ CPS_START_NAMESPACE
       }
     }
   }
-  
-  
+
+  //DEBUG
+  // for(x=0; x<lx; x++){
+  //   for(y=0; y<ly; y++){
+  //     for(z=0; z<lz; z++){
+  // 	for(t=0; t<lt; t++){
+  // 	  xyzt = (x/2)+(lx/2)*(y+ly*(z+lz*t));
+  // 	  chi = chi_p + SPINOR_SIZE * xyzt;
+  // 	  if(GJP.Gparity()){
+  // 	    printf("x=(%d,%d,%d,%d)  chi0_x = (%f,%f)\n",x,y,z,t,*chi,*(chi+1));
+  // 	  }else{
+  // 	    int gpx = x; 
+  // 	    int gpf = 0;
+  // 	    if(gpx>=lx/2){ gpx-=lx/2; gpf = 1; }
+  // 	    printf("x=(%d,%d,%d,%d)  chi%d_x = (%f,%f)\n",gpx,y,z,t,gpf,*chi,*(chi+1));
+  // 	    fflush(stdout);
+  // 	  }
+  // 	}
+  //     }
+  //   }
+  // }
+  // if(GJP.Gparity()){
+  //   for(x=0; x<lx; x++){
+  //     for(y=0; y<ly; y++){
+  // 	for(z=0; z<lz; z++){
+  // 	  for(t=0; t<lt; t++){
+  // 	    xyzt = (x/2)+(lx/2)*(y+ly*(z+lz*t));
+  // 	    chi_f1 = chi_p + SPINOR_SIZE * (xyzt + vol);
+  // 	    printf("x=(%d,%d,%d,%d)  chi1_x = (%f,%f)\n",x,y,z,t,*chi_f1,*(chi_f1+1));
+  // 	  }
+  // 	}
+  //     }
+  //   }
+  // }
+  //DEBUG
+
 //not correct because of non spin projection, but relevant for comparison
 	DiracOp::CGflops += 1320*vol;
 
-}
+
 CPS_END_NAMESPACE
 #else //USE_QMP
 #ifdef USE_SSE
-#include "../sse/sse-wilson_dslash.C"
+#include "sse-wilson_dslash.C"
 #else
-#if 1 
 #include "../qmp/wilson_dslash_vec.C"
 CPS_START_NAMESPACE
 void wilson_dslash(IFloat *chi_p_f, 
@@ -592,10 +532,6 @@ void wilson_dslash(IFloat *chi_p_f,
 	wilson_dslash_vec(chi_p_f,u_p_f,psi_p_f,cb,dag,wilson_p,1,0);
 }
 CPS_END_NAMESPACE
-#else
-// older version
-#include "../qmp/wilson_dslash_qmp.C"
-#endif
 #endif //USE_SSE
 #endif //USE_QMP
 
@@ -612,3 +548,4 @@ void wilson_dslash_two(Float *chi0, Float *chi1,
 }
 
 CPS_END_NAMESPACE
+#endif

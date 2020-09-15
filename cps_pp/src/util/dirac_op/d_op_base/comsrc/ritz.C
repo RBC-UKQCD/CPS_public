@@ -114,7 +114,7 @@ CPS_START_NAMESPACE
   \post Each vector in the array \a psi is orthogonal to all of the vectors
   in the array \a vec.
 */
-void DiracOp::GramSchm(Vector **psi, int Npsi, Vector **vec, int Nvec, int f_size) 
+void DiracOp::GramSchm(Vector **psi, int Npsi, Vector **vec, int Nvec, size_t f_size) 
 {
   Complex xp;
 
@@ -130,7 +130,7 @@ void DiracOp::GramSchm(Vector **psi, int Npsi, Vector **vec, int Nvec, int f_siz
   }
 }
 // same as above, but orthogonalize only one vector
-void DiracOp::GramSchm(Vector *psi, Vector **vec, int Nvec, int f_size) 
+void DiracOp::GramSchm(Vector *psi, Vector **vec, int Nvec, size_t f_size) 
 {
   Complex xp;
 
@@ -172,7 +172,7 @@ int DiracOp::Ritz(Vector **psi_all, int N_eig, Float &lambda,
   Float rsd;
   Float rsda_sq;
   Float rsdr_sq;
-  Float ct;
+  Float ct=0.;
   Float st;
   Float b;
   Float acc;
@@ -188,7 +188,7 @@ int DiracOp::Ritz(Vector **psi_all, int N_eig, Float &lambda,
 
 // Set the node checkerboard size of the fermion field
 //------------------------------------------------------------------
-  int f_size = RitzLatSize();
+  size_t f_size = RitzLatSize();
     
 // Set the node checkerboard size of the fermion field
 //------------------------------------------------------------------
@@ -257,6 +257,10 @@ int DiracOp::Ritz(Vector **psi_all, int N_eig, Float &lambda,
   /*  IF |g[0]| <= min(RsdR_a, RsdR_r |mu[0]|) THEN RETURN; */
   rsd = rsdr_sq * lambda * lambda;
   rsd = (rsda_sq > rsd) ? rsda_sq : rsd;
+  VRB.Result(cname,fname,"Kalk_Sim=%d\n",Kalk_Sim);
+  VRB.Result(cname,fname,"N_min=%d\n",N_min);
+  VRB.Result(cname,fname,"g2=%g\n",g2);
+  VRB.Result(cname,fname,"rsd=%g\n",rsd);
   if ( Kalk_Sim == 0 && N_min <= 0 && g2 <= rsd )
   {
     /*  Copy psi back into psi_all(N_eig-1)  */

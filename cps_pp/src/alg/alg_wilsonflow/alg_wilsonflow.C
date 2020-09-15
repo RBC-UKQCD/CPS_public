@@ -135,6 +135,8 @@ void AlgWilsonFlow::run()
 	}
 	lattice.GaugeField(lat_back);
 	lattice.ClearAllBufferedLink();
+
+	if(GJP.Gparity()) lattice.CopyConjGaugeField();
 }
 
 void AlgWilsonFlow::calculateZ(Lattice &lat, Site &site, int mu, Float Z[8])
@@ -200,6 +202,9 @@ inline Float * AlgWilsonFlow::GsiteOffset(Float * p, const int *x, const int *g_
 void AlgWilsonFlow::PathOrdProdPlus(Matrix & mat, int* x, int* dirs, int n,
     Float *gfield, const int *g_dir_offset)
 {
+  //CK: For G-parity we do not have to modify this version as it uses a locally buffered set of gauge links for which
+  //    we perform the appropriate complex-conjugation of links crossing the boundary when the buffered field is set up
+
   int abs_dir;
   int dir_sign;
   int link_site[4];
@@ -247,7 +252,9 @@ void AlgWilsonFlow::PathOrdProdPlus(Matrix & mat, int* x, int* dirs, int n,
     dir_sign = dirs[i]>>2;
 
     link_site[abs_dir] -= dir_sign;
+
     p1 = (Matrix*) GsiteOffset(gfield, link_site, g_dir_offset) + abs_dir;
+
     link_site[abs_dir] += 1 - dir_sign;
 
     //put the next link on the path in mb
@@ -400,8 +407,9 @@ void AlgWilsonFlow::AssembleGfield(Float* lfield, Float* gfield) {
         {
           g_offset = GsiteOffset(surf0, x, s_dir_offset);
           l_offset = GsiteOffset(lfield, x, l_dir_offset);
-          memcpy(g_offset, l_offset, s_dir_offset[1] * sizeof(Float));
+          memcpy(g_offset, l_offset, s_dir_offset[1] * sizeof(Float));	 
         }
+    if(GJP.Bc(i) == BND_CND_GPARITY && GJP.NodeCoor(i)==0) for(int f=1;f<GsiteSize*SurfSize;f+=2) surf0[f]*=-1; //complex conjugate links we are sending across -ve G-parity boundary
 
     getPlusData(surf1, surf0, GsiteSize * SurfSize, i);
 
@@ -449,6 +457,7 @@ void AlgWilsonFlow::AssembleGfield(Float* lfield, Float* gfield) {
           }
       ysta[i] = Slab;
     }
+    if(GJP.Bc(i) == BND_CND_GPARITY && GJP.NodeCoor(i)==GJP.Nodes(i)-1) for(int f=1;f<GsiteSize*SurfSize;f+=2) surf0[f]*=-1; //complex conjugate links we are sending across +ve G-parity boundary
 
     getMinusData(surf1, surf0, GsiteSize * SurfSize, i);
 
@@ -534,6 +543,8 @@ void AlgWilsonFlow::AssembleGfield(Float* lfield, Float* gfield) {
           }
       ysta[i] = Slab;
 
+      if(GJP.Bc(j) == BND_CND_GPARITY && GJP.NodeCoor(j)==0) for(int f=1;f<2*GsiteSize*SurfSize;f+=2) surf0[f]*=-1; //complex conjugate links we are sending across -ve G-parity boundary
+
       getPlusData(surf1, surf0, 2 * GsiteSize * SurfSize, j);
 
       // ------------------------------------------------------------------
@@ -612,6 +623,7 @@ void AlgWilsonFlow::AssembleGfield(Float* lfield, Float* gfield) {
         ysta[i] = Slab;
         ysta[j] = Slab;
       }
+      if(GJP.Bc(j) == BND_CND_GPARITY && GJP.NodeCoor(j)==GJP.Nodes(j)-1) for(int f=1;f<2*GsiteSize*SurfSize;f+=2) surf0[f]*=-1; //complex conjugate links we are sending across +ve G-parity boundary
 
       getMinusData(surf1, surf0, 2 * GsiteSize * SurfSize, j);
 
@@ -736,8 +748,8 @@ void AlgWilsonFlow::smartrun()
     AssembleGfield(lfield, gfield); 
 
     //Do each of the four steps of the RK4 integrator in turn:
+    omp_set_num_threads(GJP.Nthreads());
 
-//    omp_set_num_threads(64);
     #pragma omp parallel for
     for(int site = 0; site < GJP.VolNodeSites(); ++site)
     {
@@ -746,6 +758,7 @@ void AlgWilsonFlow::smartrun()
 
     memcpy((Float *)lat.GaugeField(), lfield, GsiteSize * vol_node_sites * sizeof(Float));
   }
+  if(GJP.Gparity()) lat.CopyConjGaugeField();
 
   sfree(cname, fname, "gfield", gfield);
   sfree(cname, fname, "lfield", lfield);

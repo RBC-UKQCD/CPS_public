@@ -173,7 +173,7 @@ int even, int odd, int Ls=0, double fac_t=1.){
   for(x[4]=0;x[4]<Ls;x[4]++){
     QDPdouble *qdp_p = (QDPdouble *) &(qdp[x[4]].elem(0).elem(0).elem(0).real());
 #if 0
-   omp_set_num_threads(1);
+//   omp_set_num_threads(1);
 #pragma omp parallel for default(none) shared(vol,node_latt,odd,even,called,qdp_p,Lat,cps_p,fac,if_export) 
     for (unsigned long i=0;i<vol;i++){
  	   unsigned long rest=i;
@@ -439,7 +439,7 @@ int DiracOpDwf::InvCg(Vector *out,
    double cg_time = -dclock();
    Float *sol_cps = (Float*) out;
    Float *src_cps = (Float*) in;
-  unsigned int f_size_cb =  GJP.VolNodeSites() * lat.FsiteSize() / (lat.FchkbEvl()+1);
+  unsigned size_t f_size_cb =  GJP.VolNodeSites() * lat.FsiteSize() / (lat.FchkbEvl()+1);
   Float src_norm_sq = in->NormSqNode(f_size_cb);
   DiracOpGlbSum(&src_norm_sq);
   VRB.Flow(cname,fname,"src_norm_sq=%e\n",src_norm_sq);

@@ -39,7 +39,8 @@ void  dwf_mdag(Vector *out,
 //------------------------------------------------------------------
 // Initializations
 //------------------------------------------------------------------
-  int f_size = 24 * dwf_lib_arg->vol_4d * dwf_lib_arg->ls / 2;
+  size_t f_size = 24 * dwf_lib_arg->vol_4d * dwf_lib_arg->ls / 2;
+  if(GJP.Gparity()) f_size*=2;
   Float minus_kappa_sq = - dwf_lib_arg->dwf_kappa * dwf_lib_arg->dwf_kappa;
   Vector *frm_tmp2 = (Vector *) dwf_lib_arg->frm_tmp2;
 

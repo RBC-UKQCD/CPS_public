@@ -319,5 +319,175 @@ static inline void MINUST( Float *u, Float *tmp, Float *tmp4,int sdag, Float *ps
 			}
 		}
 }
+
+static inline void MINUSMU(int mu, Float *u, Float *tmp, Float *tmp4,int sdag, Float *psi){
+  int c,s;
+  if(mu==0){
+    for(c=0;c<3;c++){
+      TMP(0,c,0) = 
+	      PSI(0,c,0) 
+	      - sdag 
+	      * ( -PSI(1,c,3) ); 
+      TMP(1,c,0) = PSI(1,c,0) - sdag * (  PSI(0,c,3) ); 
+
+      TMP(0,c,1) = PSI(0,c,1) - sdag * ( -PSI(1,c,2) ); 
+      TMP(1,c,1) = PSI(1,c,1) - sdag * (  PSI(0,c,2) ); 
+
+      TMP(0,c,2) = PSI(0,c,2) - sdag * (  PSI(1,c,1) ); 
+      TMP(1,c,2) = PSI(1,c,2) - sdag * ( -PSI(0,c,1) ); 
+
+      TMP(0,c,3) = PSI(0,c,3) - sdag * (  PSI(1,c,0) ); 
+      TMP(1,c,3) = PSI(1,c,3) - sdag * ( -PSI(0,c,0) ); 
+    }
+  }else if(mu==1){
+    for(c=0;c<3;c++){
+      TMP(0,c,0) = PSI(0,c,0) - sdag * ( -PSI(0,c,3) ); 
+      TMP(1,c,0) = PSI(1,c,0) - sdag * ( -PSI(1,c,3) ); 
+
+      TMP(0,c,1) = PSI(0,c,1) - sdag * (  PSI(0,c,2) ); 
+      TMP(1,c,1) = PSI(1,c,1) - sdag * (  PSI(1,c,2) ); 
+
+      TMP(0,c,2) = PSI(0,c,2) - sdag * (  PSI(0,c,1) ); 
+      TMP(1,c,2) = PSI(1,c,2) - sdag * (  PSI(1,c,1) ); 
+
+      TMP(0,c,3) = PSI(0,c,3) - sdag * ( -PSI(0,c,0) ); 
+      TMP(1,c,3) = PSI(1,c,3) - sdag * ( -PSI(1,c,0) ); 
+    }
+  }else if(mu==2){
+    for(c=0;c<3;c++){
+      TMP(0,c,0) = PSI(0,c,0) - sdag * ( -PSI(1,c,2) ); 
+      TMP(1,c,0) = PSI(1,c,0) - sdag * (  PSI(0,c,2) ); 
+
+      TMP(0,c,1) = PSI(0,c,1) - sdag * (  PSI(1,c,3) ); 
+      TMP(1,c,1) = PSI(1,c,1) - sdag * ( -PSI(0,c,3) ); 
+
+      TMP(0,c,2) = PSI(0,c,2) - sdag * (  PSI(1,c,0) ); 
+      TMP(1,c,2) = PSI(1,c,2) - sdag * ( -PSI(0,c,0) ); 
+
+      TMP(0,c,3) = PSI(0,c,3) - sdag * ( -PSI(1,c,1) ); 
+      TMP(1,c,3) = PSI(1,c,3) - sdag * (  PSI(0,c,1) ); 
+    }
+  }else if(mu==3){
+    for(c=0;c<3;c++){
+      TMP(0,c,0) = PSI(0,c,0) - sdag * (  PSI(0,c,2) ); 
+      TMP(1,c,0) = PSI(1,c,0) - sdag * (  PSI(1,c,2) ); 
+
+      TMP(0,c,1) = PSI(0,c,1) - sdag * (  PSI(0,c,3) ); 
+      TMP(1,c,1) = PSI(1,c,1) - sdag * (  PSI(1,c,3) ); 
+
+      TMP(0,c,2) = PSI(0,c,2) - sdag * (  PSI(0,c,0) ); 
+      TMP(1,c,2) = PSI(1,c,2) - sdag * (  PSI(1,c,0) ); 
+
+      TMP(0,c,3) = PSI(0,c,3) - sdag * (  PSI(0,c,1) ); 
+      TMP(1,c,3) = PSI(1,c,3) - sdag * (  PSI(1,c,1) ); 
+    }
+  }
+
+  /* multiply by U_mu */
+  for(s=0;s<4;s++){
+    for(c=0;c<3;c++){
+      TMP4(0,c,s) = (  U(0,c,0,mu) * TMP(0,0,s)
+		       + U(0,c,1,mu) * TMP(0,1,s)
+		       + U(0,c,2,mu) * TMP(0,2,s) 
+		       - U(1,c,0,mu) * TMP(1,0,s)
+		       - U(1,c,1,mu) * TMP(1,1,s)
+		       - U(1,c,2,mu) * TMP(1,2,s) );
+      TMP4(1,c,s) = (  U(0,c,0,mu) * TMP(1,0,s)
+		       + U(0,c,1,mu) * TMP(1,1,s)
+		       + U(0,c,2,mu) * TMP(1,2,s) 
+		       + U(1,c,0,mu) * TMP(0,0,s)
+		       + U(1,c,1,mu) * TMP(0,1,s)
+		       + U(1,c,2,mu) * TMP(0,2,s) );
+    }
+  }
+}
+
+
+static inline void PLUSMU(int mu, Float *u, Float *tmp, Float *tmp4,int sdag, Float *psi){
+  int c,s;
+
+  if(mu==0){
+    for(c=0;c<3;c++){
+      TMP(0,c,0) = PSI(0,c,0) + sdag * ( -PSI(1,c,3) ); 
+      TMP(1,c,0) = PSI(1,c,0) + sdag * (  PSI(0,c,3) ); 
+		
+      TMP(0,c,1) = PSI(0,c,1) + sdag * ( -PSI(1,c,2) ); 
+      TMP(1,c,1) = PSI(1,c,1) + sdag * (  PSI(0,c,2) ); 
+		
+      TMP(0,c,2) = PSI(0,c,2) + sdag * (  PSI(1,c,1) ); 
+      TMP(1,c,2) = PSI(1,c,2) + sdag * ( -PSI(0,c,1) ); 
+		
+      TMP(0,c,3) = PSI(0,c,3) + sdag * (  PSI(1,c,0) ); 
+      TMP(1,c,3) = PSI(1,c,3) + sdag * ( -PSI(0,c,0) ); 
+    }
+  }else if(mu==1){
+    for(c=0;c<3;c++){
+      TMP(0,c,0) = PSI(0,c,0) + sdag * ( -PSI(0,c,3) ); 
+      TMP(1,c,0) = PSI(1,c,0) + sdag * ( -PSI(1,c,3) ); 
+		
+      TMP(0,c,1) = PSI(0,c,1) + sdag * (  PSI(0,c,2) ); 
+      TMP(1,c,1) = PSI(1,c,1) + sdag * (  PSI(1,c,2) ); 
+		
+      TMP(0,c,2) = PSI(0,c,2) + sdag * (  PSI(0,c,1) ); 
+      TMP(1,c,2) = PSI(1,c,2) + sdag * (  PSI(1,c,1) ); 
+		
+      TMP(0,c,3) = PSI(0,c,3) + sdag * ( -PSI(0,c,0) ); 
+      TMP(1,c,3) = PSI(1,c,3) + sdag * ( -PSI(1,c,0) ); 
+    }
+  }else if(mu==2){
+    for(c=0;c<3;c++){
+      TMP(0,c,0) = PSI(0,c,0) + sdag * ( -PSI(1,c,2) ); 
+      TMP(1,c,0) = PSI(1,c,0) + sdag * (  PSI(0,c,2) ); 
+		
+      TMP(0,c,1) = PSI(0,c,1) + sdag * (  PSI(1,c,3) ); 
+      TMP(1,c,1) = PSI(1,c,1) + sdag * ( -PSI(0,c,3) ); 
+		
+      TMP(0,c,2) = PSI(0,c,2) + sdag * (  PSI(1,c,0) ); 
+      TMP(1,c,2) = PSI(1,c,2) + sdag * ( -PSI(0,c,0) ); 
+		
+      TMP(0,c,3) = PSI(0,c,3) + sdag * ( -PSI(1,c,1) ); 
+      TMP(1,c,3) = PSI(1,c,3) + sdag * (  PSI(0,c,1) ); 
+    }
+  }else if(mu==3){
+    for(c=0;c<3;c++){
+      TMP(0,c,0) = PSI(0,c,0) + sdag * (  PSI(0,c,2) ); 
+      TMP(1,c,0) = PSI(1,c,0) + sdag * (  PSI(1,c,2) ); 
+		
+      TMP(0,c,1) = PSI(0,c,1) + sdag * (  PSI(0,c,3) ); 
+      TMP(1,c,1) = PSI(1,c,1) + sdag * (  PSI(1,c,3) ); 
+		
+      TMP(0,c,2) = PSI(0,c,2) + sdag * (  PSI(0,c,0) ); 
+      TMP(1,c,2) = PSI(1,c,2) + sdag * (  PSI(1,c,0) ); 
+		
+      TMP(0,c,3) = PSI(0,c,3) + sdag * (  PSI(0,c,1) ); 
+      TMP(1,c,3) = PSI(1,c,3) + sdag * (  PSI(1,c,1) ); 
+    }
+  }
+
+  /* multiply by U_mu */
+  for(s=0;s<4;s++){
+    for(c=0;c<3;c++){
+      TMP4(0,c,s) = (  U(0,0,c,mu) * TMP(0,0,s)
+		       + U(0,1,c,mu) * TMP(0,1,s)
+		       + U(0,2,c,mu) * TMP(0,2,s) 
+		       + U(1,0,c,mu) * TMP(1,0,s)
+		       + U(1,1,c,mu) * TMP(1,1,s)
+		       + U(1,2,c,mu) * TMP(1,2,s) );
+      TMP4(1,c,s) = (  U(0,0,c,mu) * TMP(1,0,s)
+		       + U(0,1,c,mu) * TMP(1,1,s)
+		       + U(0,2,c,mu) * TMP(1,2,s) 
+		       - U(1,0,c,mu) * TMP(0,0,s)
+		       - U(1,1,c,mu) * TMP(0,1,s)
+		       - U(1,2,c,mu) * TMP(0,2,s) );
+    }
+  }
+}
+
+
+
+
+
+
 #endif
+
 

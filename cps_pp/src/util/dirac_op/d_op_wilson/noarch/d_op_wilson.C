@@ -268,6 +268,7 @@ int DiracOpWilson::MatInv(Vector *out,
   Vector *temp2 = NULL;
 
   int temp_size = GJP.VolNodeSites() * lat.FsiteSize() / 2;
+  if(GJP.Gparity()) temp_size *= 2;
 
   Vector *temp = (Vector *) smalloc(temp_size * sizeof(Float));
   if (temp == 0) ERR.Pointer(cname, fname, "temp");
@@ -370,6 +371,7 @@ void DiracOpWilson::Mat(Vector *out, Vector *in) {
 #endif
 
   int temp_size = GJP.VolNodeSites() * lat.FsiteSize() / 2;
+  if(GJP.Gparity()) temp_size *= 2;
 
   // points to the even part of fermion source 
   Vector *even_in = (Vector *) ( (IFloat *) in + temp_size );
@@ -401,6 +403,7 @@ void DiracOpWilson::MatDag(Vector *out, Vector *in) {
 #endif
 
   int temp_size = GJP.VolNodeSites() * lat.FsiteSize() / 2;
+  if(GJP.Gparity()) temp_size *= 2;
 
   // points to the even part of fermion source 
   Vector *even_in = (Vector *) ( (IFloat *) in + temp_size );
@@ -425,6 +428,8 @@ void DiracOpWilson::MatHerm(Vector *out, Vector *in) {
   VRB.Func(cname,fname);
 
   int temp_size = GJP.VolNodeSites() * lat.FsiteSize();
+  if(GJP.Gparity()) temp_size *= 2;
+
   Vector *temp = (Vector *) smalloc(temp_size * sizeof(Float));
   if (temp == 0) 
     ERR.Pointer(cname, fname, "temp");
@@ -479,7 +484,8 @@ void DiracOpWilson::CalcHmdForceVecs(Vector *chi)
 
   Vector *chi_new, *rho, *psi, *sigma ;
 
-  int f_size_cb = 12 * GJP.VolNodeSites() ;
+  size_t f_size_cb = 12 * GJP.VolNodeSites() ;
+  if(GJP.Gparity()) f_size_cb *= 2;
 
   chi_new = f_out ;
 

@@ -45,7 +45,7 @@ class AlgThreePt : public Alg
         // arguments for the three point calculation
     ThreePtPropArg* alg_threept_prop_arg;
         // pointers to propagators used in three point calculation
-    int f_size;
+    size_t f_size;
         // Node checkerboard size of the fermion field
 	enum GammaType {
 	  SCALAR = 0, //  no gamma indices

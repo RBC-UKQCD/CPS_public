@@ -128,6 +128,8 @@ void dwf_dslash_5_plus(Vector *out,
   int s_node_coor = GJP.SnodeCoor();
   int vol_4d_cb = dwf_lib_arg->vol_4d / 2;
   int ls_stride = 24 * vol_4d_cb;
+  if(GJP.Gparity()) ls_stride *=2;
+
   IFloat *f_in;
   IFloat *f_out;
 //  IFloat *f_temp;
@@ -146,9 +148,13 @@ void dwf_dslash_5_plus(Vector *out,
     f_out = f_out + 12;
   }
   f_out = f_out + ls_stride; 
-omp_set_num_threads(64);
+
+  int nthreads = GJP.SetNthreads();
+  int thread_work = vol_4d_cb*(local_ls-1);
+  if(GJP.Gparity()) thread_work*=2;
+
 #pragma omp parallel for default(shared)
-  for(x=0; x<vol_4d_cb*(local_ls-1); x++){
+  for(x=0; x<thread_work; x++){
   IFloat *f_in_t = f_in+24*x;
   IFloat *f_out_t = f_out+24*x;
 
@@ -176,8 +182,11 @@ omp_set_num_threads(64);
     f_out = f_out + 12;
   }
   
+  thread_work = vol_4d_cb;
+  if(GJP.Gparity()) thread_work*=2;
+  
 #pragma omp parallel for default(shared)
-  for(x=0; x<vol_4d_cb; x++){
+  for(x=0; x<thread_work; x++){
   IFloat *f_in_t = f_in+24*x;
   IFloat *f_out_t = f_out+24*x;
     
@@ -204,8 +213,12 @@ omp_set_num_threads(64);
     f_out = f_out + 12;
   }
   f_in = f_in + ls_stride;
+
+  thread_work = vol_4d_cb*(local_ls-1);
+  if(GJP.Gparity()) thread_work*=2;
+
 #pragma omp parallel for default(shared)
-  for(x=0; x<vol_4d_cb*(local_ls-1); x++){
+  for(x=0; x<thread_work; x++){
   IFloat *f_in_t = f_in+24*x;
   IFloat *f_out_t = f_out+24*x;
 
@@ -233,8 +246,12 @@ omp_set_num_threads(64);
   }
 
   f_out = f_out + (local_ls-1)*ls_stride;
+
+  thread_work = vol_4d_cb;
+  if(GJP.Gparity()) thread_work*=2;
+
 #pragma omp parallel for default(shared)
-  for(x=0; x<vol_4d_cb; x++){
+  for(x=0; x<thread_work; x++){
   IFloat *f_in_t = f_in+24*x;
   IFloat *f_out_t = f_out+24*x;
 

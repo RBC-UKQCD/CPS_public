@@ -129,7 +129,8 @@ class DoArg {
     Float p4_7staple;
     //! Coefficient of the Lepage term in the P4 improved staggered fermion action.
     Float p4_lepage; 
-    
+
+
 memfun  DoArg();
 memfun  void SetupAsqTadU0(double u0);
 
@@ -159,6 +160,12 @@ class DoArgExt {
     Float twist_bc_y;
     Float twist_bc_z;
     Float twist_bc_t;
+    
+    /*G-parity 1f testing options*/
+    /*Directions: choose X or X&Y, not Y alone*/
+    int gparity_1f_X;
+    int gparity_1f_Y;
+
     StartConfType start_u1_conf_kind;
     unsigned long start_u1_conf_load_addr;
     string start_u1_conf_filename<>;
