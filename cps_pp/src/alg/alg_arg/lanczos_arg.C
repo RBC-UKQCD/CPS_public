@@ -81,6 +81,8 @@ vml_LanczosArg (VML *vmls, char *name,LanczosArg *objp)
 		 return FALSE;
 	 if (!vml_int (vmls, "maxiters", &objp->maxiters))
 		 return FALSE;
+	 if (!vml_int (vmls, "n_single", &objp->n_single))
+		 return FALSE;
 	 if (!vml_int (vmls, "save", &objp->save))
 		 return FALSE;
 	 if (!vml_int (vmls, "conv_check", &objp->conv_check))

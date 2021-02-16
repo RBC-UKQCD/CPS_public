@@ -52,13 +52,19 @@ public:
     //-----------------------------------
 
     // Set the CUDA precisions
+    gauge_param.type = QUDA_SU3_LINKS;
     gauge_param.reconstruct = setReconstruct (quda_param.reconstruct);
     gauge_param.cuda_prec = setPrecision (quda_param.gauge_prec);
 
     // Set the CUDA sloppy precisions
-    gauge_param.reconstruct_sloppy =
-      setReconstruct (quda_param.reconstruct_sloppy);
+    gauge_param.reconstruct_sloppy = setReconstruct (quda_param.reconstruct_sloppy);
     gauge_param.cuda_prec_sloppy = setPrecision (quda_param.gauge_prec_sloppy);
+
+    gauge_param.reconstruct_precondition = setReconstruct (quda_param.reconstruct_sloppy);
+    gauge_param.cuda_prec_precondition = setPrecision (quda_param.gauge_prec_sloppy);
+
+    gauge_param.reconstruct_eigensolver = setReconstruct (quda_param.reconstruct_sloppy);
+    gauge_param.cuda_prec_eigensolver = setPrecision (quda_param.gauge_prec_sloppy);
 
 //      if(sizeof(Float) == sizeof(double)) {
     VRB.Result (cname, fname, "if_double=%d %d\n", if_double);
@@ -104,6 +110,12 @@ public:
     } else {
       gauge_param.t_boundary = QUDA_ANTI_PERIODIC_T;
     }
+    gauge_param.anisotropy = 1.0;
+    gauge_param.tadpole_coeff = 1.0;
+
+    gauge_param.ga_pad = 0;
+    gauge_param.mom_ga_pad = 0;
+    gauge_param.gauge_fix = QUDA_GAUGE_FIXED_NO;
   }
 
   static void ParamSetup_dwf (QudaArg & quda_param,
@@ -131,6 +143,10 @@ public:
     inv_param.reliable_delta = quda_param.reliable_delta;
 
     inv_param.Ls = GJP.SnodeSites ();
+
+    // from Jiqun: effectively turning off flags for monitoring residual misbhavior, which seems to hinder convergence in some cases
+    inv_param.max_res_increase = 10000;
+    inv_param.max_res_increase_total = 10000;
 
     //-----------------------------
     // Possible dslash types
@@ -204,8 +220,7 @@ public:
 
     gauge_param.ga_pad = 0;
     inv_param.sp_pad = 0;
-    inv_param.cl_pad = 0;
-
+   inv_param.cl_pad = 0;
 #ifdef USE_QMP
     //---------------------------------------------------------------------
     // This part is needed to make buffer memory space for multi-GPU comms
@@ -253,6 +268,10 @@ public:
     inv_param.reliable_delta = quda_param.reliable_delta;
 
     inv_param.Ls = GJP.SnodeSites ();
+
+    // from Jiqun: effectively turning off flags for monitoring residual misbhavior, which seems to hinder convergence in some cases
+    inv_param.max_res_increase = 10000;
+    inv_param.max_res_increase_total = 10000;
 
     //-----------------------------
     // Possible dslash types
@@ -386,13 +405,15 @@ public:
     if (if_double) {
       gauge_param.cuda_prec = QUDA_DOUBLE_PRECISION;
       eig_param.cuda_prec_ritz = QUDA_DOUBLE_PRECISION;
+      eig_param.save_prec = QUDA_DOUBLE_PRECISION;
 
     } else {
       gauge_param.cuda_prec = QUDA_SINGLE_PRECISION;
       eig_param.cuda_prec_ritz = QUDA_SINGLE_PRECISION;
+      eig_param.save_prec = QUDA_SINGLE_PRECISION;
     }
 
-    eig_param.location = QUDA_CPU_FIELD_LOCATION;
+//    eig_param.location = QUDA_CPU_FIELD_LOCATION;
 
     gauge_param.ga_pad = 0;
 

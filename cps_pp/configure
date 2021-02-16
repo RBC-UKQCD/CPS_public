@@ -5845,7 +5845,7 @@ ac_config_headers="$ac_config_headers conf.h"
 
 
 
-ac_config_files="$ac_config_files config.h precision.h Makefile Makefile.rules Makefile.users tests/Makefile_common hdw_tests/Makefile_common tests/regression.pl include/input/Makefile"
+ac_config_files="$ac_config_files config.h precision.h Makefile Makefile.rules Makefile.users tests/Makefile_common tests/regression.pl include/input/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -6544,7 +6544,6 @@ do
     "Makefile.rules") CONFIG_FILES="$CONFIG_FILES Makefile.rules" ;;
     "Makefile.users") CONFIG_FILES="$CONFIG_FILES Makefile.users" ;;
     "tests/Makefile_common") CONFIG_FILES="$CONFIG_FILES tests/Makefile_common" ;;
-    "hdw_tests/Makefile_common") CONFIG_FILES="$CONFIG_FILES hdw_tests/Makefile_common" ;;
     "tests/regression.pl") CONFIG_FILES="$CONFIG_FILES tests/regression.pl" ;;
     "include/input/Makefile") CONFIG_FILES="$CONFIG_FILES include/input/Makefile" ;;
 
@@ -7134,3 +7133,4 @@ $as_echo "$as_me: WARNING: unrecognized options: $ac_unrecognized_opts" >&2;}
 fi
 
 #	  XLC.cfg \
+#          hdw_tests/Makefile_common \

@@ -61,7 +61,7 @@ void NucleonPropS::localVal(Complex *currt_p, int *s)
 
   if( isDegenerateQuarks() )
   { 
-    *currt_p += det(qp0, offset) * 6;
+    *currt_p += det(qp0, offset) * 6.;
     return;
   }
 

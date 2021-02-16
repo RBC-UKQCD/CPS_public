@@ -8,13 +8,16 @@
 
 CPS_START_NAMESPACE
 
-//float* raw_in;
 // prec = sizeof(float or double)
 int EvecWriter::writeCompressedVector 
-( const char *dir, OPT *V, struct evec_write &warg, int neig){
+( const char *dir, OPT *V, struct evec_write &warg, std::vector<Float>  &evals){
 
-  const char *cname="";
+//  const char *cname="";
   const char *fname="";
+  static Timer timer (cname,fname);
+  timer.start();
+  int neig = evals.size();
+  int ID = UniqueID();
 #pragma omp parallel
   {
 #pragma omp single
@@ -37,7 +40,7 @@ int EvecWriter::writeCompressedVector
     args.nkeep=warg.nkeep;
     args.nkeep_single=warg.nkeep_single;
 //    args.filesperdir=warg.filesperdir;
-    warg.findex=UniqueID();
+    warg.findex=ID;
  
    if(warg.bigendian) bigendian=true;
 
@@ -48,7 +51,7 @@ int EvecWriter::writeCompressedVector
       VRB.Result(cname,fname,"b[%d] = %d\n",i,args.b[i]);
     VRB.Result(cname,fname,"nkeep = %d\n",args.nkeep);
     VRB.Result(cname,fname,"file_index = %10.10d\n",warg.findex);
-    VRB.Result(cname,fname,"files_per_dir = %d\n",warg.filesperdir);
+    VRB.Result(cname,fname,"n_dir = %d\n",warg.n_dir);
     VRB.Result(cname,fname,"big_endian = %d\n",warg.bigendian);
     VRB.Result(cname,fname,"nkeep_single = %d\n",args.nkeep_single);
 
@@ -114,23 +117,6 @@ int EvecWriter::writeCompressedVector
       printf("Compressed to %.4g%% of original\n",size_of_comp / size_orig * 100.);
       printf("--------------------------------------------------------------------------------\n");
     }
-    //
-
-//    fseeko(f,0,SEEK_SET);
-
-//    float *raw_in = (float*)malloc( (size_t)f_size * (neig * sizeof(float)) );
-    
-//    if (!raw_in) {
-//      fprintf(stderr,"Out of mem\n");
-//      return 5;
-//    }
-
-//    double t0 = dclock();
-
-//    if (fread(raw_in,f_size,neig*sizeof(float),f) != neig*sizeof(float)) {
-//      fprintf(stderr,"Invalid fread\n");
-//      return 6;
-//    }
 
     double t1 = dclock();
 
@@ -143,20 +129,20 @@ int EvecWriter::writeCompressedVector
 
     double t2 = dclock();
 
-    printf("Computed CRC32: %X   (in %.4g seconds)\n",crc_comp,t2-t1);
+    printf("Node %d: Computed CRC32: %X   (in %.4g seconds)\n",ID,crc_comp,t2-t1);
 
 //    fclose(f);
 
     VRB.Result(cname,fname,"Fixing endian-ness\n");
 
     // fix endian if needed
-//#pragma omp parallel for
 // turning off threading for sum testing. Eventually unnecessary 
+//#pragma omp parallel for
     for (int j=0;j<neig;j++) {
       float* segm = &raw_in[ (size_t)f_size * j ];
       fix_float_endian(segm, f_size);
 
-      if (j<MAX_EVEC_PRINT_NORM){
+        if (j<MAX_EVEC_PRINT_NORM) {
         Float sum=sp_single(segm,segm,f_size).real();
         glb_sum(&sum);
 	printf("Norm %d: %g\n",j, sum);
@@ -205,7 +191,6 @@ int EvecWriter::writeCompressedVector
 	      
 	      int co;
 	      for (co=0;co<12;co++) {
-//		float* in=&raw_in_ev[ get_bfm_index(pos,co) ];
 		float* in=&raw_in_ev[ get_cps_index(pos,co,args.s) ];
 		dst[2*co + 0] = in[0]; // may convert precision depending on OPT
 		dst[2*co + 1] = in[1];
@@ -237,7 +222,7 @@ int EvecWriter::writeCompressedVector
 	nrm_blocks += sp(in_ev,in_ev,f_size_block).real();
       }
 
-      printf("Difference of norms after blocking: %g - %g = %g\n",nrm,nrm_blocks,nrm-nrm_blocks);
+      VRB.Debug(cname,fname,"Difference of norms after blocking: %g - %g = %g\n",nrm,nrm_blocks,nrm-nrm_blocks);
 
       if (fabs(nrm - nrm_blocks) > 1e-5) {
 	fprintf(stderr,"Unexpected error in creating blocks\n");
@@ -321,7 +306,7 @@ int EvecWriter::writeCompressedVector
     for (int i=0;i<args.blocks;i++)
       block_coef[i].resize(f_size_coef_block);    
 
-    double t0 = dclock();
+//    double t0 = dclock();
 
     if (!warg.vrb_nkeep_res && !warg.vrb_evec_res) {
       printf("Do not display convergence, use fast codepath for obtaining coefficients\n");
@@ -353,7 +338,7 @@ int EvecWriter::writeCompressedVector
 //      printf("Slow codepath to display convergence %d %d\n",j,i);
 	  
 	  if (i == j && !(i % warg.vrb_nkeep_res))
-	    printf("nkeep_residuum %d = %g\n",i,norm_of_evec(block_data,j) / norm_j);
+	    printf("Node %d: nkeep_residuum %d = %g\n",ID,i,norm_of_evec(block_data,j) / norm_j);
 	  
 //#pragma omp parallel for
 	  for (int nb=0;nb<args.blocks;nb++) {
@@ -363,7 +348,7 @@ int EvecWriter::writeCompressedVector
 	}
 	
 	if (!(j % warg.vrb_evec_res))
-	  printf("evec_residuum %d = %g\n",j,norm_of_evec(block_data,j) / norm_j);
+	  printf("Node %d: evec_residuum %d = %g\n",ID,j,norm_of_evec(block_data,j) / norm_j);
       }
     }
 
@@ -371,8 +356,7 @@ int EvecWriter::writeCompressedVector
 
   }
   double t1 = dclock();
-  printf("Node %d: Computing block-coefficients took %.4g seconds\n",UniqueID(),t1-t0);
-//  exit(-43);
+  printf("Node %d: Computing block-coefficients took %.4g seconds\n",ID,t1-t0);
 
   // write result
   {
@@ -386,21 +370,28 @@ int EvecWriter::writeCompressedVector
     int concur = warg.concur;
     if(concur<1) concur=1;
     int n_block = GJP.TotalNodes()/concur;
+    if(n_block<1) n_block=1;
+    int fperdir =  GJP.TotalNodes()/warg.n_dir;
+    if (GJP.TotalNodes()%warg.n_dir) fperdir +=1;
+    if(fperdir<1 ) fperdir=1;
 
     Float temp=1.;
-    VRB.Result(cname,fname,"concur=%d n_block=%d\n",concur,n_block);
+    VRB.Result(cname,fname,"concur=%d n_block=%d file_per_dir=%d \n",concur,n_block,fperdir);
+    if(!ID) mkdir(dir,0755);
       cps::sync();
     glb_sum(&temp);
 //for(int i = 0; i< GJP.TotalNodes();i++){
 for(int i = 0; i< n_block;i++){
       cps::sync();
     glb_sum(&temp);
-    if( (UniqueID()%n_block)==i ) 
+    if( (ID%n_block)==i ) 
     {
-      sprintf(buf,"%s/%2.2d",dir,warg.findex / warg.filesperdir,warg.findex);
+      int n_dir = warg.findex/fperdir;
+      sprintf(buf,"%s/%2.2d",dir,n_dir);
+//      sprintf(buf,"%s/%2.2d",dir,warg.findex / warg.filesperdir,warg.findex);
       mkdir(buf,0755);
-      sprintf(buf,"%s/%2.2d/%10.10d.compressed",dir,warg.findex / warg.filesperdir,warg.findex);
-      printf("writing to %s/%2.2d/%10.10d.compressed\n",dir,warg.findex / warg.filesperdir,warg.findex);
+      sprintf(buf,"%s/%2.2d/%10.10d.compressed",dir,n_dir,warg.findex);
+      printf("writing to %s/%2.2d/%10.10d.compressed\n",dir,n_dir,warg.findex);
       FILE* f = fopen(buf,"w+b");
       if (!f) {
 	ERR.General(cname,fname,"Could not open %s for writing!\n",buf);
@@ -411,14 +402,14 @@ for(int i = 0; i< n_block;i++){
       
       size_t _t = (size_t)f_size_block * (args.nkeep - nkeep_fp16);
       for (int nb=0;nb<args.blocks;nb++){
-//        printf("Node %d: write_floats %d\n",UniqueID(),nb);
+//        printf("Node %d: write_floats %d\n",ID,nb);
 	write_floats(f,crc,  &block_data_ortho[nb][0], _t );
       }
       
       begin_fp16_evec = ftello(f);
       
       for (int nb=0;nb<args.blocks;nb++){
-//        printf("Node %d: write_floats_fp16 %d\n",UniqueID(),nb);
+//        printf("Node %d: write_floats_fp16 %d\n",ID,nb);
 	write_floats_fp16(f,crc,  &block_data_ortho[nb][ _t ], (int64_t)f_size_block * nkeep_fp16, 24 );
       }
       
@@ -426,57 +417,54 @@ for(int i = 0; i< n_block;i++){
 
       // write coefficients of args.nkeep_single as floats, higher coefficients as fp16
       
-#if 0
-      for (int nb=0;nb<2;nb++) {
-	
-	for (int j = 0; j < 2000; j++) {
-	  
-	  printf("Coefficients of block %d, eigenvector %d\n",nb,j);
-	  
-	  for (int i = 105; i < 106; i++) {
-	    
-	    OPT* cptr = &block_coef[nb][ 2*( i + args.nkeep*j ) ];
-	    
-	    printf("c[%d] = %g , %g\n",i,cptr[0],cptr[1]);
-	  }
-	}
-      }
-#endif
       
-//      int j;
       for (int j=0;j<neig;j++)
 	for (int nb=0;nb<args.blocks;nb++) {
-        printf("Node %d: write_floats %d %d \n",UniqueID(),j,nb);
+//        printf("Node %d: write_floats %d %d \n",ID,j,nb);
 	  write_floats(f,crc,  &block_coef[nb][2*args.nkeep*j], 2*(args.nkeep - nkeep_fp16) );
 	  write_floats_fp16(f,crc,  &block_coef[nb][2*args.nkeep*j + 2*(args.nkeep - nkeep_fp16) ], 2*nkeep_fp16 , FP16_COEF_EXP_SHARE_FLOATS);
 	}
       
       fclose(f);
+      printf("writing to %s/%2.2d/%10.10d.compressed done \n",dir,n_dir,warg.findex);
     }
 }
-
       cps::sync();
+    glb_sum(&temp);
+
+if(!ID){
+      sprintf(buf,"%s/eigen-values.txt",dir);
+      FILE* f = fopen(buf,"wt");
+      fprintf(f,"%d\n",neig);
+      for(int i=0;i<neig;i++)
+      fprintf(f,"%0.14E\n",evals[i]);
+      fclose(f);
+}
+      cps::sync();
+    glb_sum(&temp);
+     
+      
     // write meta data
     {
 //      sprintf(buf,"%s/%2.2d/%10.10d.meta",dir,warg.findex / warg.filesperdir,warg.findex);
       sprintf(buf,"%s/metadata.txt",dir);
-for(int i = 0; i< GJP.TotalNodes();i++){
+for(int node = 0; node< GJP.TotalNodes();node++){
       cps::sync();
-if (i==UniqueID()){
-printf("Node %d got the slot\n",i);
-if (i==0){
+    glb_sum(&temp);
+if (node==ID){
+//printf("Node %d got the slot\n",i);
+if (!node){
       FILE* f = fopen(buf,"wt");
       if (!f) {
 	fprintf(stderr,"Could not open %s for writing!\n",buf);
 	return 1;
       }
 
-      int i;
-      for (i=0;i<5;i++)
+      for (int i=0;i<5;i++)
 	fprintf(f,"s[%d] = %d\n",i,args.s[i]);
-      for (i=0;i<5;i++)
+      for (int i=0;i<5;i++)
 	fprintf(f,"b[%d] = %d\n",i,args.b[i]);
-      for (i=0;i<5;i++)
+      for (int i=0;i<5;i++)
 	fprintf(f,"nb[%d] = %d\n",i,args.nb[i]);
       fprintf(f,"neig = %d\n",neig);
       fprintf(f,"nkeep = %d\n",args.nkeep);
@@ -489,19 +477,22 @@ if (i==0){
       fclose(f);
 }
       FILE* f = fopen(buf,"a");
-      fprintf(f,"crc32[%d] = %X\n",UniqueID(),crc);
+      fprintf(f,"crc32[%d] = %X\n",node,crc);
       fclose(f);
+      if(VRB.Level(VERBOSE_FLOW_LEVEL))
+      printf("Node %d done\n",node);
 
 }
 }
     }
     Float t2= dclock();
-    printf("Node %d: File I/O took %.4g seconds\n",UniqueID(),t2-t1);
+    printf("Node %d: File I/O took %.4g seconds\n",ID,t2-t1);
   }
 
   // Cleanup
 //  free(raw_in);
 
+  timer.stop(true);
   return 0;
 }
 

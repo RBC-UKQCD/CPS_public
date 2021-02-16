@@ -1,4 +1,4 @@
-#ifndef __QIO_READENERICFIELDS_H__
+#ifndef __QIO_READGENERICFIELDS_H__
 #define __QIO_READGENERICFIELDS_H__
 
 #include <util/qio_general.h>

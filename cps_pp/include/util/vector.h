@@ -1,5 +1,7 @@
 #ifndef INCLUDED_VECTOR_H
 #define INCLUDED_VECTOR_H               //!< Prevent multiple inclusion
+#include<vector>
+#include<assert.h>
 #include<config.h>
 /*!\file
   \brief  Declaration/definition of Vector and Matrix classes.
@@ -12,7 +14,16 @@
 #include <util/data_types.h>
 #include <util/vector_asm.h>
 #include <util/verbose.h>
+#include <util/omp_wrapper.h>
+
 #define VEC_INLINE
+
+#if 0
+#define NOINLINE_MACRO __attribute((noinline))
+#else
+#define NOINLINE_MACRO 
+#endif
+
 CPS_START_NAMESPACE
 
 const int OMP_CUTOFF=100;
@@ -179,13 +190,29 @@ void vecNegative(IFloat *a, const IFloat *b, int);
     //! set all elements to zero
 void vecZero(IFloat *a, int size);
 
-    //! real scalar times vector multiplication; a *= b
-void vecTimesEquFloat(IFloat *a, IFloat b, int); // 
-    void vecAddEquFloat(IFloat *a, IFloat b, int); // 
+/*!
+  \param a The vector to be multiplied
+  \param b The real scalar
+  \param len The length of the vectors.
+  \post \a a is the multiplied vector.
+ */
+inline void vecTimesEquFloat(IFloat *a, IFloat b, size_t len) {
+#pragma omp parallel for
+    for(size_t i = 0; i < len; ++i) {
+    	a[i] *= b;
+    }
+}
 
-inline void vecTimesEquFloatSingle(IFloat *a, IFloat b, int len)
+inline void vecAddEquFloat(IFloat *a, IFloat b, size_t len) {
+#pragma omp parallel for
+    for(size_t i = 0; i < len; ++i) {
+        a[i] += b;
+    }
+}
+
+inline void vecTimesEquFloatSingle(IFloat *a, IFloat b, size_t len)
 {
-    for(int i = 0; i < len; ++i) {
+    for(size_t i = 0; i < len; ++i) {
     	*(a+i) *= b;
     }
 }
@@ -618,6 +645,9 @@ inline void TrLessAntiHermMatrix()
     //! Force this matrix to be an SU(3) matrix.
     void Unitarize(void);
 
+    //! Only do the last step in Unitarize.
+    void Construct3rdRow(void);
+
     //! Project this matrix onto SU(3) according to its polar decomposition
     //! Added by Thomas Dumitrescu 06/2006
     int ProjSU3(void);
@@ -957,7 +987,7 @@ class Vector
       \param len The number of real numbers in the vectors.
       \post This vector is multiplied by \a fb
     */
-    void VecTimesEquFloat(const Float &fb, int len)
+    void VecTimesEquFloat(const Float &fb, size_t len)
     {vecTimesEquFloat((IFloat *)&v, IFloat(fb), len);}
 
     //! Multiplication by a real scalar
@@ -1082,7 +1112,6 @@ class Vector
 
 };
 
-#if TARGET != BGL
   inline void vaxpy3(Vector *res,Float *scale,Vector *mult,Vector
 *add, int ncvec){
   fTimesV1PlusV2((IFloat *)res, (IFloat)*scale, (IFloat *)mult,
@@ -1093,7 +1122,110 @@ class Vector
   fTimesV1PlusV2((IFloat *)res, (IFloat)*scale, (IFloat *)mult,
     (IFloat *)add, ncvec*6);
 }
+
+#if 0
+inline void moveFloattofloat NOINLINE_MACRO (float *out, Float * in, size_t f_size)
+{
+  Float  sum=0.;
+#pragma omp parallel for reduction(+:sum)
+  for (size_t i = 0; i < f_size; i++) {
+      out[i]=in[i];
+//    flt = (float) in[i];
+//    out[i] = flt;
+      sum +=out[i]*out[i];
+  }
+  glb_sum(&sum);
+  VRB.Result("","moveFloattofloat()","norm=%e\n",sum);
+};
+
+inline void movefloattoFloat NOINLINE_MACRO (Float * out, float *in, size_t f_size)
+{
+//  float flt;
+  Float  sum=0.;
+#pragma omp parallel for reduction(+:sum)
+  for (size_t i = 0; i < f_size; i++) {
+      out[i]=in[i];
+//    flt = in[i];
+//    out[i] = (Float) flt;
+      sum +=out[i]*out[i];
+  }
+  glb_sum(&sum);
+  VRB.Result("","moveFloattofloat()","norm=%e\n",sum);
+};
 #endif
+
+template < typename AFloat, typename BFloat >
+  void compDotProduct (std::vector < Float > &result,
+                       const std::vector < AFloat * >a,
+                       const std::vector < BFloat * >b, size_t len)
+{
+
+  const char *fname="compDotProduct()";
+  size_t a_size = a.size ();
+  size_t b_size = b.size ();
+  size_t c_size = len;
+
+  int a_step = 8;
+  int b_step = 8;
+  int c_step = 8;
+  if (a_size < a_step) a_step = a_size;
+  if (b_size < b_step) b_step = b_size;
+  if (c_size < c_step ) c_step = c_size;
+  VRB.Debug("",fname,"sizes= %d %d %d step = %d %d %d result.size()=%d\n", 
+	a_size,b_size,c_size,a_step,b_step,c_step,result.size());fflush(stdout);
+  int nthr=0;
+#pragma omp parallel 
+{
+   nthr = omp_get_num_threads();
+}
+//  assert ((len % c_step) == 0);
+//  assert ((a_size % a_step) == 0);
+//  assert ((b_size % b_step) == 0);
+  result.resize (2 * a_size * b_size, 0.);
+  Float *result_p = result.data();
+//  exit(-42);
+//#pragma omp parallel for reduction(+:re,im)
+  for (size_t i = 0; i < a_size; i += a_step)
+    for (size_t j = 0; j < b_size; j += b_step)
+#pragma omp parallel for
+      for (size_t k = 0; k < c_size; k += c_step) {
+        int ii_end = a_step; if((a_size-i)<a_step) ii_end = a_size-i;
+        int jj_end = b_step; if((b_size-j)<b_step) jj_end = b_size-j;
+        int kk_end = c_step; if((c_size-k)<c_step) kk_end = c_size-k;
+//  printf("%s:end= %d %d %d \n", fname, ii_end,jj_end,kk_end);fflush(stdout);
+//OMP4( parallel for )
+        for (size_t kk = 0; kk < kk_end; kk++) {
+          std::vector < Float > re (a_step * b_step*2, 0);
+          size_t ind_k = 2 * (k + kk);
+          for (size_t ii = 0; (ii < ii_end); ii++) {
+            AFloat *a_p = a[i + ii];
+            for (size_t jj = 0; (jj < jj_end); jj++) {
+              BFloat *b_p = b[j + jj];
+//              printf("%s: %d %d: (%e %e) (%e %e)\n", fname, 
+//              if(!ind_k) VRB.Result("",fname,"%d %d: (%e %e) (%e %e)\n",
+//		i+ii,j+jj, *a_p,*(a_p+1),*b_p, *(b_p+1));fflush(stdout);
+              re[2*(ii + a_step * jj)] +=
+                *(a_p + ind_k) * *(b_p + ind_k) + *(a_p + ind_k + 1) * *(b_p + ind_k + 1);
+              re[1+2*(ii + a_step * jj)] +=
+                *(a_p + ind_k) * *(b_p + ind_k + 1) - *(a_p + ind_k + 1) * *(b_p + ind_k);
+            }
+          }
+#if 1
+          for (size_t ii = 0; ii < ii_end; ii++)
+            for (size_t jj = 0; jj < jj_end ; jj++){
+//OMP4( critical )
+#pragma omp critical
+            {
+              size_t ind_ij = (i + ii) + a_size * (j + jj);
+              result_p[2 * ind_ij] += re[2*(ii + a_step * jj)];
+              result_p[2 * ind_ij + 1] += re[1+2*(ii + a_step * jj)];
+            }
+          }
+#endif
+        }
+      }
+
+}
 
 CPS_END_NAMESPACE
 #endif

@@ -24,6 +24,7 @@ public:
 	int max_num_iter;
 	Float stop_rsd;
 	Float true_rsd;
+	Float inner_rsd;
 	enum RitzMatType RitzMatOper;
 	enum InverterType Inverter;
 	int bicgstab_n;

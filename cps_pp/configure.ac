@@ -666,8 +666,8 @@ AC_OUTPUT(config.h \
 	  Makefile.rules \
 	  Makefile.users \
           tests/Makefile_common \
-          hdw_tests/Makefile_common \
           tests/regression.pl \
 	  include/input/Makefile\
 	  )	  
 #	  XLC.cfg \
+#          hdw_tests/Makefile_common \

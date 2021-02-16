@@ -6,21 +6,6 @@ CPS_START_NAMESPACE
   
   $Id: alg_lanczos.C,v 1.25 2009/03/23 19:13:32 chulwoo Exp $
 */
-//--------------------------------------------------------------------
-//  CVS keywords
-//
-//  $Author: chulwoo $
-//  $Date: 2009/03/23 19:13:32 $
-//  $Header: /space/cvs/cps/cps++/src/alg/alg_lanczos/alg_lanczos.C,v 1.25 2009/03/23 19:13:32 chulwoo Exp $
-//  $Id: alg_lanczos.C,v 1.25 2009/03/23 19:13:32 chulwoo Exp $
-//  $Name: v5_0_8_eigCG_Qi $
-//  $Locker:  $
-//  $RCSfile: alg_lanczos.C,v $
-//  $Revision: 1.25 $
-//  $Source: /space/cvs/cps/cps++/src/alg/alg_lanczos/alg_lanczos.C,v $
-//  $State: Exp $
-//
-//--------------------------------------------------------------------
 
 CPS_END_NAMESPACE
 #include <util/qcdio.h>
@@ -173,6 +158,7 @@ void AlgLanczos::run(int init_flag, int ncompress, char* comp_file ){
     // try the linear conbination of eigenvector as an initial vector
     {
       ERR.NotImplemented(cname,fname,"This  init_flag is not supported yet\n");
+#if 0
       Lattice& lattice= lat;
       const int n_fields =  GJP.SnodeSites();  //   *nk ; 
       const size_t f_size_per_site = lattice.FsiteSize() / GJP.SnodeSites()  / (lattice.FchkbEvl()+1);
@@ -225,6 +211,7 @@ void AlgLanczos::run(int init_flag, int ncompress, char* comp_file ){
 	    eigcon. nev_check( eigenv[i],  mass );	
 	  
 	}
+#endif
     }
   
   // ----------- experiment ends ------------------------
@@ -239,6 +226,8 @@ void AlgLanczos::run(int init_flag, int ncompress, char* comp_file ){
 	VRB.Result (cname, fname, "eigenv[%d]=%p ecache %p\n", i, eigenv[i],ecache->vec_ptr(i));
   }
  
+#if 0
+//EigenContainer deprecated
   // Now Let's save them
 
   // FIXME : pass the argument contains the ensemble informations
@@ -271,6 +260,7 @@ void AlgLanczos::run(int init_flag, int ncompress, char* comp_file ){
 		       field_type_label, ensemble_id, ensemble_label, seqNum );
     }
   }
+#endif
 
 #if 0
   // Free memory if not cached

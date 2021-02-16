@@ -1,41 +1,14 @@
 #include<config.h>
-CPS_START_NAMESPACE
-//--------------------------------------------------------------------
-//  CVS keywords
-//
-//  $Author: chulwoo $
-//  $Date: 2008/02/08 18:35:05 $
-//  $Header: /space/cvs/cps/cps++/src/alg/alg_s_spect/nlocal_prop_s.C,v 1.7 2008/02/08 18:35:05 chulwoo Exp $
-//  $Id: nlocal_prop_s.C,v 1.7 2008/02/08 18:35:05 chulwoo Exp $
-//  $Name: v5_0_16_hantao_io_test_v7 $
-//  $Locker:  $
-//  $RCSfile: nlocal_prop_s.C,v $
-//  $Revision: 1.7 $
-//  $Source: /space/cvs/cps/cps++/src/alg/alg_s_spect/nlocal_prop_s.C,v $
-//  $State: Exp $
-//
-//--------------------------------------------------------------------
-// nlocal_prop_s.C
-CPS_END_NAMESPACE
 #include <alg/nlocal_prop_s.h>
 #include <alg/quark_prop_s.h>
 #include <util/gjp.h>
 #include <util/smalloc.h>
-CPS_START_NAMESPACE
 		// smalloc()
-CPS_END_NAMESPACE
 #include <comms/scu.h>	
-CPS_START_NAMESPACE
 		// getMinusData(), getMinus2Data(), getMinus3Data()
-CPS_END_NAMESPACE
 #include <alg/myenum.h>
-CPS_START_NAMESPACE
-
-#ifdef PARALLEL
-CPS_END_NAMESPACE
 #include <comms/sysfunc_cps.h>
 CPS_START_NAMESPACE
-#endif
 
 char NLocalPropS::cname[] = "NLocalPropS";
 
@@ -290,7 +263,7 @@ void NLocalPropS::localVal(Complex *currp, int *s)
   
         currp[2] += c034 - c135;
            // Nucleon16 factor excluded
-        currp[3] += c034 + c135 - 2*c245;
+        currp[3] += c034 + c135 - 2.*c245;
            // Nucleon16 factor excluded
       }
 }

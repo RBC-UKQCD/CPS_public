@@ -85,7 +85,7 @@ int Verbose::Level()
  */
 //------------------------------------------------------------------
 // This is for backwards compatibilty
-void Verbose::Level(int value){
+void Verbose::Set(int value){
     
     int i;
     if(value<0)
@@ -105,13 +105,15 @@ void Verbose::Level(int value){
   \param value The value to which the verbosity level is set.
  */
 //------------------------------------------------------------------
-void Verbose::Level(VerboseLevelType value){
+#if 1
+void Verbose::Set(VerboseLevelType value){
 
     int i;
     for(i=0; i<=value; i++) active[i] = 1;
     for(i=value+1; i<N_VERBOSE_LEVELS; i++) active[i] = 0;
    
 }
+#endif
 
 //------------------------------------------------------------------
 /*!
@@ -478,7 +480,7 @@ void Verbose::Warn(const char *class_name, const char *func_name,
     
     FILE *fp;
     char *filename = "phys.warn";
-    if( (fp = Fopen(filename, "a")) == NULL ) {
+    if( (fp = Fopen(ADD_ID,filename, "w")) == NULL ) {
 	ERR.FileA("Verbose","Warn", filename);
     }
     Fprintf(fp,"WARNING %s::%s :\n\t", class_name, func_name);

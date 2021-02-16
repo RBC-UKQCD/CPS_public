@@ -9,6 +9,7 @@
 #include <comms/glb.h>
 #include <util/verbose.h>
 #include <util/error.h>
+#include <util/conversion.h>
 #include <math.h>
 #ifdef USE_LAPACK
 #include <lapacke.h>
@@ -57,7 +58,7 @@ void lanczos_GramSchm_test (Float * psi, Float ** vec, int Nvec, size_t f_size,
 void lanczos_GramSchm_test (Float * psi, float **vec, int Nvec, size_t f_size,
 			    Float * alpha);
 void double_to_float (Float * vec, size_t f_size);
-void movefloattoFloat (Float * out, float *in, size_t f_size);
+//void movefloattoFloat (Float * out, float *in, size_t f_size);
 void moveFloattofloat (float *out, Float * in, size_t f_size);
 
 #ifdef USE_LAPACK
@@ -194,7 +195,7 @@ int DiracOp::ImpResLanczos (Vector ** V,	//Lanczos vectors, eigenvectors of Ritz
 			    LanczosArg * eig_arg)
 {
 
-  char *fname = "ImResLanczos(...)";
+  const char *fname = "ImResLanczos(...)";
 
   VRB.Func (cname, fname);
 
@@ -402,7 +403,7 @@ int DiracOp::ImpResLanczos (Vector ** V,	//Lanczos vectors, eigenvectors of Ritz
     //      Q[13][0]=0, Q[14][0]=Q[14][1]=0
 #if 1
     // FIXME:  would be slow due to non-localized memory access
-    for (int n = 0; n < f_size; n += 2) {
+    for (size_t n = 0; n < f_size; n += 2) {
       vecZero ((IFloat *) scratch_2m, 2 * m);
 
       for (int j = 0; j < np; ++j) {
@@ -459,7 +460,7 @@ int DiracOp::ImpResLanczos (Vector ** V,	//Lanczos vectors, eigenvectors of Ritz
 
     if (VRB.IsActivated (VERBOSE_DEBUG_LEVEL)) {
       VRB.Debug (cname, fname, "new residual vector\n");
-      for (int j = 0; j < f_size; j++)
+      for (size_t j = 0; j < f_size; j++)
 	VRB.Debug (cname, fname, "%d %.16f\n", j, *((Float *) r + j));
     }
 
@@ -619,7 +620,7 @@ int DiracOp::ImpResLanczos (Vector ** V,	//Lanczos vectors, eigenvectors of Ritz
   }
 #endif
 
-  for (int n = 0; n < f_size; n += 2) {
+  for (size_t n = 0; n < f_size; n += 2) {
     vecZero ((IFloat *) scratch_2m, 2 * m);
 #if 0
     for (int k = 0; k < m; ++k) {
@@ -874,32 +875,45 @@ void DiracOp::lanczos (int k0, int m, size_t f_size,
 }
 
 #if 0
+
+#if 0
 #define NOINLINE_MACRO __attribute((noinline))
 #else
 #define NOINLINE_MACRO 
 #endif
 
-
 void moveFloattofloat NOINLINE_MACRO (float *out, Float * in, size_t f_size)
 {
 #if 1
-  float flt;
-  for (int i = 0; i < f_size; i++) {
-    flt = (float) in[i];
-    out[i] = flt;
+  Float  sum=0.;
+#pragma omp parallel for reduction(+:sum)
+  for (size_t i = 0; i < f_size; i++) {
+      out[i]=in[i];
+//    flt = (float) in[i];
+//    out[i] = flt;
+      sum +=out[i]*out[i];
   }
+  glb_sum(&sum);
+  VRB.Result("","moveFloattofloat()","norm=%e\n",sum);
 #endif
 };
 
 #if 1
 void movefloattoFloat NOINLINE_MACRO (Float * out, float *in, size_t f_size)
 {
-  float flt;
-  for (int i = 0; i < f_size; i++) {
-    flt = in[i];
-    out[i] = (Float) flt;
+//  float flt;
+  Float  sum=0.;
+#pragma omp parallel for reduction(+:sum)
+  for (size_t i = 0; i < f_size; i++) {
+      out[i]=in[i];
+//    flt = in[i];
+//    out[i] = (Float) flt;
+      sum +=out[i]*out[i];
   }
+  glb_sum(&sum);
+  VRB.Result("","moveFloattofloat()","norm=%e\n",sum);
 };
+#endif
 #endif
 
 CPS_END_NAMESPACE

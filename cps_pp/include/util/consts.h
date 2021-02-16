@@ -1,0 +1,6 @@
+#ifndef INCLUDE_UTIL_CONSTS_H
+#define INCLUDE_UTIL_CONSTS_H
+CPS_START_NAMESPACE
+const Float le=log(exp(1.));
+CPS_END_NAMESPACE
+#endif

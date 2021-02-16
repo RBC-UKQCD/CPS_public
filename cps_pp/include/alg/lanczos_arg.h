@@ -43,6 +43,7 @@ public:
 	Float eigen_shift;
 	Float stop_residual;
 	int maxiters;
+	int n_single;
 	int save;
 	int conv_check;
 	PrecType precision;

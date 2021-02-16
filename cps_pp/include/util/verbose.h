@@ -72,11 +72,15 @@ class Verbose
     int Level();
     //!< Gets the value of the verbosity level.
 
-    void Level(int);
+    void Set(int);
     //!< Sets the value of the verbosity level
 
-    void Level(VerboseLevelType);
+    void Set(VerboseLevelType);
     //!< Sets the value of the verbosity level
+    int Level(VerboseLevelType level){
+      return(active[level]);
+    }
+    //!< returns the value of the verbosity level
     
     void Func(const char*, const char*);
     //!< For printing a message upon function entry.

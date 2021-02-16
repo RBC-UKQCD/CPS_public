@@ -10,6 +10,7 @@ class CgArg {
   
   Float stop_rsd;		/*!<  The target residual. */
   Float true_rsd;
+  Float inner_rsd; 		/*!<  The Inner residual for mixed precision solvers */
   
   enum RitzMatType RitzMatOper; /*!< Which operator to determine eigenvalues
                                   of, if any. */

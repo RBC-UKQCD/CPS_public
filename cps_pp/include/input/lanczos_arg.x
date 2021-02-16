@@ -33,10 +33,11 @@ class LanczosArg {
     Float eigen_shift;     // shift for target eigenvalues, only for DWF, for now 
     Float stop_residual;     /*!< Absolute residual.  */
     int maxiters;            /*!< max number of restartings  */
+    int n_single;         // number of evecs saved in single precision
     int save; /* save eig vecs or not (always save evals) */
     int conv_check; /* do the convergence check every conv_check iters */
-	PrecType precision; 
-	int	 mem_save;
+    PrecType precision; 
+    int	 mem_save;
 
     string results<>;  // the file name for ascii output file (number of iteration and whatnot)
     string file<>;  // the file name for eigen vector/values

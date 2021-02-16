@@ -53,28 +53,6 @@ void AlgIntAB::heatbath() {
 //  char *veloc_p = veloc_label.c_str();
   A->heatbath();
   B->heatbath();
-#ifdef HAVE_VELOC
-  if (level == TOP_LEVEL_INTEGRATOR){
-     int veloc_v = getVer(veloc_label.c_str());
-     VRB.Result(cname,fname,"veloc_v=%d\n",veloc_v);
-     Float dtime = -dclock();
-     if (veloc_v<1){
-	VELOC_Checkpoint_begin(veloc_label.c_str(),1);
-//	VELOC_Checkpoint_selective(VELOC_CKPT_SOME,phi_veloc_all.data(),phi_veloc_all.size());
-	VELOC_Checkpoint_mem();
-	VELOC_Checkpoint_end(1);
-     } else {
-        VELOC_Restart_begin (veloc_label.c_str(),1);
-//	VELOC_Recover_selective(VELOC_CKPT_SOME,phi_veloc_all.data(),phi_veloc_all.size());
-	VELOC_Recover_mem();
-	VELOC_Restart_end(1);
-        exit(-42);
-     }
-//     VELOC_Finalize(0);
-     dtime +=dclock();
-     print_time(fname,"VeloC()",dtime);
-  }
-#endif
 }
 
 Float AlgIntAB::energy() {

@@ -36,14 +36,7 @@ AlgActionGauge::AlgActionGauge(AlgMomentum &mom, ActionGaugeArg &g_arg)
 
   Lattice &lat = LatticeFactory::Create(F_CLASS_NONE, gluon);
  int veloc_id=-1;
-#if 1
  veloc_id = protect(cname,fname,lat.GaugeField(),g_size,sizeof(Float));
-#else
-#ifdef HAVE_VELOC
- VELOC_Mem_protect (  (veloc_id= VeloCCounter() ) , lat.GaugeField(), g_size, sizeof(Float) );
- VRB.Result(cname,fname,"gauge VELOC id:%d ptr=%p g_size=%d \n",veloc_id,lat.GaugeField(), g_size);
-#endif
-#endif
 if (veloc_id>-1) md_veloc_all.push_back(veloc_id);
 
   LatticeFactory::Destroy();

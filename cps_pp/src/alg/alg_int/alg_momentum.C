@@ -36,17 +36,7 @@ AlgMomentum::AlgMomentum() : AlgHamiltonian()
   md_time_str = "MD_time/step_size = ";
   mom = (Matrix*)smalloc(g_size*sizeof(Float),"mom",fname,cname);
   int veloc_id=-1;
-#if 1
  veloc_id = protect(cname,fname,mom,g_size,sizeof(Float));
-#else
-#ifdef HAVE_VELOC
- Float dtime = -dclock();
- VELOC_Mem_protect (  (veloc_id= VeloCCounter() ) , mom, g_size, sizeof(Float) );
- VRB.Result(cname,fname,"mom VELOC id:%d\n",veloc_id);
- dtime +=dclock();
- print_flops(fname,"VeloC()",0,dtime);
-#endif
-#endif
   if (veloc_id>-1) md_veloc_all.push_back(veloc_id);
 
 
@@ -66,27 +56,7 @@ void AlgMomentum::heatbath() {
   int veloc_v=-1;
   std::string veloc_label;
   veloc_label="MD_traj"+std::to_string(traj_num);
-#if 1
   veloc_v = getVer(veloc_label.c_str());
-#else
-#ifdef HAVE_VELOC
-   Float dtime2 = -dclock();
-  {
-    std::stringstream veloc_label;
-    veloc_label <<"MD_traj"<<traj_num<<std::endl;
-    std::string veloc_str = veloc_label.str();
-    std::cout <<"Veloc label: "<<(veloc_str).c_str()<<std::endl;
-    VRB.Result(cname,fname,"Veloc label version: %s %d\n",
-              (veloc_str).c_str(),veloc_v);
-    int veloc_v = VELOC_Restart_test((veloc_str).c_str(),65536);
-    VRB.Result(cname,fname,"Veloc label version: %s %d\n",
-              (veloc_str).c_str(),veloc_v);
-  }
-   dtime2 += dclock();
-   print_flops(fname,"VeloC_Restart_test()",0,dtime);
-  exit(-4);
-#endif
-#endif
 
   Lattice &lat = LatticeFactory::Create(F_CLASS_NONE, G_CLASS_NONE);
   lat.RandGaussAntiHermMatrix(mom, 1.0);

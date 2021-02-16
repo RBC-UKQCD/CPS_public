@@ -38,6 +38,8 @@ vml_CgArg (VML *vmls, char *name,CgArg *objp)
 		 return FALSE;
 	 if (!vml_Float (vmls, "true_rsd", &objp->true_rsd))
 		 return FALSE;
+	 if (!vml_Float (vmls, "inner_rsd", &objp->inner_rsd))
+		 return FALSE;
 	 if (!vml_RitzMatType (vmls, "RitzMatOper", &objp->RitzMatOper))
 		 return FALSE;
 	 if (!vml_InverterType (vmls, "Inverter", &objp->Inverter))

@@ -12,8 +12,8 @@ int start_u1_conf_alloc_flag = 0
 int mult_u1_conf_flag = 0
 int save_stride = 0
 int trajectory = 0
-double mobius_b_coeff = 1.5
-double mobius_c_coeff = 0.5
+double mobius_b_coeff = 2.5
+double mobius_c_coeff = 1.5
 Array zmobius_b_coeff[0] = {
 }
 Array zmobius_c_coeff[0] = {

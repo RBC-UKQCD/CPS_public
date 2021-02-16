@@ -4,7 +4,7 @@
 SRCDIR = @abs_top_srcdir@
 BUILDDIR = @abs_top_builddir@
 TESTDIR = tests
-HDW_TESTDIR= hdw_tests
+#HDW_TESTDIR= hdw_tests
 DOCDIR = doc
 
 # Added by Hantao
@@ -84,13 +84,10 @@ copy_include:
 TESTSUBDIRS :=$(shell ls -p $(SRCDIR)/$(TESTDIR)/*/Makefile_regression)
 TESTSUBDIRS :=$(dir $(TESTSUBDIRS))
 TESTSUBDIRS :=$(patsubst $(SRCDIR)/$(TESTDIR)/%/, %, $(TESTSUBDIRS))
-HDW_TESTSUBDIRS :=$(shell ls -p $(SRCDIR)/$(HDW_TESTDIR)/*/Makefile_regression)
-HDW_TESTSUBDIRS :=$(dir $(HDW_TESTSUBDIRS))
-HDW_TESTSUBDIRS :=$(patsubst $(SRCDIR)/$(HDW_TESTDIR)/%/, %, $(HDW_TESTSUBDIRS))
 TESTBUILDDIRS :=$(shell ls -p $(SRCDIR)/$(TESTDIR)/*/test_command)
 TESTBUILDDIRS :=$(patsubst $(SRCDIR)/$(TESTDIR)/%/test_command, %/build.done, $(TESTBUILDDIRS))
 
-copy_testdir: $(TESTSUBDIRS) $(HDW_TESTSUBDIRS)
+copy_testdir: $(TESTSUBDIRS) 
 	$(if $(findstring s, $(MAKEFLAGS)),,@echo TESTSUBDIRS = $(TESTSUBDIRS))
 
 $(TESTSUBDIRS):
@@ -98,10 +95,6 @@ $(TESTSUBDIRS):
 	-cp -p $(SRCDIR)/$(TESTDIR)/$@/Makefile*  $(TESTDIR)/$@
 	-cp -p $(SRCDIR)/$(TESTDIR)/$@/*.in  $(TESTDIR)/$@
 
-$(HDW_TESTSUBDIRS):
-	$(if $(builddir_isnt_srcdir), mkdir -p $(HDW_TESTDIR)/$@)
-	-cp -p $(SRCDIR)/$(HDW_TESTDIR)/$@/Makefile_regression  $(HDW_TESTDIR)/$@
- 
 testbuild: $(TESTBUILDDIRS)
 	@echo TESTBUILDDIR = $(TESTBUILDDIRS)
  

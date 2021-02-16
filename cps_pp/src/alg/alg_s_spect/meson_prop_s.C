@@ -80,9 +80,9 @@ void MesonPropS::localVal(Complex *currt_p, int *s)
   Complex trace = traceG1DagG2(qp0, qp1, offset);
 
   *currt_p++ += trace;
-  *currt_p++ += trace * signVT(s);
-  *currt_p++ += trace * signPV(s);
-  *currt_p   += trace * signSC(s);
+  *currt_p++ += trace * (Float)signVT(s);
+  *currt_p++ += trace * (Float)signPV(s);
+  *currt_p   += trace * (Float)signSC(s);
 
   return; 
 }

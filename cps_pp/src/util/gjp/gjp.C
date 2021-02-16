@@ -115,9 +115,10 @@ QudaArg QudaParam;
 // Constructor
 //------------------------------------------------------------------
 GlobalJobParameter::GlobalJobParameter() 
+:cname("GlobalJobParameter")
 {
-  cname = "GlobalJobParameter";
-  char *fname = "GlobalJobParameter()";
+//  cname = "GlobalJobParameter";
+  const char *fname = "GlobalJobParameter()";
 //  printf("%s::%s Entered\n",cname,fname);
 //  VRB.Func(cname,fname);
   doext_p = NULL;
@@ -135,7 +136,7 @@ GlobalJobParameter::GlobalJobParameter()
 // Destructor
 //------------------------------------------------------------------
 GlobalJobParameter::~GlobalJobParameter() {
-  char *fname = "~GlobalJobParameter()";
+  const char *fname = "~GlobalJobParameter()";
 //  printf("%s::%s Entered\n",cname,fname);
   VRB.Func(cname,fname);
 }
@@ -178,7 +179,7 @@ void GlobalJobParameter::InitializeExt(const DoArgExt& rda) {
 }
 
 void GlobalJobParameter::Initialize() {
-  char *fname = "Initialize()";
+  const char *fname = "Initialize()";
   VRB.Func(cname,fname);
   int i, j;
   char *dim_name[5] = {"X","Y","Z","T","S"};
@@ -413,7 +414,7 @@ node_coor[0], node_coor[1], node_coor[2], node_coor[3], node_coor[4]);
 
   VRB.DeactivateAll();
 //  printf("verbose_level =%d\n",doarg_int.verbose_level);
-  VRB.Level(doarg_int.verbose_level);
+  VRB.Set(doarg_int.verbose_level);
 if (!UniqueID())
   printf("verbose_level =%d\n",VRB.Level());
 //  exit(-31);
@@ -516,7 +517,7 @@ void GlobalJobParameter::Bc(int dir, BndCndType cond){
 
 int GlobalJobParameter::argc(void){
 
-  char *fname="argc()";
+  const char *fname="argc()";
   if (!arg_set){
     ERR.General(cname,fname,"ERROR: GJP.argc not initialized\n");
     exit(-1);
@@ -526,7 +527,7 @@ int GlobalJobParameter::argc(void){
 
 int *GlobalJobParameter::argc_p(void){
 
-  char *fname="argc_p()";
+  const char *fname="argc_p()";
   if (!arg_set){
     ERR.General(cname,fname,"ERROR: GJP.argc not initialized\n");
     exit(-1);
@@ -537,7 +538,7 @@ int *GlobalJobParameter::argc_p(void){
 
 char** GlobalJobParameter::argv(void){
 
-  char *fname="argv()";
+  const char *fname="argv()";
   if (!arg_set){
     ERR.General(cname,fname,"ERROR: GJP.argv not initialized\n");
     exit(-1);
@@ -548,7 +549,7 @@ char** GlobalJobParameter::argv(void){
 
 char*** GlobalJobParameter::argv_p(void){
 
-  char *fname="argv_p()";
+  const char *fname="argv_p()";
   if (!arg_set){
     ERR.General(cname,fname,"ERROR: GJP.argv not initialized\n");
     exit(-1);

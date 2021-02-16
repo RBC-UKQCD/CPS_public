@@ -1,10 +1,7 @@
 // -*- mode:c++; c-basic-offset:4 -*-
 #include<config.h>
 #include<vector>
-#ifdef HAVE_VELOC
-#include<veloc.h>
 #include<util/time_cps.h>
-#endif
 #include<util/misc.h>
 #include<util/time_cps.h>
 CPS_START_NAMESPACE
@@ -86,43 +83,11 @@ public:
 //int  getVer(const char *cname,const char *fname){
 int  getVer(const char *_label){
    int veloc_v=-1;
-#ifdef HAVE_VELOC
-   Float dtime2 = -dclock();
-  {
-    VRB.Result(cname,"getVer()","VELOC_Restart_test %s\n",_label);
-    veloc_v = VELOC_Restart_test(_label,65536);
-    VRB.Result(cname,"getVer()","Veloc label version: %s %d\n",
-              _label,veloc_v);
-  }
-   dtime2 += dclock();
-//   print_flops(fname,"VeloC_Restart_test()",0,dtime2);
-#if 0
-    std::stringstream veloc_label;
-    veloc_label <<"MD_traj"<<traj_num;
-    std::string veloc_str = veloc_label.str();
-    std::cout <<"Veloc label: "<<veloc_str.c_str()<<std::endl;
-    veloc_v = VELOC_Restart_test(veloc_str.c_str(),65536);
-    VRB.Result(cname,fname,"Veloc label version: %s %d\n",
-              (veloc_str).c_str(),veloc_v);
-  }
-   dtime2 += dclock();
-   print_flops(fname,"VeloC_Restart_test()",0,dtime2);
-#endif
-#endif
    return veloc_v;
 }
 
 int protect (const char *cname,const char *fname, void *p, size_t m_size, int d_size){
  int veloc_id= -1;
-#ifdef HAVE_VELOC
- veloc_id= VeloCCounter();
-  Float dtime = -dclock();
-  VRB.Result(cname,fname,"VELOC_Mem_protect \n");
- VELOC_Mem_protect (  veloc_id  , p, m_size, d_size );
- VRB.Result(cname,fname,"VELOC id size=%d %d :%d\n",veloc_id,m_size,d_size);
- dtime +=dclock();
- print_flops(fname,"VeloC()",0,dtime);
-#endif
  return veloc_id;
 }
 
@@ -169,63 +134,7 @@ public:
 
     int checkpoint( const char *cname, const char *fname, int &i, int _steps) {
        Float dtime = -dclock();
-#ifdef HAVE_VELOC
-#if 1
-       std::string veloc_label , veloc_label2;
-       veloc_label = "MD_traj"+toString(traj_num);
-       veloc_label2 = "RNG_traj"+toString(traj_num);
-       int veloc_v = VELOC_Restart_test(veloc_label.c_str(),_steps+2);
-       VRB.Result(cname,fname,"Veloc label version i steps : %s %d %d %d\n",veloc_label.c_str(),veloc_v,i,_steps);
-       if(veloc_v == VELOC_FAILURE  || (veloc_v < (i+2) ) ){ // no restart, checkpoint
-        VELOC_Checkpoint_begin(veloc_label.c_str(), i+2 ); //leaving room for heatbath
-        VELOC_Checkpoint_selective(VELOC_CKPT_SOME,md_veloc_all.data(),md_veloc_all.size());
-//        VELOC_Checkpoint_mem();
-        VELOC_Checkpoint_end(1 );
-       if(veloc_v == VELOC_FAILURE  || (veloc_v <2 ) ){ // no restart, checkpoint
-       VRB.Result(cname,fname, "Veloc Checkpoint label2: %s .\n",veloc_label2.c_str());
-        LRG.Write(veloc_label2.c_str());
-#else
-       std::stringstream veloc_label , veloc_label2;
-       veloc_label <<"MD_traj"<<traj_num;
-       std::string veloc_str = veloc_label.str();
-       veloc_label2 <<"RNG_traj"<<traj_num;
-       std::string veloc_str2 = veloc_label2.str();
-//     int veloc_v = VELOC_Restart_test("MD_traj",_steps+2);
-       int veloc_v = VELOC_Restart_test((veloc_str).c_str(),_steps+2);
-       VRB.Result(cname,fname,"Veloc label version i steps : %s %d %d %d\n",(veloc_str.c_str()),veloc_v,i,_steps);
-// no restart, checkpoint
-       if(veloc_v == VELOC_FAILURE  || (veloc_v < (i+2) ) ){ 
-//leaving room for heatbath
-        VELOC_Checkpoint_begin((veloc_str).c_str(), i+2 ); 
-        VELOC_Checkpoint_mem();
-        VELOC_Checkpoint_end(1 );
-       if(veloc_v == VELOC_FAILURE  || (veloc_v <2 ) ){ // no restart, checkpoint
-       VRB.Result(cname,fname, "Veloc Checkpoint label2: %s .\n",(veloc_str2).c_str());
-        LRG.Write((veloc_str2).c_str());
-#endif
-        }
-        } else {
-       assert(veloc_v <(_steps+2));
-        i = veloc_v-2;
-#if 1
-        VELOC_Restart_begin (veloc_label.c_str(), i+2 );
-//        VELOC_Recover_mem();
-        VELOC_Recover_selective(VELOC_CKPT_SOME,md_veloc_all.data(),md_veloc_all.size());
-        VELOC_Restart_end(1 );
-       VRB.Result(cname,fname, "Veloc Recover label2: %s .\n",veloc_label.c_str());
-        LRG.Read(veloc_label2.c_str());
-#else
-        VELOC_Restart_begin (veloc_str.c_str(), i+2 );
-        VELOC_Recover_mem();
-        VELOC_Restart_end(1 );
-       VRB.Result(cname,fname, "Veloc Recover label2: %s .\n",(veloc_str2).c_str());
-        LRG.Read(veloc_str2.c_str());
-#endif
-       }
-       dtime += dclock();
-       print_flops(fname,"VeloC()",0,dtime);
-//       exit(-43);
-#endif
+// VELOC interface 
        return i;
     }
 

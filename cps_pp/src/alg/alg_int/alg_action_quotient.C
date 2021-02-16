@@ -305,10 +305,8 @@ fclose(fp);
 	else
 	  lat.SetPhi (phi[i], tmp2, tmp1, bsn_mass[i], DAG_NO);
       }
-#ifndef USE_VELOC
 	VRB.Result (cname,fname,"%p %p: phi[%d] = M(m_b) (1/MdagM(m_b)) Mdag(m_f)|R>=%e\n", phi[i],phi[i], i, lat.FhamiltonNode (phi[i],phi[i]) );
 	VRB.Result (cname,fname,"%p %p: <R|M(m_b) (1/MdagM(m_b)) Mdag(m_f)|R>=%e\n",tmp1,phi[i],  lat.FhamiltonNode (tmp1,phi[i]) );
-#endif
       Float total_h_i = h_i;
       glb_sum (&total_h_i);
       VRB.Result (cname, fname,
