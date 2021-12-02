@@ -3,7 +3,7 @@
 
 #define _FILE_OFFSET_BITS 64
 #include <mpi.h>
-#include <omp.h>
+#include <util/omp_wrapper.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>

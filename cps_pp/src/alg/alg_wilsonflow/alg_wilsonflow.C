@@ -10,7 +10,7 @@
 #include<util/link_buffer.h>
 #include<util/smalloc.h>
 #include <comms/scu.h>
-#include <omp.h>
+#include <util/omp_wrapper.h>
 
 
 CPS_START_NAMESPACE

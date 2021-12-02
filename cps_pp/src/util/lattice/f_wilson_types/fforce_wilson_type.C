@@ -12,7 +12,6 @@
 #include <util/lattice/fforce_wilson_type.h>
 #include <util/lattice/bfm_evo_aux.h>
 
-#include<omp.h>
 
 USING_NAMESPACE_CPS;
 
@@ -484,7 +483,7 @@ ForceArg FforceWilsonType::run()
 		}
 	    }else{
 		//shift mom[mu] field by xsites/2
-		for(long i=0;i<cps::GJP.VolNodeSites();i++){
+		for(size_t i=0;i<cps::GJP.VolNodeSites();i++){
 		    //i = (x + Lx*(y+Ly*(z+Lz*t) ) )
 		    int x = i % cps::GJP.XnodeSites();
 		    int pos_rem = i/cps::GJP.XnodeSites(); //(y+Ly*(z+Lz*t)

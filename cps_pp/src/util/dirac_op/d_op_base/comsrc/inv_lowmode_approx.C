@@ -30,54 +30,9 @@ CPS_START_NAMESPACE
 #include "cublas_v2.h"
 #include <cuComplex.h>
 #endif
-  CPS_START_NAMESPACE
-//void cDot (std::vector < Float * >)
-#if 0
-template < FLOAT1, FLOAT2 >
-  void compDotProduct (std::vector < Float > &result,
-                       const std::vector < FLOATA * >a,
-                       const std::vector < FLOATB * >b, int len)
-{
+CPS_START_NAMESPACE
 
-  int a_size = a.size ();
-  int b_size = b.size ();
-  result.resize (2 * a_size * b_size, 0.);
-//#pragma omp parallel for reduction(+:re,im)
-  for (int i = 0; i < a_size; i += a_step)
-    for (int j = 0; j < b_size; j += b_step)
-      for (int k = 0; k < len; j += c_step) {
-#pragma omp parallel for
-        for (int kk = 0; (kk < c_step) && ((k + kk) < c_size); kk++) {
-          std::vector < Float > re (a_step * b_step, 0);
-          std::vector < Float > in (a_step * b_step, 0);
-          size_t ind = 2 * (k + kk);
-          for (int ii = 0; (ii < a_step) && ((i + ii) < a_size); ii++) {
-            FLOATA *a_p = a[i + ii];
-            for (int jj = 0; (jj < b_step) && ((j + jj) < b_size); jj++) {
-              FLOATB *b_p = b[j + jj];
-              re[ii + a_step * jj] +=
-                *(a_p + ind) * *(b_p + ind) + *(a_p + ind + 1) * *(b_p + ind +
-                                                                   1);
-              im[ii + a_step * jj] +=
-                *(a_p + ind) * *(b_p + ind + 1) - *(a_p + ind + 1) * *(b_p +
-                                                                       ind);
-//       im+= a[i] * b[i+1] - a[i+1] * b[i];       // imag part
-            }
-          }
-          for (int ii = 0; (ii < a_step) && ((i + ii) < a_size); ii++)
-            for (int jj = 0; (jj < b_step) && ((j + jj) < b_size); jj++)
-#pragma omp critical
-            {
-              int ind = (i + ii) + a_size * (j + jj);
-              result[2 * ind] += re[ii + a_step * jj];
-              result[2 * ind + 1] += im[ii + a_step * jj];
-            }
-        }
-      }
-
-}
-#endif
-
+#ifdef USE_QUDA
 #undef USE_CUDA_MM
 #ifdef USE_CUDA_MM
 #define CUDA_MALLOC cudaMallocManaged
@@ -310,6 +265,7 @@ void cublasGS (std::vector < Vector * >&dest, std::vector < Vector * >&src,
 #undef CUDA_COMPLEX
 #undef MAKE_COMPLEX
 #undef ZAXPY
+#endif
 
 void movefloattoFloat (Float * out, float *in, size_t f_size);
 int DiracOp::InvLowModeApprox (std::vector < Vector * >&out,
@@ -474,8 +430,8 @@ int DiracOp::InvLowModeApprox (std::vector < Vector * >&out,
     }
 
   } else {
-#ifdef USE_QUDA
     Float dtime;
+#ifdef USE_QUDA
     if (1) {
       dtime = -dclock ();
       for (int i = 0; i < len; i++) {

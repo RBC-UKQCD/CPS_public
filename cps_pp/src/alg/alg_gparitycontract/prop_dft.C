@@ -33,9 +33,7 @@
 #include <bitset>
 #include <algorithm>
 
-#ifdef USE_OMP
-#include <omp.h>
-#endif
+#include <util/omp_wrapper.h>
 
 CPS_START_NAMESPACE
 

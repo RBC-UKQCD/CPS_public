@@ -22,7 +22,7 @@
 
 #include <util/gjp.h>
 #include <alg/correlationfunction.h>
-#include <omp.h>
+#include <util/omp_wrapper.h>
 CPS_START_NAMESPACE
 
 CorrelationFunction::CorrelationFunction(const char *_label, const ThreadType &thread): wick(NULL),wick_threaded(NULL),ncontract(0),threadtype(thread),global_sum_on_write(true), label(_label){

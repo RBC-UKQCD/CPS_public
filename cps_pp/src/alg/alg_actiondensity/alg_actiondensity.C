@@ -7,7 +7,7 @@
 #include <util/link_buffer.h>
 #include <comms/glb.h>
 #include <comms/scu.h>
-#include <omp.h>
+#include <util/omp_wrapper.h>
 #include <util/time_cps.h>
 CPS_START_NAMESPACE
 

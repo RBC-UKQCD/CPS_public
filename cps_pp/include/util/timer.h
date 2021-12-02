@@ -8,8 +8,8 @@
 
 #ifdef USE_PAPI
 #include <papi.h>
-#include <omp.h>
 #endif
+#include <util/omp_wrapper.h>
 
 #include <util/time_cps.h>
 #include <util/verbose.h>

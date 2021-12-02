@@ -3,7 +3,7 @@
 #include <config.h> 
 #include <alg/qpropw_s.h>
 #include <alg/wilson_matrix.h>
-#include <omp.h>
+#include <util/omp_wrapper.h>
 
 CPS_START_NAMESPACE
 

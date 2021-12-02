@@ -3,7 +3,6 @@
 
 #include <util/lattice/bfm_evo.h>
 
-#include <omp.h>
 #include <alg/eigen/Deflate.h>
 #include <alg/eigen/Francis.h>
 #include <cstdlib>
