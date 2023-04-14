@@ -41,7 +41,7 @@ endif
 
 LIBNAME = libcps
 
-all: rpcgenvml vml cps copy_testdir archive
+all: cps copy_testdir archive
 
 archive: cps
 	find $(BUILDDIR) \( -name '*.o' -o -name '*.xlo' \) -a -print0 | xargs -0 ${AR} rcs ${BUILDDIR}/$(LIBNAME).a
@@ -56,7 +56,7 @@ clean: recurse
 
 buildlib: recurse
 
-recurse: vml
+recurse: 
 #	@echo CONCUR = $(CONCUR)
 	mkdir -p $(BUILDDIR)/objs
 	touch -a $(BUILDDIR)/objs/Makefile_depend

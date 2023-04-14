@@ -91,9 +91,9 @@ if test "$enable_target" = "bgq"; then
    ARCHDIR="BGQ_DIR"
    TESTING_PARALLEL="yes";
    DFLAGS="${DFLAGS} -DUSE_OMP -DVEC_INLINE"
-   LDFLAGS="${LDFLAGS} -fopenmp"
+   LDFLAGS="-fopenmp ${LDFLAGS}"
    CFLAGS="${CFLAGS} -fopenmp"
-   CXXFLAGS="${CXXLAGS} -fopenmp"
+   CXXFLAGS="${CXXFLAGS} -fopenmp"
 
 #CK: Add an option to use bfm for noarch machines
 elif test "$enable_target" = "noarch-bfm"; then
@@ -128,8 +128,8 @@ fi
 dnl Need to put in machine/compiler specific optimisation flags here
 AC_ARG_ENABLE(openmp, 
 	AC_HELP_STRING([--enable-openmp], 
-	       [Compile with OpenMP. (default=no)]),
-	,[enable_openmp="no"])
+	       [Compile with OpenMP. (default=yes)]),
+	,[enable_openmp="yes"])
 AC_MSG_CHECKING([if using OpenMP])
 AC_MSG_RESULT($enable_openmp)
 if test "$enable_openmp" = "yes"; then
@@ -225,10 +225,10 @@ AC_MSG_CHECKING([if including cg-dwf])
 AC_MSG_RESULT($enable_cg_dwf)
 if test "$enable_cg_dwf" != "no"; then
 	if test "$enable_cg_dwf" != "yes"; then
-   		LDFLAGS="${LDFLAGS} -L${enable_cg_dwf} -ldwf-sse"
+   		LDFLAGS="-L${enable_cg_dwf} -ldwf-sse ${LDFLAGS}"
    		INCLUDE_FLAGS="${INCLUDE_FLAGS} -I${enable_cg_dwf}"
 	else
-   		LDFLAGS="${LDFLAGS} -L\${SRCDIR}/aux/cg-dwf-1.3.3 -ldwf-sse"
+   		LDFLAGS="-L\${SRCDIR}/aux/cg-dwf-1.3.3 -ldwf-sse ${LDFLAGS}"
    		INCLUDE_FLAGS="${INCLUDE_FLAGS} -I\${SRCDIR}/aux/cg-dwf-1.3.3"
 	fi
    	DFLAGS="${DFLAGS} -DUSE_CG_DWF"
@@ -272,16 +272,16 @@ AC_MSG_CHECKING([if including GMP mpfr])
 AC_MSG_RESULT($enable_mpfr)
 if test "$enable_gmp" != "no"; then
    DFLAGS="${DFLAGS} -DUSE_GMP"
-   LDFLAGS="${LDFLAGS} -lgmp"
+   LDFLAGS="-lgmp ${LDFLAGS}"
   if test "$enable_gmp" != "yes"; then
-   LDFLAGS="${LDFLAGS} -L${enable_gmp}/lib "
+   LDFLAGS="-L${enable_gmp}/lib  ${LDFLAGS}"
    INCLUDE_FLAGS="${INCLUDE_FLAGS} -I${enable_gmp}/include"
   fi
   if test "$enable_mpfr" != "no"; then
-     LDFLAGS="${LDFLAGS} -lmpfr"
+     LDFLAGS="-lmpfr ${LDFLAGS}"
      DFLAGS="${DFLAGS} -DUSE_MPFR"
     if test "$enable_mpfr" != "yes"; then
-     LDFLAGS="${LDFLAGS} -L${enable_mpfr}/lib "
+     LDFLAGS="-L${enable_mpfr}/lib ${LDFLAGS} "
      INCLUDE_FLAGS="${INCLUDE_FLAGS} -I${enable_mpfr}/include"
     fi
   fi
@@ -305,7 +305,7 @@ if test "$enable_qmp" != "no"; then
    QMP_CFLAGS=`${QMP_DIR}/bin/qmp-config --cflags`
    QMP_LDFLAGS=`${QMP_DIR}/bin/qmp-config --ldflags`
    QMP_LIBS=`${QMP_DIR}/bin/qmp-config --libs`
-   LDFLAGS="${LDFLAGS} ${QMP_LDFLAGS} ${QMP_LIBS}"
+   LDFLAGS="${QMP_LDFLAGS} ${QMP_LIBS} ${LDFLAGS}"
    INCLUDE_FLAGS="${INCLUDE_FLAGS} ${QMP_CFLAGS} "
    DFLAGS="${DFLAGS} -DUSE_QMP"
    TESTING_PARALLEL="yes";
@@ -329,7 +329,7 @@ if test "$enable_mdwf" != "no"; then
    MDWF_CFLAGS=`${MDWF_DIR}/bin/mdwf-config --cflags`
    MDWF_LDFLAGS=`${MDWF_DIR}/bin/mdwf-config --ldflags`
    MDWF_LIBS=`${MDWF_DIR}/bin/mdwf-config --libs`
-   LDFLAGS="${LDFLAGS} ${MDWF_LDFLAGS} ${MDWF_LIBS}"
+   LDFLAGS="${MDWF_LDFLAGS} ${MDWF_LIBS} ${LDFLAGS}"
    INCLUDE_FLAGS="${INCLUDE_FLAGS} ${MDWF_CFLAGS}"
    DFLAGS="${DFLAGS} -DUSE_MDWF"
 fi
@@ -342,11 +342,11 @@ if test "$enable_qio" != "no"; then
    QMP_CFLAGS=`${QMP_DIR}/bin/qmp-config --cflags`
    QMP_LDFLAGS=`${QMP_DIR}/bin/qmp-config --ldflags`
    QMP_LIBS=`${QMP_DIR}/bin/qmp-config --libs`
-   LDFLAGS="${LDFLAGS} ${QMP_LDFLAGS} ${QMP_LIBS}"
+   LDFLAGS="${QMP_LDFLAGS} ${QMP_LIBS} ${LDFLAGS}"
    INCLUDE_FLAGS="${INCLUDE_FLAGS} ${QMP_FLAGS} "
 if test "$enable_qio" != "yes"; then
    QIO_DIR=${enable_qio}
-   LDFLAGS="${LDFLAGS} -L${QIO_DIR}/lib"
+   LDFLAGS="-L${QIO_DIR}/lib ${LDFLAGS}"
    INCLUDE_FLAGS="${INCLUDE_FLAGS} -I${QIO_DIR}/include"
 fi
    LDFLAGS="${LDFLAGS} -lqio -llime "
@@ -370,10 +370,10 @@ if test "$enable_xml" != "no"; then
    XML_CFLAGS=`${XML_DIR}/bin/xml2-config --cflags`
    XML_LDFLAGS=`${XML_DIR}/bin/xml2-config --libs`
 
-   LDFLAGS="${LDFLAGS} ${XML_LDFLAGS}"
+   LDFLAGS="${XML_LDFLAGS} ${LDFLAGS}"
    INCLUDE_FLAGS="${INCLUDE_FLAGS} ${XML_CFLAGS}"
    else 
-   LDFLAGS="${LDFLAGS} ${XML_LDFLAGS}"
+   LDFLAGS="${XML_LDFLAGS} ${LDFLAGS}"
    INCLUDE_FLAGS="${INCLUDE_FLAGS} ${XML_CFLAGS}"
    fi
 fi
@@ -394,18 +394,18 @@ dnl     echo "BFM_DIR environment variable not set"
 
 
    if test "$enable_bfm" != "yes"; then
-      LDFLAGS="${LDFLAGS} -L${BFM_DIR}/lib "
+      LDFLAGS="-L${BFM_DIR}/lib ${LDFLAGS} "
       INCLUDE_FLAGS="-I${BFM_DIR}/include ${INCLUDE_FLAGS} "
    else
       BFM_DIR=${QMP_DIR}
-      LDFLAGS="${LDFLAGS} -L${QMP_DIR}/lib "
+      LDFLAGS="-L${QMP_DIR}/lib ${LDFLAGS} "
       INCLUDE_FLAGS="-I${QMP_DIR}/include ${INCLUDE_FLAGS} "
    fi
       DFLAGS="${DFLAGS} -DUSE_BFM -DUSE_BFM_MINV -DUSE_BFM_TM -DUSE_HDCG"
 
    #CK: don't assume QIO
    if test "$enable_qio" != "no"; then
-	LDFLAGS="${LDFLAGS} -lqio"
+	LDFLAGS="-lqio ${LDFLAGS}"
    fi		    					 
 
 dnl      LDFLAGS="${LDFLAGS} -lqdp -lXPathReader -lxmlWriter -lxml2 -lqio -lbfm -lgsl -lgslcblas -lqmp"
@@ -430,7 +430,7 @@ if test "$enable_xml" != "no"; then
    XML_CFLAGS=`${XML_DIR}/bin/xml2-config --cflags`
    XML_LDFLAGS=`${XML_DIR}/bin/xml2-config --libs`
 
-   LDFLAGS="${LDFLAGS} ${XML_LDFLAGS}"
+   LDFLAGS="${XML_LDFLAGS} ${LDFLAGS}"
    INCLUDE_FLAGS="${INCLUDE_FLAGS} ${XML_CFLAGS}"
 fi
 
@@ -478,7 +478,7 @@ dnl     echo "CUDA_DIR environment variable not set"
      CUDA_DIR=${enable_cuda}
    fi
    INCLUDE_FLAGS="${INCLUDE_FLAGS} -I${CUDA_DIR}/include"
-   LDFLAGS="${LDFLAGS} -L${CUDA_DIR}/lib64 -lcudart -lcuda"
+   LDFLAGS="${LDFLAGS} -L${CUDA_DIR}/lib64 -lcudart -lcuda -lcublas "
 fi
 
 dnl If --enable-cuda was given for --enable-quda case, program will stop.
@@ -497,11 +497,11 @@ AC_SEARCH_LIBS([fftw_execute],[fftw3],
 	[AC_DEFINE([USE_FFTW],[1],[Define 1 if you have fftw3 library])]
 	[enable_fftw=true])
 
-AC_SEARCH_LIBS([crc32],[z],
-	[AC_DEFINE([USE_ZLIB],[1],[Define 1 if you have zlib])]
-	[enable_zlib=true],
-	[AC_MSG_ERROR("zlib needed for crc32")]
-	)
+#AC_SEARCH_LIBS([crc32],[z],
+#	[AC_DEFINE([USE_ZLIB],[1],[Define 1 if you have zlib])]
+#	[enable_zlib=true],
+#	[AC_MSG_ERROR("zlib needed for crc32")]
+#	)
 
 #AC_ARG_ENABLE(fftw, 
 #	AC_HELP_STRING([--enable-fftw], 
@@ -535,10 +535,10 @@ AC_MSG_CHECKING([if including Grid])
 AC_MSG_RESULT($enable_grid)
 if test "$enable_grid" != "no"; then
 	if test "$enable_grid" != "yes"; then
-   		LDFLAGS="${LDFLAGS} -L${enable_grid}/build/Grid -lGrid"
+   		LDFLAGS="-L${enable_grid}/build/Grid -lGrid ${LDFLAGS}"
    		INCLUDE_FLAGS="${INCLUDE_FLAGS} -I${enable_grid}/ -I${enable_grid}/build/Grid "
 	else
-   		LDFLAGS="${LDFLAGS} -lGrid"
+   		LDFLAGS="-lGrid ${LDFLAGS}"
 	fi
    	CXXFLAGS="${CXXFLAGS} -std=c++11"
    	DFLAGS="${DFLAGS} -DUSE_GRID"
@@ -615,7 +615,10 @@ AC_SUBST(SRCDIR)
 AC_SUBST(BUILDDIR)
 
 dnl configuring version number
+echo "`git log -n 1 --format=format:"#define GITHASH \\"%H:%d\\"%n" HEAD`" > $srcdir/include/version.h
+#git log -n 1 --format=format:GITHASH=\\\"%H:%d\\\"%n\\\" HEAD > $srcdir/GITHASH
 .  $srcdir/VERSION
+#.  $srcdir/GITHASH
 echo CPS source: $srcdir
 echo "CPS Version MAJOR: ${VERSION_MAJOR}"
 echo "CPS Version MINOR: ${VERSION_MINOR}"
@@ -627,6 +630,7 @@ AC_SUBST(VERSION_MAJOR)
 AC_SUBST(VERSION_MINOR)
 AC_SUBST(VERSION_SUB)
 AC_SUBST(VERSION_STR)
+AC_SUBST(GITHASH)
 AC_SUBST(SRCDIR)
 AC_SUBST(BUILDDIR)
 
@@ -669,5 +673,3 @@ AC_OUTPUT(config.h \
           tests/regression.pl \
 	  include/input/Makefile\
 	  )	  
-#	  XLC.cfg \
-#          hdw_tests/Makefile_common \
